@@ -1,0 +1,64 @@
+# Node / npm / pnpm
+node_modules/
+dist/
+.pnpm-store/
+
+# Rust / Cargo
+target/
+# Keep Cargo.lock (application repo, not a library)
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+.eggs/
+*.whl
+
+# Build artifacts
+tauri-build*/
+*.app
+*.dmg
+*.deb
+*.rpm
+*.msi
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Databases
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# Editors / IDEs
+.DS_Store
+.idea/
+.vscode/
+# Re-include shared extension recommendations if added later
+# !.vscode/extensions.json
+
+# Test / coverage
+coverage/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+*.cover
+.coverage
+.coverage.*
+
+# Logs
+*.log
+
+# Misc
+*.bak
+*.tmp

@@ -1,7 +1,7 @@
 ---
 pass: "00"
 version: v0.0.0
-sha: PLACEHOLDER
+sha: becf6a3
 date: 2026-06-13
 summary: "Lattica repo bootstrap — git init, Aseptic adoption, requirements scaffolding"
 ---

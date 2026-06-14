@@ -72,6 +72,99 @@ original).
 
 ---
 
+## End-of-pass manifest snippets — reduce courier load
+
+When any Claude completes a pass (or any response) that writes coordination files
+or needs another Claude to chime in, the response ends with a structured manifest
+snippet per recipient. The developer copy-pastes these snippets verbatim to the
+recipient Claude's session.
+
+**Why this discipline exists:**
+
+The developer is the courier between Claude sessions. Couriering content (full
+relay text, file contents) is expensive — high context-switch load, error-prone,
+scales badly with project count. Couriering manifest snippets is cheap — short,
+grep-able, copy-paste-ready, and exercises the grounding-pass discipline.
+
+The recipient Claude reads the manifest, runs their grounding pass to find the
+referenced files in `~/Projects/lattica/docs/coordination/`, and acts on them.
+
+**Format:**
+
+```
+For <recipient-project>:
+- File: <absolute-path-to-file>
+- From: <source-project> (or "Lattica" for coordination-hub messages)
+- Action: <one-line ask — what they need to do>
+```
+
+One block per recipient project. Multiple files per recipient combine into one
+block:
+
+```
+For cerebra:
+- File: ~/Projects/lattica/docs/coordination/outbound/2026-06-14_lattica_to_cerebra_up-001-arm-trigger.md
+- File: ~/Projects/lattica/docs/coordination/cross-pollination/lattica/pass-0.3.0.md
+- From: Lattica
+- Action: Run UP-001 pre-flight per ASSIGNMENTS.md Cerebra section; file at UP-001/pre-flight/cerebra.md
+```
+
+**When to include a manifest snippet:**
+
+- Any coordination file was filed addressed to that project (inbound for them,
+  outbound from this Claude to them)
+- A cross-pollination file mirrors into their index requiring their review
+- A unified-passage phase moved and they participate
+- A platform decision was locked affecting their work
+- Their state-change is awaited (e.g., "waiting for Cerebra ACK")
+
+**When NOT to include a manifest snippet:**
+
+- The pass was purely internal (no cross-project impact)
+- The change is informational only — already covered by mail_routing.md
+- The project's role is wait-and-see, not take-action
+
+**Symmetric discipline:** every project Claude follows this, not just Lattica.
+Cerebra's pass reports include "For lattica:" / "For fossic:" snippets when
+their work affects those projects. Fossic does the same. Etc.
+
+**Hybrid forwarding:**
+
+- **Notification-only (default):** developer pastes the manifest snippet into the
+  recipient Claude's session. Recipient grounding-passes to find the referenced
+  files. Lower friction; exercises the discipline.
+- **Copy-paste fallback:** if the relay is urgent, load-bearing, or the recipient
+  has shown inconsistency at grounding-pass discipline, paste the full file
+  contents alongside the manifest. Belt-and-suspenders.
+
+The discipline takes load OFF the developer (less to courier) and ONTO the
+filesystem-based coordination hub (which was designed to take this load).
+
+**Example — Lattica completing a pass that touches Cerebra and Fossic:**
+
+```
+── PASS COMPLETE · v0.X.Y · 2026-06-14 ──
+[normal pass complete content]
+
+────────────────────────────────────────
+For cerebra:
+- File: ~/Projects/lattica/docs/coordination/outbound/2026-06-14_lattica_to_cerebra_<topic>.md
+- From: Lattica
+- Action: <one-line ask>
+
+For fossic:
+- File: ~/Projects/lattica/docs/coordination/outbound/2026-06-14_lattica_to_fossic_<topic>.md
+- From: Lattica
+- Action: <one-line ask>
+```
+
+This pattern subsumes the previous "For <project>:" section convention (P-012
+in COORDINATION_PATTERNS.md). The structured manifest replaces narrative
+description — narrative is fine for context but the manifest is what the
+developer actually forwards.
+
+---
+
 ## Current state — your project's living dashboard
 
 Each project maintains `~/Projects/lattica/docs/coordination/current-states/<your-project>/current_state.md`. 

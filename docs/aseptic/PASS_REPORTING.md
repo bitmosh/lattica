@@ -1,6 +1,6 @@
 ---
 title: Pass Reporting — Structured Format
-last_reviewed: v0.2.1.c
+last_reviewed: v0.2.1v
 ---
 
 # Pass Reporting — Structured Format
@@ -207,40 +207,40 @@ blast-radius must point to a reachable commit.
 
 ---
 
-## End-of-pass-report "For <project>:" sections
+## End-of-pass manifest snippets — structured format
 
-Every pass-completion report (the message the developer sees when a pass closes) ends
-with one "For <project>:" section per affected adjacent project. Each section is a
-short copy-paste snippet the developer can forward verbatim to the named project's
-Claude session.
+Every pass-completion report ends with structured per-recipient manifest snippets
+when the pass writes coordination files addressed to other projects or needs
+another Claude to chime in.
 
-**Format:**
+**Format (load-bearing — match exactly):**
 
 ```
-For cerebra: <one-paragraph snippet describing what's waiting and where>
-
-For fossic: <one-paragraph snippet>
+For <recipient-project>:
+- File: <absolute-path-to-file>
+- From: <source-project>
+- Action: <one-line ask>
 ```
 
-**Each snippet must be self-contained:** name a specific file or directory the project
-Claude should read, state what action (if any) they should take, and require no other
-context to act on.
+One block per recipient. Multiple files per recipient combine into one block
+with multiple `File:` lines.
 
-**Include when:** A coordination file was filed addressed to that project; a
-cross-pollination mirror requires their review; a unified-passage phase changed and
-they participate; a platform decision was locked affecting their work; another
-project's state change affects their dependencies.
+**Why structured rather than narrative:** the developer copy-pastes these
+verbatim to the recipient Claude's session. Structured snippets are
+grep-able, unambiguous, and reduce courier load. Narrative descriptions
+require the developer to extract the actionable bits manually.
 
-**Omit when:** The pass was purely internal (no cross-project impact); the change is
-informational only and covered by `mail_routing.md`; the project's role is wait-and-see
-rather than take-action (surface via current-state instead).
+**Include when:** coordination files were filed addressed to that project; a
+cross-pollination mirror requires their review; a unified-passage phase
+changed and they participate; a platform decision was locked affecting them;
+another project's state-change affects their dependencies.
 
-**Symmetric discipline:** project Claudes' own end-of-pass reports also include
-"For <project>:" sections when their work affects others. Not just Lattica.
+**Omit when:** pass was purely internal; informational-only changes covered
+by mail_routing.md; project's role is wait-and-see.
 
-**Why this matters:** the developer is the courier between Claude sessions. Pre-drafted
-per-project snippets reduce courier overhead to the minimum — read the report, see
-who has mail, forward.
+**Symmetric discipline:** project Claudes (Cerebra, Fossic, etc.) follow this
+in their own end-of-pass reports too. Not just Lattica.
 
-See `docs/coordination/COORDINATION_PATTERNS.md` P-012 for the platform-shared version
-of this pattern.
+See `docs/coordination/COORDINATION_PROTOCOL.md` "End-of-pass manifest
+snippets — reduce courier load" for the platform-wide canonical version of
+this pattern.

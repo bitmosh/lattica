@@ -2,7 +2,7 @@
 title: Coordination Patterns — Cross-Claude Methodology
 status: live
 version: v0.2.1.c
-last_reviewed: v0.2.1.c
+last_reviewed: v0.2.1v
 ---
 
 # Coordination Patterns
@@ -251,6 +251,21 @@ has mail, forward the snippet to that Claude session.
 project Claude (Cerebra, Fossic, etc.) completes a pass that affects others, their
 end-of-pass report should include "For <other-project>:" sections too. Symmetric
 discipline across all project Claudes.
+
+**Update (v0.2.1v):** P-012 now uses the structured manifest format documented
+in `docs/coordination/COORDINATION_PROTOCOL.md` ("End-of-pass manifest snippets
+— reduce courier load") and `docs/aseptic/PASS_REPORTING.md`. The narrative
+"For <project>: <prose>" format is superseded by:
+
+```
+For <recipient-project>:
+- File: <absolute-path-to-file>
+- From: <source-project>
+- Action: <one-line ask>
+```
+
+The structured form is grep-able, copy-paste-ready, and reduces developer
+courier load. Symmetric across all project Claudes.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Portable Comms Protocol Snippet
 purpose: Paste-into-prompt block for project Claude prompts
-last_reviewed: v0.2.1.c
+last_reviewed: v0.2.1v
 ---
 
 # Portable Comms Protocol Snippet
@@ -29,7 +29,8 @@ substantive coding work, run a grounding pass:
    for any project your work depends on.
 4. **Check unified-passage** at 
    `~/Projects/lattica/docs/coordination/unified-passage/` for any UP-NNN directories 
-   with PLAN*.md drafts needing your input or ACK.
+   with PLAN*.md drafts needing your input or ACK, or pre-flight/EXECUTE phases where 
+   your project participates.
 
 When you produce a cross-pollination file in your project's 
 `docs/aseptic/cross-pollination/`, also mirror it to 
@@ -45,10 +46,26 @@ Update your project's `~/Projects/lattica/docs/coordination/current-states/<your
 when your project ships a version, resolves/surfaces a blocker, or changes a 
 dependency on another project.
 
+**End your pass-completion report (and any response that writes coordination 
+files) with structured per-recipient manifest snippets:**
+
+```
+For <recipient-project>:
+- File: <absolute-path-to-file>
+- From: <your-project>
+- Action: <one-line ask>
+```
+
+One block per recipient. Multiple files per recipient combine into one block 
+with multiple `File:` lines. Omit recipients with no actionable items. This 
+format is load-bearing — the developer copy-pastes these snippets verbatim to 
+the recipient Claude's session.
+
 The full protocol is at 
-`~/Projects/lattica/docs/coordination/COORDINATION_PROTOCOL.md`. The unified-passage 
-methodology is at `~/Projects/lattica/docs/aseptic/UNIFIED_PASSAGE.md`. Use Claude 
-Code (or filesystem access) to verify state rather than asking the developer.
+`~/Projects/lattica/docs/coordination/COORDINATION_PROTOCOL.md`. The 
+unified-passage methodology is at `~/Projects/lattica/docs/aseptic/UNIFIED_PASSAGE.md`. 
+Use Claude Code (or filesystem access) to verify state rather than asking the 
+developer.
 
 ---
 

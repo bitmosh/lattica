@@ -2,8 +2,9 @@
 pass: 0.2.1.a
 version: v0.2.1.a
 sha: 59cb98f
+sha_phase3: 5ab6e25
 date: 2026-06-14
-summary: Coordination briefing distributed to all projects; superseded relay-response placeholder annotated
+summary: Coordination briefing distributed to all projects; superseded relay-response placeholder annotated; living reports bumped to v0.2.1.a
 ---
 
 # Blast Radius — Pass 0.2.1.a (v0.2.1.a)
@@ -14,14 +15,10 @@ current protocol; annotate the stale relay-response placeholder as superseded.
 
 ## Version note
 
-Living reports are at `v0.2.1.b` at time of this commit. This is because "prompt B"
-(the second part of the two-prompt series this pass belongs to) was accidentally
-distributed to other project Claudes before "prompt A" was executed by Lattica Claude.
-Those Claudes partially executed prompt B (bumping the living report version) before
-being stopped. This pass is correctly labeled `v0.2.1.a` as its canonical identifier;
-living reports were NOT rolled back to `v0.2.1.a` to avoid a version regression.
-The blast-radius artifact for `v0.2.1.b` content was never created; the only `v0.2.1.b`
-action that landed was the living report version bump.
+This pass was executed in two phases due to accidental B-prompt distribution to 5 other
+project Claudes. Those Claudes bumped living reports to `v0.2.1.b` before being stopped.
+Phase 3 (B-prompt completion) overwrote those version strings with the correct `v0.2.1.a`
+identifier. `sha_phase3` above records the living-report correction commit.
 
 ## Files
 
@@ -41,6 +38,10 @@ action that landed was the living report version bump.
 - `docs/coordination/inbound/2026-06-13_fossic_to_lattica_round1-relay-response.md` —
   status changed from `placeholder` to `superseded`; body replaced with superseded notice
 - `docs/coordination/mail_routing.md` — appended pass v0.2.1.a section (superseded entry + 6 mirror entries)
+- `docs/aseptic/TECH_DEBT.md` — `last_reviewed: v0.2.1.a` (was `v0.2.1.b`, overwritten)
+- `docs/aseptic/POLISH_DEBT.md` — `last_reviewed: v0.2.1.a` (was `v0.2.1.b`, overwritten)
+- `docs/aseptic/DEVIATION.md` — `last_reviewed: v0.2.1.a` (was `v0.2.1.b`, overwritten)
+- `docs/aseptic/README.md` — `version: v0.2.1.a` (was `v0.2.1.b`, overwritten)
 
 ### Deleted
 
@@ -52,8 +53,8 @@ None.
 
 ## Living report updates
 
-No new TECH_DEBT, POLISH_DEBT, or DEVIATION entries this pass. Living reports already at
-`v0.2.1.b` due to version anomaly described above — not bumped further.
+No new TECH_DEBT, POLISH_DEBT, or DEVIATION entries this pass. All four living reports
+bumped to `v0.2.1.a` (overwriting accidental `v0.2.1.b` version strings).
 
 ## Adjacent project impact
 

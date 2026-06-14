@@ -62,8 +62,9 @@ is accepted.
 
 **Locked convention for Phase 2:**
 
-- Cerebra emits `ActionProposed` in stream `cerebra/agent-trace/<cycle_id>`
+- Cerebra emits `ActionProposed` in stream `cerebra/agent-trace/<session_id>`
   at the moment it submits a command to an external gate
+  _(correction: original said `<cycle_id>` — see `2026-06-14_lattica_to_policy-scout_stream-key-correction.md`)_
 - Policy-scout's `CommandRequested` fossic event carries:
   `causation_id = ActionProposed.event_id`
 - The `upstream_causation_id` field on `CommandRequested` is the payload

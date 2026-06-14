@@ -97,7 +97,8 @@ Not every cycle invokes the catalyst. The chain
 the action proposal is not caused by arm selection directly.
 
 **Revised proposal:** Introduce a dedicated `ActionProposed` event in
-Cerebra's `cerebra/agent-trace/<cycle_id>` stream that fires at the moment
+Cerebra's `cerebra/agent-trace/<session_id>` stream that fires at the moment
+_(note: original said `<cycle_id>` — Cerebra self-corrected in the 3-way session; see `2026-06-14_cerebra_to_policy-scout_actionproposed-briefing.md`)_
 Cerebra submits a command to an external evaluator (policy-scout). Payload:
 
 ```json
@@ -115,7 +116,7 @@ Policy-scout's `ContextGathered` would reference `ActionProposed.event_id`
 as its `causation_id`. The chain becomes:
 
 ```
-cerebra/agent-trace/<cycle_id>:
+cerebra/agent-trace/<session_id>:
   StepExecuted → ActionProposed
 
 policy_scout/requests/<request_id>:

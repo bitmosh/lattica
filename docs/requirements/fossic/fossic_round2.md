@@ -25,7 +25,7 @@ substrate behavior against each glob pattern in the map:
 |---|---|---|
 | `**` | All events in the store | `**` matches any depth — confirmed |
 | `cerebra/**` | All Cerebra streams | Matches `cerebra/agent-trace/*` and `cerebra/lattice/*` — correct |
-| `cerebra/agent-trace/*` | All Cerebra cycle streams | `*` = one segment — matches `cerebra/agent-trace/<cycle_id>` for any `cycle_id` |
+| `cerebra/agent-trace/*` | All Cerebra session streams | `*` = one segment — matches `cerebra/agent-trace/<session_id>` for any `session_id` _(correction: original said `<cycle_id>` — Cerebra streams are session-scoped, not cycle-scoped)_ |
 | `policy-scout/audit/*` | All Policy Scout audit streams | `*` = one segment — matches `policy-scout/audit/<request_id>` |
 | `bot/**` | All Bo streams | Matches `bot/conversation/<channel_id>` and `bot/lifecycle` — correct |
 | `ai-stack/**` | All ai-stack streams | Matches `ai-stack/models`, `ai-stack/gpu`, `ai-stack/inference` — correct |
@@ -130,6 +130,11 @@ subscription to `cerebra/agent-trace/*` would still catch all of them, but the
 grouping logic in the R-CB-003 tile should group by `session_id` (payload
 field), not by stream segment, to reconstruct the session tree correctly. This
 is an implementation note for Cerebra's tile work, not a fossic constraint.
+
+> **ANSWERED (2026-06-14):** The segment is `session_id`. Cerebra confirmed in
+> the 3-way session that streams are session-scoped, not cycle-scoped.
+> See `2026-06-14_lattica_to_fossic_stream-key-and-vocab-sibling.md` — Lattica
+> has asked Fossic to update `AGENT_TRACE_VOCABULARY.md §7.5` accordingly.
 
 **Verdict for R-CB-003:** No blocking infrastructure gap. The glob subscription
 approach is confirmed as architecturally sound. R-CB-003 sequenced after R-CB-002

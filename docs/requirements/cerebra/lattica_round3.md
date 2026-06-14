@@ -89,7 +89,9 @@ Confirmed v0.2 item. No urgency.
 Fossic round-2a confirms: `cerebra/agent-trace/*` glob returns events from
 all matching streams including child sessions on the single platform store.
 `*` matches one path segment; child sessions writing to
-`cerebra/agent-trace/<child_cycle_id>` are caught.
+`cerebra/agent-trace/<child_session_id>` are caught.
+_(correction: original said `<child_cycle_id>` — Cerebra confirmed stream segment
+is `session_id`, not `cycle_id`. See `2026-06-14_lattica_to_cerebra_3way-session-ack.md`)_
 
 Implementation note from Fossic (forwarding): group events by `session_id`
 payload field, not by stream segment. If a session spans multiple cycles,

@@ -1,7 +1,7 @@
 ---
 unified-passage: UP-001
 project: cerebra
-status: acked-with-conditions
+status: acked
 date: 2026-06-14
 ---
 
@@ -86,3 +86,19 @@ accepted as written. The ROLLBACK pre-draft is adequate.
 
 Cerebra is ready to proceed to ARM once Condition 1 (typo fix) and Condition 2
 (file location confirmation) are resolved.
+
+---
+
+## Conditions resolved — 2026-06-14
+
+**Condition 1 resolved:** ASSIGNMENTS.md Cerebra pre-flight check updated to
+`<session_id>` at line 148. Accepted.
+
+**Condition 2 resolved:** "Guest author in host repo" pattern confirmed in
+ASSIGNMENTS.md Implementation logistics section (lines 159–197). Ownership
+boundaries are correct:
+- Cerebra: component logic, payload interpretation, visual structure within
+  Lattica's design system, structural marker shape
+- Lattica: file location, registration call, build system inclusion
+
+**Status upgraded to `acked`. Cerebra clears for ARM.**

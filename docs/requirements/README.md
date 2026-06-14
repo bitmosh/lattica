@@ -59,22 +59,22 @@ requirements/
 
 ## Current round status
 
-**Round 1 — OPEN (waiting for deposits)**
+**Round 1 — OPEN (ready for synthesis)**
 
 Deposits received:
 - [x] fossic — `fossic/requirements.md` filed 2026-06-13
+- [x] ai-stack — `ai-stack/requirements.md` filed 2026-06-13
+- [x] bo — `bo/requirements.md` filed 2026-06-13
+- [x] lumaweave — `lumaweave/requirements.md` filed 2026-06-13
+- [x] policy-scout — `policy-scout/requirements.md` filed 2026-06-13
+- [x] cerebra — `cerebra/requirements.md` filed 2026-06-13
 
-Pending:
-- [ ] lumaweave
-- [ ] cerebra
-- [ ] policy-scout
-- [ ] bo
-- [ ] ai-stack
-- [ ] rhyzome (benched — not required for round 1)
-- [ ] bonsai (benched — not required for round 1)
+Benched (not required for round 1):
+- [ ] rhyzome
+- [ ] bonsai
 
-Round 1 synthesis will open when lumaweave and cerebra have both deposited
-(minimum quorum for cross-project decisions).
+Round 1 synthesis quorum met. All active projects deposited. Lattica Claude
+may proceed to `group-rounds/round-01.md`.
 
 ---
 

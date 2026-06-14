@@ -3,7 +3,7 @@
 **Project:** policy-scout
 **Maintainer:** Policy Scout Claude (living doc — update on each
 significant state change)
-**Last updated:** 2026-06-13
+**Last updated:** 2026-06-14
 **Version:** 0.3.6
 
 This is a living document for Lattica Claude to track policy-scout's
@@ -182,6 +182,67 @@ adapter design to be resolved first.
   HITL approval view with expiry filter and group-by-command dedup;
   sandbox migration flow; lockdown/watch status; Check view now has
   Check/Simulate tab pair
+
+---
+
+## Lattica coordination — locked decisions (rounds 1–3, closed 2026-06-14)
+
+The three-round requirements exchange with Lattica Claude is complete.
+Decisions that affect policy-scout's implementation:
+
+**IPC surface for Lattica tiles:**
+- `get_system_health` unified handler — **action item, not yet wired.**
+  Returns `{ lockdown: LockdownStatusData, watch: WatchStatusData }` in
+  one subprocess call. Replaces two-call pattern Lattica would otherwise
+  use. Individual `get_lockdown_status` / `get_watch_status` handlers remain.
+- All other 27 handlers usable by Lattica today as-is.
+- Approval tile: event-driven refresh only (fetch on tile open + manual
+  refresh button). No background polling timer.
+
+**Fossic Phase 2 — stream and causation convention (locked):**
+- Stream pattern: `policy-scout/audit/<request_id>` for all governance events.
+- Lattica subscribes via glob `policy-scout/audit/*`.
+- Platform fossic store: `~/.lattica/fossic/store.db` (ADR-L-004, single store).
+- Causation anchor: Cerebra emits `ActionProposed` (v0.2 event) in stream
+  `cerebra/agent-trace/<cycle_id>` when submitting a command to an external
+  gate. Policy-scout's `CommandRequested` fossic event carries
+  `causation_id = ActionProposed.event_id` (via `upstream_causation_id` field
+  on the `CommandRequested` event payload). `walk_causation` from any
+  `DecisionIssued` reaches `ActionProposed` in one hop.
+- Timing: Phase 2, pending fossic-py approval. No Phase 1 action needed.
+
+**Canonical event type names (Lattica tile code must use these):**
+
+| Display label | Canonical `event_type` |
+|---|---|
+| Policy Check | `CommandRequested` |
+| Policy Decision | `DecisionIssued` |
+| Approval Request | `ApprovalRequested` |
+| Sandbox Complete | `SandboxInstallCompleted` |
+| Sweep Complete | `SweepCompleted` |
+
+Full Phase 2 fossic stream:
+```
+CommandRequested → CommandParsed → CommandClassified
+→ PolicyMatched → DecisionIssued
+→ ApprovalRequested? → ApprovalApprovedOnce | ApprovalDeniedOnce
+→ SandboxInstallStarted? → SandboxInstallCompleted?
+→ CommandExecutionCompleted | CommandExecutionBlocked
+```
+
+**Architectural constraints from ADR-009 (Lattica hybrid composition):**
+- Policy-scout is Mode A only — no standalone Tauri frontend in Lattica.
+  Renderer components and governance tiles run inside Lattica's shell.
+- Approve/deny buttons are explicitly disabled (not silently no-op'd) when
+  policy-scout backend is offline. Lattica enforces this client-side;
+  Rust handler re-checks decision server-side. Both layers check.
+- `run_command_through_gate` button never shown in Lattica UI for DENY /
+  SANDBOX_FIRST / REQUIRE_APPROVAL decisions.
+
+**Payload renderer registry (R-PS-005):**
+- Pending `payloadRendererRegistry` creation by LumaWeave Claude.
+- Policy-scout will register renderers for: `DecisionIssued`,
+  `ApprovalRequested`, `SandboxInstallCompleted`, `SweepCompleted`.
 
 ---
 

@@ -112,6 +112,7 @@ Dependency-free (stdlib only).
 | Item | Notes | Target phase |
 |---|---|---|
 | `cerebra run-cycle` CLI command | Cycle execution is library-only; no CLI entry point | Phase 10 |
+| ~~Re-injection (`ReinjectionTriggered`)~~ | **✅ Shipped — Phase 9 Step 4, b175874** | Done |
 | `cerebra/lattice/*` event vocabulary (formal) | Writes are live but the vocabulary addendum doc is incomplete | Phase 10 |
 | Re-injection / continuation (`ReinjectionTriggered`) | `ContinuationBundleCreated` logic exists; spawning a child session is not wired | Phase 10 |
 | Consolidation (`ConsolidationStarted/Completed`) | Schema and event types defined; the `cerebra consolidate` CLI command is stubbed | Phase 10 |
@@ -191,7 +192,7 @@ indicates something worth surfacing:
 | `LeewayGrantApplied.final_decision == "forbidden"` | A write was blocked by governance; user may want to know |
 | `CycleCompleted.outcome == "cap_reached"` | Cycle hit step cap without natural stop; may indicate loop |
 | `ContinuationBundleCreated.truncation_applied == true` | Bundle hit size limit; context was compressed |
-| `ReinjectionTriggered.recursion_cap_hit == true` | Max recursion depth reached; chain terminated |
+| No `ReinjectionTriggered` after `SessionFlushed` (and session has `recursion_depth > 0`) | Max recursion depth reached; chain terminated — depth-limit block emits no event in v0.1; `ReinjectionBlocked` planned for v0.2 |
 | `StepExecutionFailed` | LLM call failed after retry; check model endpoint health |
 | `ContextPacketBuilt.abstained == true` | Retrieval returned nothing above floor; step ran without memory context |
 

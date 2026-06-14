@@ -209,16 +209,25 @@ When a cycle hits context budget or the Clutch issues a continuation:
 - `recursion_depth`, `bundle_size_bytes`
 - `truncation_applied` — whether the bundle hit the size cap
 
-`ReinjectionTriggered` records:
-- `child_session_id` — the new session spawned
-- `trigger_reason` — `context_budget` / `clutch_spawn` / `explicit_continuation`
-- `recursion_cap_hit` — whether the max recursion depth was reached
+`ReinjectionTriggered` records (actual payload — Phase 9 Step 4, b175874):
+- `session_id` — parent session that terminated
+- `cycle_id` — parent cycle_id
+- `trigger_predicate` — predicate that fired (`"max_steps_without_acceptance"` in v0.1)
+- `continuation_bundle_id` — ID of the distilled ContinuationBundle
+- `child_session_id` — the newly spawned child session
+- `recursion_depth` — CHILD's depth (parent_depth + 1; NOT parent depth)
+- `triggered_at` — Unix epoch milliseconds
+
+**Depth-limit block:** When `recursion_depth >= max_recursion_depth` blocks
+re-injection, **no event is emitted.** `SessionFlushed` is the last event on
+the parent stream. A `ReinjectionBlocked` event is planned for v0.2 to make
+terminal chain nodes observable from fossic alone.
 
 The `parent_session_id` on the child's `SessionOpened` closes the link.
 Together these form a walkable parent→child session tree.
 
 **Visualization potential:** Session lineage tree, recursion depth indicator,
-trigger reason annotation on each edge, cap-hit warning on terminal nodes.
+trigger predicate annotation on each edge. (R-CB-003, queued v0.2.0)
 
 ---
 

@@ -1,7 +1,7 @@
 # LumaWeave — Capabilities Inventory
 
 **Project:** lumaweave
-**Last updated:** 2026-06-13
+**Last updated:** 2026-06-14
 **Status:** Living document
 
 This file catalogs what LumaWeave offers to the Lattica platform — capabilities
@@ -100,10 +100,12 @@ in the theme inspector tile. All production tokens have been WCAG-audited.
 
 **What:** 20+ typed registries, two tiers:
 - **T1 (static):** `const`-array + pure helpers, no subscription. Examples:
-  `physicsDialectRegistry`, `systemIndexRegistry`, `themeTargetRegistry`
+  `physicsDialectRegistry`, `systemIndexRegistry`, `themeTargetRegistry`,
+  `commandRegistry` (`src/control-plane/commands/command-registry.ts` — 25+ commands,
+  `register()` / `getAll()` / `getById()`, no subscribe)
 - **T2 (runtime-reactive):** `register()` + `subscribe()` pattern. Examples:
   `sourceAdapterRegistry`, `tileSectionRegistry`, `inspectorSpokeRegistry`,
-  `commandRegistry`
+  `payloadRendererRegistry`
 
 T2 registries are the extensibility surface — modules register into them at
 startup without modifying core.
@@ -207,6 +209,56 @@ streaming response rendering.
 
 ---
 
+## Payload Renderer Registry
+
+**What:** T2 registry (`register()` + `subscribe()`) at
+`src/control-plane/payload-renderer/payloadRendererRegistry.ts`. External
+projects register type-aware React components that render fossic event payloads.
+LumaWeave is the composition host; the registry is permanent here.
+
+Entry shape:
+```typescript
+{
+  project: string;          // e.g. "cerebra", "policy-scout"
+  event_type: string;       // e.g. "SignalEvaluated"
+  component: ComponentType<{ payload: unknown; event_id: string }>;
+  label?: string;
+  stream_glob?: string;     // e.g. "cerebra/agent-trace/*"
+}
+```
+
+**Lookup:** `getPayloadRenderer(event_type, stream_path?)` — prefers
+stream_glob-specific match over wildcard. Minimal glob support: `*` (single
+segment), `**` (any depth).
+
+**Integration relevance:**
+- Cerebra R-CB-006, policy-scout R-PS-005, bo, and fossic R-F-006 all
+  contribute renderers here
+- No Lattica core modification needed to add a renderer
+
+**Phase:** Live as of this pass.
+
+---
+
+## Portfolio Token System
+
+**What:** `src/styles/portfolio-tokens.css` — 10 shared CSS custom properties
+that cross-project tile renderers reference instead of `--lw-*` internal tokens.
+
+Structural (6): `--portfolio-bg`, `--portfolio-surface`, `--portfolio-text-primary`,
+`--portfolio-text-secondary`, `--portfolio-accent`, `--portfolio-border`.
+
+Semantic status (4): `--portfolio-color-danger`, `--portfolio-color-success`,
+`--portfolio-color-warning`, `--portfolio-color-info`.
+
+All map to `--lw-*` tokens with hex fallbacks that cover all LumaWeave themes.
+The `--lw-color-*` status tokens are newly introduced in `lumaweave-visual-handles.css`
+as base defaults; themes may override them.
+
+**Phase:** Live as of this pass.
+
+---
+
 ## Capabilities NOT currently available
 
 These are planned but not implemented:
@@ -215,6 +267,7 @@ These are planned but not implemented:
 - **Push event test mock** — `listen()` path has no test shim (R-LW-008)
 - **Portfolio graph generation** — self-graph only today
 - **gwells as standalone package** — currently internal only
+- **moduleRegistry** — does not exist; was an aspirational claim, removed
 
 ---
 

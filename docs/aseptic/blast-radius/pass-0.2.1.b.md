@@ -1,7 +1,7 @@
 ---
 pass: 0.2.1.b
 version: v0.2.1.b
-sha: content-absorbed-into-08fc325 (v0.2.1.c); living-report-close: <will-record>
+sha: content-absorbed-into-08fc325 (v0.2.1.c); living-report-close: 7850adb
 date: 2026-06-14
 summary: Methodology bundle — unified passage doc, template, PLAN/ADR naming convention, grounding-pass discipline, portable comms snippet
 ---

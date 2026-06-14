@@ -1,6 +1,6 @@
 ---
 title: Lattica Now — Live State
-status: Phase 0 — Bootstrap
+status: Phase 0 — Round 1 closed
 last_updated: 2026-06-13
 ---
 
@@ -12,13 +12,21 @@ file wins.
 
 ## Version
 
-`v0.0.0` — pre-Phase-0 bootstrap. No source code yet.
+`v0.1.0` — round-1 architectural lock. No source code yet.
 
 ## Current phase
 
-**Phase 0 — Platform Bootstrap.** Not yet started in code. Planning docs
-are committed; structural work (monorepo scaffolding, LumaWeave absorption,
-ADR-001 execution) has not begun.
+**Phase 0 — Platform Bootstrap.** Architecture locked at v0.1.0 via ADR-009
+(hybrid composition + selective webview embedding). Round-1 advocate coordination
+complete; all six project deposits received and responded. ADR-L-001 through
+ADR-L-005 family referenced in ADR-009; full content drafts in v0.1.1.
+
+**Round-1 summary:** Six project advocates (fossic, lumaweave, cerebra,
+policy-scout, ai-stack, bo) filed requirements, capabilities, and current_state
+deposits. Lattica Claude synthesized cross-project architecture and dispatched
+round-1 responses (`docs/requirements/<project>/lattica_round1.md`). Two
+outbound relays sent to fossic and lumaweave. Structural code work has not
+begun.
 
 ## What exists right now
 
@@ -72,9 +80,11 @@ For advocates writing requirements against fossic:
 
 ## Next moves
 
-1. Naming reconciliation pass (ES toolkit / lattica-es → fossic across docs)
-2. Open advocate requirements round 1: LumaWeave and Cerebra first
-3. Cross-project synthesis (group-rounds/round-01.md) when 3+ advocates
-   have deposited
-4. Phase 0 structural decisions: monorepo layout, LumaWeave absorption
-   timing, registry hook additions
+1. ADR-L family drafts (ADR-L-001 through ADR-L-005) — full content pass
+2. Naming reconciliation pass (PD-001 resolution — ES toolkit / lattica-es → fossic)
+3. Round-2 iterations:
+   - Cerebra ↔ policy-scout causation ID convention
+   - LumaWeave DV-001 confirmation (commandRegistry / moduleRegistry status)
+   - ai-stack / bo sidecar architecture (post fossic-py approval)
+4. Begin Mode A composition tile scaffolding — start with fossic R-F-001
+   (live event stream view as MVP)

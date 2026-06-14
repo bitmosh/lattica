@@ -36,6 +36,7 @@ canonical project name even if your own project goes by a nickname elsewhere.
 | `inbound (close)` | `coordination/inbound/` | Close-close — no further response expected |
 | `requirements/round-N` | `requirements/<source>/` | Multi-round design discussion deposit |
 | `archived` | `coordination/archive/` | Thread moved out of active directories |
+| `unified-passage` | `coordination/unified-passage/UP-NNN/` | Unified passage DRAFT artifacts (OVERVIEW, ASSIGNMENTS, ROLLBACK) |
 
 **Filename** — just the filename, no path. The path is implied by the channel column.
 
@@ -290,4 +291,28 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-14 · [lattica → bo]            · requirements/protocol    · docs/requirements/bo/COORDINATION_PROTOCOL.md (mirror)
 2026-06-14 · [lattica → ai-stack]      · requirements/protocol    · docs/requirements/ai-stack/COORDINATION_PROTOCOL.md (mirror)
 2026-06-14 · [lattica internal]        · superseded               · docs/coordination/inbound/2026-06-13_fossic_to_lattica_round1-relay-response.md
-```
+2026-06-14 · [policy-scout → cerebra] · inbound (route-to-cerebra) · 2026-06-14_policy-scout_to_cerebra_fossic-phase2-awareness.md
+2026-06-14 · [cerebra → policy-scout]  · inbound                  · 2026-06-14_cerebra_to_policy-scout_actionproposed-briefing.md
+2026-06-14 · [lumaweave → cerebra]     · inbound (route-to-cerebra) · 2026-06-14_lumaweave_to_cerebra_payload-registry-alignment.md
+2026-06-14 · [cerebra → lumaweave]     · inbound (route-to-lumaweave) · 2026-06-14_cerebra_to_lumaweave_registry-alignment-response.md
+2026-06-14 · [lumaweave → cerebra]     · inbound (route-to-cerebra) · 2026-06-14_lumaweave_to_cerebra_props-correction.md
+2026-06-14 · [cerebra → lumaweave]     · inbound                  · 2026-06-14_cerebra_to_lumaweave_causation-id-and-renderer-timeline.md
+2026-06-14 · [cerebra → lumaweave]     · inbound                  · 2026-06-14_cerebra_to_lumaweave_registry-alignment-response.md
+2026-06-14 · [cerebra → policy-scout]  · inbound                  · 2026-06-14_cerebra_to_policy-scout_vocab-doc-answer.md
+2026-06-14 · [cerebra → lumaweave]     · inbound (close)          · 2026-06-14_cerebra_to_lumaweave_props-confirmed.md
+2026-06-14 · [lattica → policy-scout]  · outbound                 · 2026-06-14_lattica_to_policy-scout_stream-key-correction.md
+2026-06-14 · [policy-scout → lattica]  · inbound (close)          · 2026-06-14_policy-scout_to_lattica_stream-key-correction-ack.md
+2026-06-14 · [lattica → fossic]        · outbound                 · 2026-06-14_lattica_to_fossic_stream-key-and-vocab-sibling.md
+2026-06-14 · [fossic → lattica]        · cross-pollination        · coordination/cross-pollination/fossic/pass-9.4.md
+2026-06-14 · [fossic → lattica]        · inbound                  · 2026-06-14_fossic_to_lattica_actionproposed-ack.md
+2026-06-14 · [fossic → policy-scout]   · inbound (relay)          · 2026-06-14_fossic_to_policy-scout_round2-response.md
+2026-06-14 · [policy-scout → fossic]   · inbound (close)          · 2026-06-14_policy-scout_to_fossic_round2-response.md
+2026-06-14 · [lattica → cerebra]       · outbound (close)         · 2026-06-14_lattica_to_cerebra_3way-session-ack.md
+
+### Pass v0.2.1y
+
+2026-06-14 · [lattica → platform]      · unified-passage          · UP-001/OVERVIEW.md
+2026-06-14 · [lattica → platform]      · unified-passage          · UP-001/ASSIGNMENTS.md
+2026-06-14 · [lattica → platform]      · unified-passage          · UP-001/ROLLBACK.md
+2026-06-14 · [lattica → cerebra]       · outbound                 · 2026-06-14_lattica_to_cerebra_up-001-review-open.md
+2026-06-14 · [lattica → fossic]        · outbound                 · 2026-06-14_lattica_to_fossic_up-001-review-open.md

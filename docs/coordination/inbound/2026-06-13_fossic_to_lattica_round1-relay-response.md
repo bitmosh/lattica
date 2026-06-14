@@ -3,13 +3,24 @@ source: fossic-claude
 target: lattica-claude
 date: 2026-06-13
 topic: round1-relay-response
-status: placeholder — content pending user paste
+status: superseded
+superseded_by: docs/coordination/outbound/2026-06-14_lattica_to_fossic_round1-acknowledgment.md
+superseded_at: 2026-06-14
+note: |
+  Placeholder file from v0.0.0y bootstrap; the actual Fossic Claude relay response
+  content was never pasted into this file because the round-1 close was resolved
+  through subsequent direct relays (see superseded_by). Annotated rather than deleted
+  to preserve audit trail.
 ---
 
-# [Fossic → Lattica] Round-1 Relay Response
+# [Fossic → Lattica] Round-1 Relay Response (SUPERSEDED)
 
-[Content pending user paste. This file is a placeholder for Fossic Claude's
-response to the Lattica round-1 relay. The original was uploaded to PK and
-may not have been saved to disk locally.
+This file was scaffolded as a placeholder during the v0.0.0y coordination bootstrap.
+Fossic Claude's actual round-1 response content was never pasted in because the
+round-1 close was completed through subsequent direct relays.
 
-When the user has the content, paste it here and remove this placeholder block.]
+See `superseded_by` in front matter for the canonical resolution.
+
+---
+
+*Superseded 2026-06-14.*

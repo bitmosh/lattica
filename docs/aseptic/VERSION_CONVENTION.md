@@ -126,3 +126,28 @@ Pass 11 is concurrent; they do not conflict.
 The `v<version>` in the PASS COMPLETE Discord message is the version assigned to the pass.
 For descending-letter passes, use the full version including the letter: `v0.10.x`. The
 blog.bumper parser accepts the optional trailing `[a-z]` suffix on version numbers.
+
+---
+
+## Historical format drift — v0.2.1.a / v0.2.1.b / v0.2.1.c
+
+The passes `v0.2.1.a`, `v0.2.1.b`, and `v0.2.1.c` (committed before v0.2.1z) used
+a non-canonical format with a dot before the letter (`v0.2.1.a` instead of
+`v0.2.1a`). The dot is parser-incorrect per the format strictness section above.
+
+These versions were not posted to Blog Bumper (dev-log posts were paused from
+v0.1.0 onward), so the format error never reached the parser. Going forward,
+sub-letter variants use the canonical `v0.<major>.<minor><letter>` format with
+no dot before the letter:
+
+- Correct: `v0.2.1a`, `v0.2.1b`, `v0.3.0z`, `v0.3.0y`
+- Incorrect: `v0.2.1.a`, `v0.2.1.b`, `v0.3.0.z`
+
+Ascending letters (`a`, `b`, `c`...) and descending letters (`z`, `y`, `x`...) are
+both valid per local Lattica convention. Ascending is used for sub-variants that
+elaborate on a forward version; descending is used for cleanup that ratchets toward
+the next forward version. The original fossic convention used descending only; Lattica
+extends this with ascending for forward-elaboration variants.
+
+Blast-radius files for `v0.2.1.a`, `v0.2.1.b`, `v0.2.1.c` are committed and not
+rewritten — historical drift is documented here rather than erased.

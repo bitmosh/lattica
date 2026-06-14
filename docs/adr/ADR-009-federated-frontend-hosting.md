@@ -23,9 +23,9 @@ Both modes coexist. Workspace composition determines which is used for any given
 - **Lattica's main bundle is the host for Mode A composition tiles.** Tiles in Mode A are React components in the same React tree as Lattica's shell.
 - **Mode A components reach the bundle at build time.** Project contributions to Mode A live in source code Lattica's bundler includes at build time (workspace package, npm publish, or path import). No runtime loading of arbitrary Mode A bundles.
 - **Mode B webviews host the project's unchanged frontend code.** A Mode B project's lattica-mode rendering is the same code as its standalone frontend, hosted in a Tauri child webview pointed at the same dev server or build artifact. No project-side conditional behavior keyed on "am I in Lattica."
-- **`tileSectionRegistry` is the platform tile registry.** No parallel registry exists. Mode A tiles register here. Mode B webviews are also registered as tiles (with `kind: "webview"` rather than `kind: "component"` — see ADR-L-002).
+- **`tileSectionRegistry` is the platform tile registry.** No parallel registry exists. Mode A tiles register here. Mode B webviews are also registered as tiles (with `kind: "webview"` rather than `kind: "component"` — see ADR-016).
 - **`payloadRendererRegistry` is the shared payload-renderer extensibility point.** Located in LumaWeave's control-plane as a T2 registry. Mode A renderer contributions go through this registry.
-- **Theme propagation works across webview boundaries via CSS custom properties.** `--portfolio-*` tokens (ADR-L-001) are inherited from the host shell's stylesheet into Mode B webviews via standard cascade. Mode B projects read these tokens to render in Lattica's visual identity when embedded.
+- **Theme propagation works across webview boundaries via CSS custom properties.** `--portfolio-*` tokens (ADR-015) are inherited from the host shell's stylesheet into Mode B webviews via standard cascade. Mode B projects read these tokens to render in Lattica's visual identity when embedded.
 - **React context does NOT cross webview boundaries.** Mode B webviews are separate React trees with separate runtimes. Cross-webview communication uses `window.postMessage` or Tauri events, never shared context.
 - **Each project's backend is unchanged.** Standalone-launched and lattica-launched share the same backend process, same dependencies, same lifecycle. No conditional behavior keyed on launch context.
 - **Lattica's shell does not embed project backends.** Lattica connects to each project's running backend through that project's existing interface (Tauri IPC for projects with Tauri backends, subprocess CLI calls where applicable, fossic event subscriptions for event-only consumers).
@@ -39,15 +39,15 @@ Files this decision permits modification of:
 - Project-side: each project's `<repo>/src/` for Mode A component contributions (scoped to the project's own directory), and the project's existing frontend code for Mode B embedding
 
 Files this decision PROHIBITS modification of (without revisiting this ADR):
-- LumaWeave's `tileSectionRegistry` contract shape — ADR-L-002 governs this
+- LumaWeave's `tileSectionRegistry` contract shape — ADR-016 governs this
 - Any cross-project file outside the project's own repo
 
 Other ADRs this decision depends on:
-- ADR-L-001 (Platform Design Token Namespace) — `--portfolio-*` tokens propagate across both modes
-- ADR-L-002 (Tile Registration Contract) — `TileSectionEntry` with `kind: "component" | "webview"` discriminator
-- ADR-L-003 (Payload Renderer Registry) — Mode A renderer registration
-- ADR-L-004 (Platform Fossic Store Topology) — single platform store at `~/.lattica/fossic/store.db`
-- ADR-L-005 (Canonical vs. Live Graph Layer Ownership) — Reflective Twin diff layer
+- ADR-015 (Platform Design Token Namespace) — `--portfolio-*` tokens propagate across both modes
+- ADR-016 (Tile Registration Contract) — `TileSectionEntry` with `kind: "component" | "webview"` discriminator
+- ADR-017 (Payload Renderer Registry) — Mode A renderer registration
+- ADR-012 (Platform Fossic Store Topology) — single platform store at `~/.lattica/fossic/store.db`
+- ADR-018 (Canonical vs. Live Graph Layer Ownership — planned, not yet filed) — Reflective Twin diff layer
 
 ## Invariants (testable)
 
@@ -90,15 +90,15 @@ Other ADRs this decision depends on:
 
 ### Negative / Risks
 
-- **Two implementation paths to maintain.** Mode A tile registration is different from Mode B tile registration. ADR-L-002 must address both cleanly without introducing accidental complexity.
-- **CSS theme propagation needs explicit design.** `--portfolio-*` tokens must be available in Mode B webviews. The mechanism (inject the host stylesheet, use a shared stylesheet served from a known path, etc.) needs to be decided in ADR-L-001.
+- **Two implementation paths to maintain.** Mode A tile registration is different from Mode B tile registration. ADR-016 must address both cleanly without introducing accidental complexity.
+- **CSS theme propagation needs explicit design.** `--portfolio-*` tokens must be available in Mode B webviews. The mechanism (inject the host stylesheet, use a shared stylesheet served from a known path, etc.) needs to be decided in ADR-015.
 - **Cross-Mode communication is asymmetric.** Mode A tiles can communicate via shared React state. Mode B webviews communicate with the shell via Tauri events / `postMessage`. Mixing the two in one workspace requires bridging.
 - **Bundle size still grows with Mode A contributions.** Mode B doesn't help here — only projects with no standalone frontend get the bundle-bloat-mitigating Mode B path. At today's scale this is fine; revisit if Mode A contributions accumulate beyond reasonable bundle size.
 
 ### Mitigations baked into the decision
 
-- `tileSectionRegistry` with the `kind` discriminator (ADR-L-002) means Mode A and Mode B tiles register through the same surface. The developer doesn't have to think about which mode when registering a tile — the registration's `kind` field captures it.
-- Theme propagation has a clear mechanism path: CSS custom properties inherited via `:root` in the embedded webview, populated from the host's stylesheet at webview creation time. ADR-L-001 specifies the exact mechanism.
+- `tileSectionRegistry` with the `kind` discriminator (ADR-016) means Mode A and Mode B tiles register through the same surface. The developer doesn't have to think about which mode when registering a tile — the registration's `kind` field captures it.
+- Theme propagation has a clear mechanism path: CSS custom properties inherited via `:root` in the embedded webview, populated from the host's stylesheet at webview creation time. ADR-015 specifies the exact mechanism.
 - Mode B is opt-in per project. No project is forced to expose a webview-embeddable mode. Projects that prefer to contribute only via Mode A stay that way.
 
 ---
@@ -115,7 +115,7 @@ ADR-004 (Policy Scout governance scope), ADR-005 (Cerebra API surface), and ADR-
 
 ## What ADR-009 does NOT decide
 
-- **fossic store topology** — decided in ADR-L-004 (single platform store).
+- **fossic store topology** — decided in ADR-012 (single platform store).
 - **Specific Tauri 2 child-webview API mechanics** — implementation detail, captured in the LumaWeave + Cerebra Mode B integration ADRs when those work begins.
 - **gwells extraction scope** — R-LW-006 is the developer's call.
 - **Cerebra's library-only `run-cycle` state** — Lattica is observer for Phase 1.

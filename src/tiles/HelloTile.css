@@ -1,0 +1,98 @@
+.hello-tile {
+  padding: 2.5rem;
+  background: var(--portfolio-bg);
+  color: var(--portfolio-text-primary);
+  min-height: 100vh;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+.hello-tile__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--portfolio-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.hello-tile__version {
+  color: var(--portfolio-accent);
+}
+
+.hello-tile__subtitle {
+  font-size: 0.875rem;
+  color: var(--portfolio-text-secondary);
+  margin-bottom: 2rem;
+}
+
+.hello-tile__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.hello-tile__card {
+  padding: 1.25rem;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 8px;
+}
+
+.hello-tile__card h2 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--portfolio-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}
+
+.hello-tile__status {
+  font-size: 0.875rem;
+  color: var(--portfolio-text-primary);
+  line-height: 1.5;
+}
+
+.hello-tile__status--ok {
+  color: var(--portfolio-color-success);
+}
+
+.hello-tile__status--err {
+  color: var(--portfolio-color-danger);
+}
+
+.hello-tile__status code {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8125rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+}
+
+.hello-tile__btn {
+  padding: 0.375rem 0.875rem;
+  background: transparent;
+  border: 1px solid var(--portfolio-accent);
+  color: var(--portfolio-accent);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.hello-tile__btn:hover {
+  background: var(--portfolio-accent);
+  color: var(--portfolio-bg);
+}
+
+.hello-tile__log {
+  margin-top: 0.75rem;
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--portfolio-text-secondary);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.hello-tile__log li {
+  padding: 0.25rem 0;
+  border-top: 1px solid var(--portfolio-border);
+}

@@ -18,6 +18,14 @@ dist/
 .eggs/
 *.whl
 
+# Vite
+.vite/
+dist-ssr/
+
+# Tauri generated files
+src-tauri/gen/
+src-tauri/WixTools/
+
 # Build artifacts
 tauri-build*/
 *.app

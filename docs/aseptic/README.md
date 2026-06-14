@@ -1,7 +1,7 @@
 ---
 title: Aseptic Methodology — Lattica Working Copy
 status: live
-version: v0.0.0
+version: v0.0.0z
 ---
 
 # Aseptic — Lattica Working Files

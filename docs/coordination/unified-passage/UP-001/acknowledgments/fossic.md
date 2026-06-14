@@ -2,7 +2,7 @@
 source: fossic-claude
 unified-passage: UP-001
 date: 2026-06-14
-status: ack-with-corrections
+status: acked
 ---
 
 # fossic ACK — UP-001 REVIEW Phase

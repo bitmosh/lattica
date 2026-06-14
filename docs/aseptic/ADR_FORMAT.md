@@ -179,3 +179,32 @@ language-specific reducer).
 Creates debt: the Python DynReducer bridge currently replays all events (no snapshot caching
 via the Rust path) pending a public DynReducer trait. This is tracked as TD-001.
 ```
+
+---
+
+## PLAN*.md vs ADR*.md — naming for evolving decisions
+
+A platform decision goes through two states: under discussion (mutable) and locked 
+(immutable except via supersession).
+
+**Under discussion (mutable):** filename is `PLAN-NNN-<topic>.md`. The Status field 
+in front matter is `Draft`. The file can be edited freely as discussion progresses.
+
+**Locked (immutable):** rename to `ADR-NNN-<topic>.md` and update Status to `Accepted`. 
+Subsequent changes either supersede the ADR (new ADR with `supersedes: ADR-NNN`) or 
+amend it via a new ADR that references it.
+
+The number stays the same across the rename — `PLAN-015-token-namespace.md` becomes 
+`ADR-015-token-namespace.md`. This makes the rename visible in directory listings 
+without confusing the numbering.
+
+### When to use PLAN vs. ADR
+
+- **Use PLAN** when the decision is still being negotiated, when input from project 
+  Claudes is expected, when alternatives are being weighed
+- **Promote to ADR** when the decision has been ratified and is ready to be load-bearing
+
+### Discovery
+
+`ls docs/adr/PLAN-*` shows everything still under discussion. `ls docs/adr/ADR-*` 
+shows everything locked. The split is visible without opening files.

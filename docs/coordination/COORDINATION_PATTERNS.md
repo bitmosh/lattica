@@ -1,8 +1,8 @@
 ---
 title: Coordination Patterns — Cross-Claude Methodology
 status: live
-version: v0.0.0y
-last_reviewed: v0.0.0y
+version: v0.2.1.c
+last_reviewed: v0.2.1.c
 ---
 
 # Coordination Patterns
@@ -162,6 +162,95 @@ Fossic Claude owns event sourcing — fossic-tauri/fossic-node integration,
 cross-consumer event vocabulary, fossic-side polish affecting Lattica consumers.
 Each cross-gates the other's work between arc closes. See `SUPERVISION_MODEL.md`
 for full detail.
+
+---
+
+## P-011 — Grounding pass before substantive coding pass
+
+Before any substantive coding pass, run a grounding pass first. It's lightweight (5-10 
+minutes of reading, no writes) but it prevents working against stale assumptions.
+
+**Grounding pass checklist:**
+
+1. **Check mail** — your `requirements/<project>/` directory for new messages 
+   addressed to you; `coordination/outbound/` (if non-Lattica) or `coordination/inbound/` 
+   (if Lattica) for direct relays
+2. **Check cross-pollination** — browse 
+   `coordination/cross-pollination/<other-projects>/` for new pass-X.Y.md files since 
+   your last grounding pass; identify anything affecting your scope
+3. **Check current states** — read 
+   `coordination/current-states/<other-projects>/current_state.md` for any project your 
+   upcoming work depends on
+4. **Check unified-passage** — `coordination/unified-passage/` for UP-NNN directories 
+   with PLAN*.md drafts needing your input or ACK
+5. **Update your own current_state.md** if relevant
+
+The grounding pass produces no commits. It's pure preparation. After grounding, you 
+either proceed with your planned coding pass (now informed by current platform state) 
+or surface that the work needs to wait or change scope.
+
+**Why this works:** stale assumptions about platform state are the most common source 
+of cross-project bugs. 5-10 minutes of grounding prevents 1-2 hours of correction work 
+later. The discipline pays for itself within the first week.
+
+**Lattica Claude application:** Lattica Claude does grounding pass at the start of 
+every session by reading the current STATUS.md and mail_routing.md plus relevant 
+recent inbound/cross-pollination. Project Claudes follow the same pattern in their 
+own sessions.
+
+---
+
+## P-012 — End-of-pass-report "For <project>:" sections
+
+Every Claude Code pass report (the message the developer sees after a pass completes)
+ends with a "For <project>:" section per affected project. Each section is a short
+copy-paste snippet the developer can forward verbatim to the named project's Claude
+session.
+
+**Format:**
+
+```
+For cerebra: <one-paragraph snippet describing what's waiting for them and where>
+
+For fossic: <one-paragraph snippet>
+
+For lumaweave: <one-paragraph snippet>
+```
+
+Each snippet:
+- Names a specific file or directory the project Claude should read
+- States what action (if any) the project Claude should take
+- Is self-contained — the project Claude doesn't need any other context to know what
+  to do
+
+**When to include a "For <project>:" section:**
+
+- A coordination file was filed addressed to that project (inbound for them, outbound
+  from Lattica to them)
+- A cross-pollination file mirrors into that project's index requiring their review
+- A unified passage moved phase (DRAFT, REVIEW, ARM, etc.) and that project is a
+  participant
+- A platform decision was locked that affects how that project does work going forward
+- A change in another project's state affects that project's dependencies
+
+**When NOT to include a "For <project>:" section:**
+
+- The pass was purely internal to Lattica (e.g., updating Lattica's own
+  blast-radius), no cross-project impact
+- The change is informational only — already covered by the standard mail_routing
+  manifest, no need for a separate snippet
+- The project's involvement is "wait and see" rather than "take action" — surface
+  via current-state, not a per-project snippet
+
+**Why this works:** The developer is the courier between Claude sessions. Every
+courier task that's manual is a chance for things to drop. Per-project snippets that
+are copy-paste-ready reduce courier overhead to the minimum: read the report, see who
+has mail, forward the snippet to that Claude session.
+
+**This pattern also applies to project Claudes' own end-of-pass reports.** When a
+project Claude (Cerebra, Fossic, etc.) completes a pass that affects others, their
+end-of-pass report should include "For <other-project>:" sections too. Symmetric
+discipline across all project Claudes.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Pass Reporting — Structured Format
-last_reviewed: v0.0.0x
+last_reviewed: v0.2.1.c
 ---
 
 # Pass Reporting — Structured Format
@@ -204,3 +204,43 @@ merge SHA. If that SHA is orphaned, links to "click here for the
 commit" don't resolve. For dev-log credibility — and for the
 self-referential audit trail Aseptic depends on — the SHA in the
 blast-radius must point to a reachable commit.
+
+---
+
+## End-of-pass-report "For <project>:" sections
+
+Every pass-completion report (the message the developer sees when a pass closes) ends
+with one "For <project>:" section per affected adjacent project. Each section is a
+short copy-paste snippet the developer can forward verbatim to the named project's
+Claude session.
+
+**Format:**
+
+```
+For cerebra: <one-paragraph snippet describing what's waiting and where>
+
+For fossic: <one-paragraph snippet>
+```
+
+**Each snippet must be self-contained:** name a specific file or directory the project
+Claude should read, state what action (if any) they should take, and require no other
+context to act on.
+
+**Include when:** A coordination file was filed addressed to that project; a
+cross-pollination mirror requires their review; a unified-passage phase changed and
+they participate; a platform decision was locked affecting their work; another
+project's state change affects their dependencies.
+
+**Omit when:** The pass was purely internal (no cross-project impact); the change is
+informational only and covered by `mail_routing.md`; the project's role is wait-and-see
+rather than take-action (surface via current-state instead).
+
+**Symmetric discipline:** project Claudes' own end-of-pass reports also include
+"For <project>:" sections when their work affects others. Not just Lattica.
+
+**Why this matters:** the developer is the courier between Claude sessions. Pre-drafted
+per-project snippets reduce courier overhead to the minimum — read the report, see
+who has mail, forward.
+
+See `docs/coordination/COORDINATION_PATTERNS.md` P-012 for the platform-shared version
+of this pattern.

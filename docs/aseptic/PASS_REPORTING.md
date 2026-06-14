@@ -1,5 +1,6 @@
 ---
 title: Pass Reporting — Structured Format
+last_reviewed: v0.0.0x
 ---
 
 # Pass Reporting — Structured Format
@@ -146,3 +147,60 @@ no test suite was run.
 ```
 
 Omitting a section silently is not acceptable.
+
+---
+
+## Commit SHA recording — the two-commit pattern
+
+The blast-radius file records the merge SHA of the pass it documents. Two
+approaches exist; the **two-commit pattern** is canonical going forward.
+
+### Old approach (amend-with-SHA) — DO NOT USE for new passes
+
+1. Write blast-radius with `sha: <placeholder>`
+2. Commit everything including the blast-radius file
+3. Amend the commit to replace placeholder with the (now-orphaned)
+   pre-amend SHA
+
+Problem: `git commit --amend` rewrites the commit. The SHA referenced in
+the blast-radius file is the pre-amend SHA, which becomes orphaned in
+the reflog rather than reachable via branch traversal. The file points to
+a commit that effectively no longer exists.
+
+Used by: v0.0.0z, v0.0.0y, v0.1.0 (pre-fix). Cosmetic limitation; doesn't
+affect git history correctness.
+
+### New approach (two-commit) — use this
+
+1. Stage the pass content (everything *except* the blast-radius file)
+2. Write the blast-radius file with `sha: <will-record-after-content-commit>`
+   as a placeholder — but do NOT stage it yet
+3. Commit just the content as **commit 1**
+4. Capture commit 1's real SHA: `SHA=$(git rev-parse --short HEAD)`
+5. Edit the blast-radius file's `sha:` field with the actual `$SHA`
+6. Stage and commit just the blast-radius file as **commit 2**
+
+```
+git add <all-pass-content-except-blast-radius>
+git commit -m "<pass message>"
+SHA=$(git rev-parse --short HEAD)
+sed -i "s|sha: <will-record-after-content-commit>|sha: $SHA|" docs/aseptic/blast-radius/pass-X.Y.Z.md
+git add docs/aseptic/blast-radius/pass-X.Y.Z.md
+git commit -m "docs(aseptic): close pass-X.Y.Z blast-radius with content SHA"
+```
+
+Commit 1's SHA is stable and reachable via branch. Commit 2's SHA doesn't
+matter because nothing references it. The blast-radius file in commit 2
+correctly points to the content commit.
+
+Used by: bootstrap pass v0.0.0 (which had a similar two-commit approach
+for the same reason). v0.0.0x ratifies this as canonical and all passes
+v0.0.0x forward use it.
+
+### Why this matters
+
+The PASS COMPLETE message (sent to blog.bumper / Discord) includes the
+merge SHA. If that SHA is orphaned, links to "click here for the
+commit" don't resolve. For dev-log credibility — and for the
+self-referential audit trail Aseptic depends on — the SHA in the
+blast-radius must point to a reachable commit.

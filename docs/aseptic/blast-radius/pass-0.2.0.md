@@ -1,7 +1,7 @@
 ---
 pass: 0.2.0
 version: v0.2.0
-sha: 73adebc (commit 1, content) / TBD (commit 2, blast-radius)
+sha: 73adebc (commit 1, content) / 549256c (commit 2, blast-radius)
 date: 2026-06-14
 summary: First real code commit — Tauri 2 + Vite 7 + React 19 + fossic scaffold
 ---

@@ -1,6 +1,6 @@
 ── PASS COMPLETE · v0.2.0 · Pass 0.2.0 (Load-Bearing: First Code Commit) ──
 
-**SHA:** 73adebc (commit 1, content) / TBD (commit 2, blast-radius + this file)
+**SHA:** 73adebc (commit 1, content) / 549256c (commit 2, blast-radius + this file)
 **Date:** 2026-06-14
 **Branch:** main → origin/main (awaiting push approval)
 
@@ -66,7 +66,7 @@ live state.
 - [x] Port 1421 in both vite.config.ts and tauri.conf.json
 - [x] ADR-011 through ADR-014 committed
 - [x] TD-002 opened (targetOrigin "*")
-- [x] blast-radius/pass-0.2.0.md committed (commit 2)
+- [x] blast-radius/pass-0.2.0.md committed (commit 2 — 549256c)
 - [x] No Discord post (dev-log paused; this file is the artifact)
 
 ---

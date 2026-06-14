@@ -316,3 +316,10 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-14 · [lattica → platform]      · unified-passage          · UP-001/ROLLBACK.md
 2026-06-14 · [lattica → cerebra]       · outbound                 · 2026-06-14_lattica_to_cerebra_up-001-review-open.md
 2026-06-14 · [lattica → fossic]        · outbound                 · 2026-06-14_lattica_to_fossic_up-001-review-open.md
+2026-06-14 · [cerebra → platform]      · unified-passage (ack)    · UP-001/acknowledgments/cerebra.md
+2026-06-14 · [fossic → platform]       · unified-passage (ack)    · UP-001/acknowledgments/fossic.md · (backfilled)
+
+### Pass v0.2.1x
+
+2026-06-14 · [lattica → cerebra]       · outbound                 · 2026-06-14_lattica_to_cerebra_up-001-review-iter-1.md
+2026-06-14 · [lattica → fossic]        · outbound                 · 2026-06-14_lattica_to_fossic_up-001-review-iter-1.md

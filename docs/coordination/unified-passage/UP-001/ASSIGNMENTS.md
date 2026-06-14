@@ -56,12 +56,17 @@ surfaces a gap, fossic ships a fix as a separate small pass before Cerebra begin
 **Pre-flight checks:**
 
 - [ ] `~/.lattica/fossic/store.db` exists, file size > 0
-- [ ] Running `lattica_store_status` Tauri command returns valid output
+- [ ] `fossic_list_streams()` returns valid output (substitute health check;
+      `lattica_store_status` doesn't exist in fossic-tauri per fossic's ACK
+      code review)
 - [ ] Manually invoking `fossic_subscribe("cerebra/agent-trace/*")` from a test
       harness (or via Lattica's HelloTile if extended) returns subscription handle
       without error
-- [ ] If Cerebra has previously emitted events to the platform store, they're
-      queryable via `fossic_read_range("cerebra/agent-trace/*", None)`
+- [ ] If Cerebra has previously emitted events: `fossic_list_streams()` shows
+      streams matching `cerebra/agent-trace/*` pattern, then
+      `fossic_read_range(<specific_stream_id>)` reads the events from each
+      (note: `fossic_read_range` is exact-stream-only, not glob-capable —
+      must list-then-read; per fossic's ACK code review)
 
 **Pass version:** No version change expected. If a fix is needed, fossic determines
 appropriate version per its own discipline (descending-letter cleanup or small
@@ -136,9 +141,12 @@ existing in the registry AND events being emittable for the smoke test.
 **Pre-flight checks:**
 
 - [ ] Cerebra's frontend codebase compiles; renderer component type-checks
+      (via Lattica's build system per "guest author in host repo" pattern — see
+      implementation logistics below)
 - [ ] Manually invoking a Cerebra cycle to completion succeeds
 - [ ] At least one `SignalEvaluated` event lands in
-      `~/.lattica/fossic/store.db` under `cerebra/agent-trace/<cycle_id>` stream
+      `~/.lattica/fossic/store.db` under `cerebra/agent-trace/<session_id>` stream
+      (corrected from `<cycle_id>` per 2026-06-14 stream-key fix)
 - [ ] `payloadRendererRegistry` registration call doesn't throw at module-load time
 - [ ] The renderer's structural marker is verifiable via DOM inspection of a test
       render (Cerebra Claude provides test harness or verification path)
@@ -147,6 +155,40 @@ existing in the registry AND events being emittable for the smoke test.
 Likely a forward version (the work delivers user-noticeable behavior — a rendered
 event in Lattica's UI). Could be e.g. `cerebra/v0.5.0` or whatever Cerebra's next
 forward increment is.
+
+**Implementation logistics — guest author in host repo:**
+
+Cerebra has no TypeScript codebase (per Cerebra's REVIEW Condition 2). The
+SignalEvaluated renderer ships as a Cerebra-authored file in Lattica's tree at:
+
+    src/renderers/cerebra/SignalEvaluatedRenderer.tsx
+
+This establishes the "guest author in host repo" coordination pattern.
+
+**Ownership boundaries:**
+
+- **Cerebra (guest) authority:** component logic (what the renderer renders),
+  payload interpretation (how to extract meaning from `payload: unknown`),
+  visual structure within Lattica's design system, the structural marker shape
+- **Lattica (host) authority:** file location, registration call against
+  `payloadRendererRegistry`, imports of Lattica-provided utilities, type-check
+  and lint integration, build system inclusion
+- **Shared discipline:** ADR-017 PayloadRendererProps contract,
+  `--portfolio-*` design token usage only, structural marker convention
+
+**Logistics:** Cerebra Claude drafts the renderer content (either via chat for
+the developer to paste into Lattica Claude Code's session, or directly into the
+file location for Lattica Claude Code to commit). Lattica Claude Code commits
+the file to Lattica's repo with the standard ADR-017 registration call. Updates
+follow the same pattern.
+
+**Commit attribution:** git author is Lattica's identity (the committing Claude
+Code session); commit message body credits Cerebra Claude as content author.
+
+This pattern likely generalizes to future renderers from other projects (Policy
+Scout, Bo, ai-stack as they ship event types). If UP-001 exercises it cleanly,
+the post-UP-001 retrospective considers promoting to `COORDINATION_PATTERNS.md`
+as P-013 — Guest author in host repo.
 
 **Cross-pollination:** Standard cross-pollination cycle. File in Cerebra's own repo
 under `docs/aseptic/cross-pollination/pass-X.Y.md`; mirror to

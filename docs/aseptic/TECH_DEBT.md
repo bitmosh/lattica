@@ -1,6 +1,6 @@
 ---
 title: Tech Debt — Living Report (Lattica)
-last_reviewed: v0.2.1z
+last_reviewed: v0.2.1.b
 ---
 
 # Tech Debt — Living Report

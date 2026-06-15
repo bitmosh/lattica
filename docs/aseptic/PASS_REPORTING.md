@@ -1,6 +1,6 @@
 ---
 title: Pass Reporting — Structured Format
-last_reviewed: v0.2.1v
+last_reviewed: v0.3.2z
 ---
 
 # Pass Reporting — Structured Format
@@ -244,3 +244,112 @@ in their own end-of-pass reports too. Not just Lattica.
 See `docs/coordination/COORDINATION_PROTOCOL.md` "End-of-pass manifest
 snippets — reduce courier load" for the platform-wide canonical version of
 this pattern.
+
+---
+
+## Blog Bumper PASS COMPLETE template (canonical)
+
+Every pass produces a PASS COMPLETE message that Blog Bumper consumes and
+posts to `#changelog`. The template format below is load-bearing — Blog
+Bumper's parser has specific field expectations.
+
+**Format:**
+
+```
+── PASS COMPLETE · vX.Y.Z · YYYY-MM-DD ──────────────────────
+
+Title: <50 chars or fewer; descriptive single line>
+
+Summary: <≤ 300 chars; concise narrative of what changed and why>
+
+Project: <project-name>
+
+Highlights:
+· <bullet — most important>
+· <bullet — next>
+· <bullet>
+· (3-6 bullets typical; can extend if warranted)
+
+Learnings:
+· <bullet — methodology insight banked>
+· (1-3 typical; omit section if no notable learnings)
+
+Commit: <short-SHA>
+Tests: <N passed · M failed · K skipped> (or "No test suite yet")
+Branch: clean (or describe non-clean state)
+```
+
+**Critical field constraints:**
+
+- **Summary ≤ 300 characters.** Blog Bumper maps this to a frontmatter
+  `description` field with a hard 300-char cap. Violations cause parse
+  failure — the post is silently dropped or surfaces as a writer error.
+  Multiple posts across projects were lost due to this cap. Trim Summary
+  before writing.
+- **Title ≤ 50 characters** (soft limit; readability constraint).
+- **Highlights** are bullet points with `·` (middle dot), not `-` or `*`.
+- **Date** in ISO format `YYYY-MM-DD`.
+- **Commit** is the SHA of commit 1 (content commit), not commit 2
+  (blast-radius close).
+
+**Writing the Summary:**
+
+Default approach: write what you want, then count chars, then trim. The
+Summary should answer "what changed and why" in under 300 chars. Common
+trim patterns:
+
+- Drop articles ("the", "a") where readable
+- Use compact phrasing ("X via Y" instead of "X using the Y mechanism")
+- Reference acronyms (UP-001 instead of "Unified Passage 001")
+- Cut redundancy with Title
+
+**Example (v0.3.2's Summary, ~290 chars):**
+
+> First unified passage closes successfully. Smoke test verified live Cerebra
+> SignalEvaluated events rendering in Lattica's UI via the registry pipeline.
+> Methodology validated across DRAFT → REVIEW → ARM → EXECUTE → POST_FLIGHT.
+> First user-observable feature beyond v0.2.0 scaffold.
+
+Counts ~290 chars. Comfortably under 300; safe margin for variable rendering.
+
+---
+
+## Pass-complete and merge-gate files: absorbed by next pass
+
+The PASS COMPLETE markdown file (`docs/aseptic/pass-complete/pass-VERSION.md`)
+and merge gate file (`docs/aseptic/merge-gates/pass-VERSION-merge-gate.md`)
+are produced during their owning pass but **committed in the subsequent pass**.
+
+**Why:**
+
+- The PASS COMPLETE file is written AFTER push succeeds (per the channel
+  orchestration: merge gate → push → save PASS COMPLETE → END)
+- The owning pass already used its two commits (content + blast-radius) by
+  the time PASS COMPLETE is written
+- Adding a "commit 3" for PASS COMPLETE would violate the two-commit pattern
+
+**Discipline:**
+
+The next pass's commit 1 staging routinely includes:
+- The prior pass's `pass-complete/pass-PREV.md` (if present)
+- The prior pass's `merge-gates/pass-PREV-merge-gate.md` (if present)
+
+This is "straggler absorption" — intentional, not a methodology gap.
+Every pass leaves two stragglers; every pass absorbs the prior pass's
+stragglers. Self-balancing.
+
+**Practical staging:**
+
+When a pass begins, the working tree typically shows:
+- `pass-complete/pass-PREV.md` (untracked or modified)
+- `merge-gates/pass-PREV-merge-gate.md` (untracked or modified)
+
+The new pass's commit 1 stages both alongside the new pass's own content.
+No special handling required; just include them in `git add`.
+
+**When this discipline DOESN'T apply:**
+
+- The very first pass after a long pause where multiple stragglers accumulated
+  (absorb them all in one cleanup pass)
+- Passes that didn't post PASS COMPLETE (e.g., aborted before push)
+- The first pass ever (no prior stragglers to absorb)

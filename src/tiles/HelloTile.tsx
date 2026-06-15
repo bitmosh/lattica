@@ -5,6 +5,7 @@ import { tileSectionRegistry } from "../control-plane/tile-section/tileSectionRe
 import type { TileSectionEntry } from "../control-plane/tile-section/types";
 import { sendToEmbedded } from "../ipc/postMessageBridge";
 import { getAllPayloadRenderers } from "../control-plane/payload-renderer/payloadRendererRegistry";
+import pkg from "../../package.json";
 import "./HelloTile.css";
 
 interface StoreStatus {
@@ -75,8 +76,8 @@ export function HelloTile() {
 
   return (
     <div className="hello-tile">
-      <h1 className="hello-tile__title">Lattica <span className="hello-tile__version">v0.2.0</span></h1>
-      <p className="hello-tile__subtitle">Tauri + Vite + React + fossic scaffold</p>
+      <h1 className="hello-tile__title">Lattica <span className="hello-tile__version">v{pkg.version}</span></h1>
+      <p className="hello-tile__subtitle">Tauri + Vite + React + fossic</p>
 
       <div className="hello-tile__grid">
         <section className="hello-tile__card">

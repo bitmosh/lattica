@@ -1,8 +1,8 @@
 ---
 title: Coordination Patterns — Cross-Claude Methodology
 status: live
-version: v0.2.1.c
-last_reviewed: v0.2.1v
+version: v0.3.2z
+last_reviewed: v0.3.2z
 ---
 
 # Coordination Patterns
@@ -266,6 +266,120 @@ For <recipient-project>:
 
 The structured form is grep-able, copy-paste-ready, and reduces developer
 courier load. Symmetric across all project Claudes.
+
+---
+
+## P-013 — Guest author in host repo
+
+When a project needs to contribute UI code (React component, CSS, etc.) but
+lacks a frontend codebase to ship it from, the contributing project (guest)
+authors the file; the host project commits it to their tree. The guest owns
+content; the host owns build integration.
+
+**When to use:**
+
+- A project contributes a payload renderer, tile, or other UI component to
+  Lattica
+- The contributing project has no compatible build system (e.g., Cerebra is
+  Python-only; Policy Scout is Python-only; Bo is Python-only)
+- The receiving project has the build/lint/type-check infrastructure
+
+**Ownership boundaries:**
+
+- **Guest authority:** component logic (what it renders), payload
+  interpretation, visual structure within host's design system, structural
+  marker shape (for testability)
+- **Host authority:** file location, registration call against any host
+  registry, build system inclusion, type-check + lint integration
+- **Shared discipline:** ADR-defined contracts (e.g., ADR-017 PayloadRendererProps),
+  host's design token namespace, agreed structural marker conventions
+
+**Logistics:**
+
+1. Guest drafts the file content (via chat for developer to relay, or directly
+   via filesystem access to the host's repo if available)
+2. Host Claude Code commits the file to the host's tree with the standard
+   registration boilerplate added
+3. Updates follow the same pattern; the guest authors, the host commits
+4. Git author is the host's identity (the committing Claude Code session);
+   commit message body credits the guest as content author
+
+**Empirical validation:**
+
+UP-001 (closed 2026-06-14) exercised this pattern end-to-end. Cerebra
+(Python-only, no TS codebase) authored `SignalEvaluatedRenderer.tsx` +
+`.css`. Lattica Claude Code committed the files to `src/renderers/cerebra/`.
+The renderer compiled cleanly under Lattica's `tsconfig.json` (Cerebra Claude
+verified against `jsx: react-jsx`, `strict`, `noUnusedLocals`, etc. before
+handoff). End-to-end smoke test showed real `SignalEvaluated` events rendering
+via the guest-authored component without integration friction.
+
+**Generalization:**
+
+Future renderer or tile contributions from Policy Scout, Bo, and ai-stack
+follow this pattern. Each project's contributions land in `src/renderers/<project>/`
+(payload renderers) or `src/tiles/<project>/` (tiles) in Lattica's tree.
+
+See also: `docs/aseptic/UNIFIED_PASSAGE.md` for the methodology that surfaced
+this pattern during REVIEW phase; ADR-017 for the PayloadRendererProps
+contract; `docs/aseptic/retrospectives/UP-001-retrospective.md` for the full
+context of pattern emergence.
+
+---
+
+## P-014 — Don't hardcode dynamic values
+
+**The anti-pattern:** displaying values that should be computed at runtime as
+literal strings in source code. Common offenders: version strings, item counts
+(stream count, tile count, renderer count), timestamps, status indicators,
+configuration paths.
+
+**Why it bites:**
+
+- The displayed value diverges from reality as soon as the underlying state
+  changes
+- Future agents (Claude or human) editing the surrounding code don't know the
+  value is hardcoded vs. live
+- The divergence often goes unnoticed for multiple passes until someone
+  eyeballs the UI
+
+**Concrete example (UP-001 smoke test):**
+
+Lattica's v0.2.0 main shell showed:
+- `"Lattica v0.2.0"` in the header (hardcoded; survived v0.3.0, v0.3.1, v0.3.2)
+- `"Tauri + Vite + React + fossic scaffold"` as subtitle (hardcoded; no longer
+  the full scope)
+- The FOSSIC STORE panel's `"online · N stream(s)"` is the correct counter-example:
+  queried fossic for actual stream count and rendered the result live
+
+The two hardcoded strings were fixed in v0.3.2z. The FOSSIC STORE counter-example
+shows the right pattern: query the source of truth, render the result.
+
+**The discipline:**
+
+For any value displayed in the UI that *could* change:
+
+1. **Identify the source of truth.** Is it `package.json`? A registry? A
+   subscribed event stream? A computed property?
+2. **Read from source.** Use the appropriate hook, query, or function — not a
+   literal string.
+3. **If the value really is static** (e.g., a hardcoded version because it's
+   for display only and doesn't track package.json), make the staticness
+   explicit and reviewable — a comment indicating why this isn't dynamic.
+
+**Audit pattern (worth running periodically):**
+
+When in doubt, eyeball the UI and ask:
+- Does anything displayed change at runtime?
+- Does each "changing value" actually update when its source changes?
+- Are there any version strings, counts, or status indicators that look
+  suspicious?
+
+If multiple display values match patterns from your training data ("Lattica v0.2.0"
+literally appears as text in the source), they're almost certainly hardcoded.
+
+See also: ADR-014 (canary stream startup), `src/control-plane/tile-section/tileSectionRegistry.ts`
+(`list()` returns current state).
 
 ---
 

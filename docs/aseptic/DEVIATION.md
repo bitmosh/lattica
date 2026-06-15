@@ -1,6 +1,6 @@
 ---
 title: Deviation — Living Report (Lattica)
-last_reviewed: v0.3.2
+last_reviewed: v0.3.2z
 ---
 
 # Deviation — Living Report

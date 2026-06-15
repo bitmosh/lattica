@@ -132,3 +132,71 @@ expect generalized-tile to win compositionally.
 Target: please file (or update) within the next 15-30 minutes.
 
 [Lattica → All Project Claudes] end of design architectural update.
+
+---
+
+## Amendment — observability-first framing (applies to all design requests)
+
+Two cross-cutting clarifications that should inform your design request, in
+addition to what was above.
+
+### A. Observability-first, diagnostics-second
+
+This is Lattica's positioning. The distinction matters:
+
+- **Observability** — ambient awareness of "what is happening right now."
+  Status pulses, live indicators, traffic flow, color-coded health. Low
+  cognitive load. The user should not have to actively investigate to know
+  if things are working.
+- **Diagnostics** — investigation of "why something happened." Drill-down
+  detail, archive review, causation tracing, structured tables. The user
+  expects to spend cognitive effort under attention.
+
+These imply different visual languages. The live-tail-vs-archive split
+aligns with this: live tail = observability surface (always visible,
+ambient); archive view = diagnostic surface (on-demand, deliberate).
+
+### B. Per-project balance on the observability / diagnostics axis
+
+This affects how much "ambient indicator" surface vs. "deep-read" surface
+your design request should emphasize:
+
+- **Cerebra — observability-heavy.** Signal feed shows ambient cognitive
+  state; occasional drill-down for diagnostic depth on specific sessions.
+- **LumaWeave — observability-heavy.** Graph state events ambient;
+  diagnostic detail when errors fire (SourceLoadFailed).
+- **Policy Scout — balanced.** Governance health observability + diagnostic-
+  heavy for "why was this proposal flagged" investigation.
+- **Fossic — balanced.** Substrate health visualization is ambient; "why
+  is this stream slow / what's the causation depth" is investigative.
+- **ai-stack/bo — observability-heavy.** Topology view shows what's
+  connected/active; diagnostics when "why isn't this LLM responding."
+
+If your project is **observability-heavy**: weight your request toward
+at-a-glance affordances and ambient indicators.
+
+If your project is **balanced**: address both surfaces explicitly — what's
+ambient, what opens on investigation.
+
+### C. Fossic — additional structural-visualization framing
+
+The Fossic visualization should resemble what fossic structurally **is**:
+
+- Streams as horizontal flows — time arrows with events as points
+- Subscribers as nodes attached to streams
+- Causation links as edges between events across streams
+- Status indicators on subscriber nodes
+- Activity indicators on streams
+
+This is a real visualization problem, not a styling problem. The
+streams-as-flows + subscribers-as-nodes layout reflects fossic's actual
+structural nature; familiar event-sourcing users would recognize the shape
+on sight; unfamiliar users would understand fossic better from seeing it.
+
+**Density challenge (include in your enumeration):** how does the
+visualization gracefully reduce density when load is high (10+ streams,
+20+ subscribers, hundreds of events per minute)? LOD strategies,
+time-window filtering, stream-grouping — address the dense-state question
+explicitly, not just the steady-state visualization.
+
+[Lattica → All Project Claudes] end of amendment.

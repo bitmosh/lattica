@@ -151,3 +151,37 @@ ThemeChanged is useful as a debugging signal ("the user changed themes at
 14:33; that's when the rendering changed") but is noise in normal operation.
 Should it be hidden by default with a "show system events" toggle? Or filtered
 out entirely in the production event feed?
+
+---
+
+## Section 10 — Live-tail addendum (observability-first framing)
+
+*Added 2026-06-15 following architectural update v0.3.5y.*
+
+LumaWeave is observability-heavy. The primary event surface should provide
+ambient awareness of graph state — not function as a diagnostic tool.
+
+**Primary (ambient) surface — live-tail:**
+
+- Show the last 3–5 events; older ones scroll out naturally
+- A persistent graph health indicator (separate from the event list) shows
+  current SourceLoaded state: graph up, node/edge count at a glance. This
+  indicator should be visible without reading the event list at all
+- `SourceLoadFailed` escalates visually even in the ambient view and stays
+  sticky until superseded by a `SourceLoaded` — it's the one event that may
+  require user action
+- `SourceLoaded` and `SourceSwitched` can replace each other in live-tail:
+  only current state matters. Showing "SourceLoaded 5 minutes ago" is noise
+- `ThemeChanged` and `GraphLayoutSettled` are low-signal in live-tail;
+  suppress by default (consistent with Q3 inclination above)
+
+**Diagnostic (on-demand) surface — archive view:**
+
+- Full event history, opened deliberately (click/expand)
+- `SourceLoadFailed` full error text, adapter label, source path on expand
+- `GraphLayoutSettled` useful here for performance tracking over time
+- `ThemeChanged` visible in archive if "show system events" is toggled on
+
+**Framing note:** the live-tail + ambient indicator IS the primary product.
+The archive view is depth, not the starting point. Design should not bias
+toward the archive-first pattern.

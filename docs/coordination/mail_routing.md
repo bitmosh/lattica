@@ -126,6 +126,8 @@ grep 'pass-9.4.md' ~/Projects/lattica/docs/coordination/mail_routing.md
 2026-06-14 · [bo → lattica]            · inbound (close)          · 2026-06-14_bo_to_lattica_p013-p014-blogbumper-acked.md
 2026-06-15 · [cerebra → lattica]       · cross-pollination        · PredictionMadeRenderer.tsx + .css (direct-write, P-013)
 2026-06-15 · [lattica → policy-scout]  · outbound                 · 2026-06-15_lattica_to_policy-scout_p013-host-correction.md
+2026-06-15 · [lattica → all]           · outbound                 · 2026-06-15_lattica_to_all_design-architectural-update.md · (backfilled)
+2026-06-15 · [ai-stack/bo → lattica]   · design/request           · design-request.md
 ```
 
 *Entries above marked `(backfilled)` were added retroactively when this manifest was created.
@@ -363,3 +365,13 @@ confirmed on disk. Tagged `(backfilled)`.
 
 2026-06-15 · [lattica → all]           · outbound                 · 2026-06-15_lattica_to_all_design-architectural-update.md
 2026-06-15 · [lattica → platform]      · design                   · docs/coordination/design/requests/lattica/design-request.md (architectural reframe)
+
+### Pass v0.3.5x
+
+2026-06-15 · [lumaweave → lattica]     · inbound                  · 2026-06-15_lattica_to_lumaweave_v035y-design-arch-update.md
+2026-06-15 · [policy-scout → design]   · design/request           · docs/coordination/design/requests/policy-scout/design-request.md
+2026-06-15 · [fossic → design]         · design/request           · docs/coordination/design/requests/fossic/design-request.md
+2026-06-15 · [cerebra → design]        · design/request           · docs/coordination/design/requests/cerebra/design-request.md
+2026-06-15 · [lattica → frontend-design] · design/packet          · docs/coordination/design/packets/PACKET-001.md
+2026-06-15 · [policy-scout → lattica]  · design/request            · docs/coordination/design/requests/policy-scout/design-request.md
+2026-06-15 · [lattica → lumaweave]     · inbound                   · 2026-06-15_lattica_to_lumaweave_v035y-design-arch-update.md

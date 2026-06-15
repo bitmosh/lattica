@@ -5,7 +5,27 @@
 - **Project name:** lattica
 - **Filed by:** lattica-claude
 - **Date:** 2026-06-15
-- **Updated:** 2026-06-15 (v0.3.5y architectural reframe — divisible-pane workspace)
+- **Updated:** 2026-06-15 (v0.3.5y architectural reframe — divisible-pane workspace; observability-first amendment)
+
+## Section 1b — Platform positioning
+
+**Lattica is observability-first, diagnostics-second.**
+
+- **Observability surfaces** — always-on, ambient awareness, low cognitive
+  load. Status panels, live tail, activity indicators. The user should know
+  at a glance if things are working without actively investigating.
+- **Diagnostic surfaces** — on-demand, deliberate, high cognitive focus.
+  Archive views, causation traces, structured detail tables. These open only
+  when the user chooses to investigate.
+
+The workspace chrome, status panels, and live tail are all observability
+surfaces. Archive views, debug panels, and raw event detail are diagnostic
+surfaces. Design should reflect this split in visual weight and chrome.
+
+Lattica's own visual footprint is **observability-heavy** — the platform
+shell exists to communicate ambient platform health, not to be a diagnostic
+tool for itself. Diagnostic depth for substrate investigation belongs to
+Fossic's surface, not Lattica's chrome.
 
 ## Section 2 — What this project contributes visually
 
@@ -34,22 +54,26 @@ The Lattica-scoped visual surface includes:
 
 ## Section 3 — Visual priority hierarchy
 
-- **Highest priority (at-a-glance):**
+Lattica's chrome is **observability-heavy**. The hierarchy maps directly to
+the observability/diagnostics axis: highest-priority items are ambient
+observability; low-priority items are diagnostic.
+
+- **Highest priority — observability (at-a-glance, always-on):**
   - Is the platform alive? (header heartbeat or status pulse)
   - Which build is running? (header version)
   - Are events flowing? (subtle activity indicator)
   - Which pane has my attention right now? (active pane affordance)
-- **Medium priority (visible without effort):**
+- **Medium priority — ambient-but-not-always-prominent:**
   - Pane header showing the active tile in each pane
-  - Substrate stats (current status panel content) accessible but not
-    necessarily always-on
-- **Low priority (deep-read only; can be tucked):**
+  - Substrate stats (current status panel content) — accessible without
+    effort, but not necessarily occupying constant chrome space
+- **Low priority — diagnostic (can be tucked or on-demand):**
   - Specific counts beyond at-a-glance summary
   - Layout management UI (split/close buttons, save/recall) — affordances
     visible on hover or in a chrome strip; not always-on chrome
   - Debug/developer info (POSTMESSAGE demo button, raw event IDs)
 
-## Section 4 — What a glance should communicate
+## Section 4 — What a glance should communicate (observability surface)
 
 Within 2 seconds of looking, a user should understand:
 
@@ -57,6 +81,19 @@ Within 2 seconds of looking, a user should understand:
 - "I'm looking at [N] panes, each showing [tile type for project X]"
 - "The most recent activity in [pane I'm focused on] is [most-recent event]"
 - "Build version is [v0.X.Y]"
+
+## Section 4b — What investigation should reveal (diagnostic surface)
+
+When the user deliberately opens a diagnostic surface (e.g., clicks "why is
+this stream slow?"), they should be able to learn:
+
+- Fossic substrate health detail — stream lag, subscriber counts, causation
+  depth (this is Fossic's surface, surfaced through Lattica's chrome)
+- Full session/cycle archive grouped by project event stream
+- Layout management history if applicable
+
+Lattica's chrome does **not** need to provide its own diagnostic depth
+beyond what Fossic and per-project archive views already offer.
 
 ## Section 5 — What doesn't matter at-a-glance
 

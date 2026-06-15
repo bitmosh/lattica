@@ -1,6 +1,7 @@
 import { registerPayloadRenderer } from "./control-plane/payload-renderer/payloadRendererRegistry";
 import { tileSectionRegistry } from "./control-plane/tile-section/tileSectionRegistry";
 import { SignalEvaluatedRenderer } from "./renderers/cerebra/SignalEvaluatedRenderer";
+import { PredictionMadeRenderer } from "./renderers/cerebra/PredictionMadeRenderer";
 import { CerebraSignalTile } from "./tiles/cerebra-signal/CerebraSignalTile";
 
 registerPayloadRenderer({
@@ -8,6 +9,14 @@ registerPayloadRenderer({
   event_type: "SignalEvaluated",
   component: SignalEvaluatedRenderer,
   label: "Cerebra — Signal Evaluated",
+  stream_glob: "cerebra/agent-trace/*",
+});
+
+registerPayloadRenderer({
+  project: "cerebra",
+  event_type: "PredictionMade",
+  component: PredictionMadeRenderer,
+  label: "Cerebra — Prediction Made",
   stream_glob: "cerebra/agent-trace/*",
 });
 

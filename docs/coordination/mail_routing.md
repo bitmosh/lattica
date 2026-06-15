@@ -124,6 +124,8 @@ grep 'pass-9.4.md' ~/Projects/lattica/docs/coordination/mail_routing.md
 2026-06-14 · [bo → lattica]            · inbound                  · 2026-06-14_bo_to_lattica_heartbeat-ack-phase2-also-complete.md
 2026-06-14 · [lattica → bo]            · outbound                 · 2026-06-14_lattica_to_bo_phase2-fossic-emitter-ack.md · (backfilled)
 2026-06-14 · [bo → lattica]            · inbound (close)          · 2026-06-14_bo_to_lattica_p013-p014-blogbumper-acked.md
+2026-06-15 · [cerebra → lattica]       · cross-pollination        · PredictionMadeRenderer.tsx + .css (direct-write, P-013)
+2026-06-15 · [lattica → policy-scout]  · outbound                 · 2026-06-15_lattica_to_policy-scout_p013-host-correction.md
 ```
 
 *Entries above marked `(backfilled)` were added retroactively when this manifest was created.

@@ -1,0 +1,110 @@
+.cerebra-prediction-made {
+  font-family: monospace;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 4px;
+  color: var(--portfolio-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cerebra-prediction-made--baseline {
+  border-color: var(--portfolio-color-warning);
+}
+
+.cerebra-prediction-made--invalid {
+  color: var(--portfolio-color-danger);
+  font-style: italic;
+}
+
+.cerebra-prediction-made__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-prediction-made__label {
+  color: var(--portfolio-accent);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+}
+
+.cerebra-prediction-made__error {
+  color: var(--portfolio-color-danger);
+}
+
+.cerebra-prediction-made__basis {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.cerebra-prediction-made__basis--trajectory {
+  background: var(--portfolio-color-info);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-prediction-made__basis--config {
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  color: var(--portfolio-text-secondary);
+}
+
+.cerebra-prediction-made__basis--baseline {
+  background: var(--portfolio-color-warning);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-prediction-made__score-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-prediction-made__bar {
+  color: var(--portfolio-color-info);
+  letter-spacing: 0.02em;
+}
+
+.cerebra-prediction-made__pct {
+  color: var(--portfolio-text-secondary);
+  min-width: 3ch;
+}
+
+.cerebra-prediction-made__signals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.15rem 0.5rem;
+  padding: 0.2rem 0;
+}
+
+.cerebra-prediction-made__signal {
+  display: flex;
+  gap: 0.3rem;
+  align-items: baseline;
+}
+
+.cerebra-prediction-made__signal-name {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
+.cerebra-prediction-made__signal-score {
+  color: var(--portfolio-text-primary);
+  font-size: 0.78rem;
+}
+
+.cerebra-prediction-made__meta {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.cerebra-prediction-made__sep {
+  opacity: 0.4;
+}

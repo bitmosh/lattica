@@ -1,8 +1,8 @@
 ---
 title: Coordination Patterns — Cross-Claude Methodology
 status: live
-version: v0.3.2y
-last_reviewed: v0.3.2y
+version: v0.3.3
+last_reviewed: v0.3.3
 ---
 
 # Coordination Patterns
@@ -290,12 +290,29 @@ can be a guest (any project authoring content for another project's tree). The s
 project can be host for one contribution and guest for another:
 
 - **Cerebra is guest, Lattica is host** for SignalEvaluatedRenderer (validated UP-001)
-- **Policy Scout will be guest, LumaWeave is host** when Policy Scout contributes a
-  renderer to LumaWeave's payloadRendererRegistry
+- **Policy Scout will be guest, Lattica is host** when Policy Scout contributes a
+  renderer for ActionProposed and governance-related event types to Lattica's
+  payloadRendererRegistry
 - **Future: ai-stack as guest, Lattica as host** when ai-stack contributes a
   ResponseGeneratedRenderer to Lattica's cerebra signal feed
 
 The pattern generalizes across the platform.
+
+**Methodology note (v0.3.3 correction):**
+
+The Policy Scout example above was originally written as "LumaWeave is host" in
+v0.3.2z's P-013 promotion, based on a Policy Scout check-in mentioning a
+LumaWeave-side dependency. The framing was accepted into the canonical doc without
+architectural verification. The actual architectural truth: Policy Scout's
+renderer destination is Lattica's tree (same as Cerebra). The LumaWeave reference
+was a temporal/conditional prerequisite, not an architectural host designation.
+
+Lesson: check-in observations from project Claudes are valuable signal, but
+should be verified against architectural source-of-truth before promotion to
+canonical documentation. Project Claudes operate with deep context but partial
+view; the canonical doc-keeper (Lattica Claude here) integrates across views
+and is the right place to catch framing drift. Banked for application in future
+pattern promotions.
 
 **Ownership boundaries:**
 

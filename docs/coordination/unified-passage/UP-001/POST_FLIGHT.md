@@ -55,8 +55,8 @@ npm run tauri dev
 
 # In a separate terminal, trigger a Cerebra cycle
 cd ~/Projects/cerebra
-CEREBRA_PLATFORM_STORE=~/.lattica/fossic/store.db python -m cerebra.cli.main \
-  run --config simple.planning.v0 --goal "UP-001 smoke test"
+CEREBRA_PLATFORM_STORE=~/.lattica/fossic/store.db uv run cerebra run-cycle \
+  --goal "UP-001 smoke test" simple.planning.v0
 ```
 
 Expected: `CerebraSignalTile` receives events on `cerebra/agent-trace/*`,

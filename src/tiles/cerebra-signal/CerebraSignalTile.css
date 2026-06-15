@@ -1,56 +1,19 @@
 .cerebra-signal-tile {
-  font-family: monospace;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: var(--portfolio-bg);
-  color: var(--portfolio-text-primary);
-  min-height: 120px;
-}
-
-.cerebra-signal-tile__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--portfolio-border);
-  padding-bottom: 0.4rem;
-}
-
-.cerebra-signal-tile__title {
-  font-size: 0.85rem;
-  color: var(--portfolio-accent);
-  font-weight: bold;
-  letter-spacing: 0.04em;
-}
-
-.cerebra-signal-tile__count {
-  font-size: 0.75rem;
-  color: var(--portfolio-text-secondary);
-  background: var(--portfolio-surface);
-  border: 1px solid var(--portfolio-border);
-  border-radius: 3px;
-  padding: 0.05rem 0.4rem;
-}
-
-.cerebra-signal-tile__events {
+  font-family: "IBM Plex Mono", monospace;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  overflow-y: auto;
-  max-height: 260px;
 }
 
 .cerebra-signal-tile__empty {
-  color: var(--portfolio-text-secondary);
   font-size: 0.8rem;
+  color: var(--portfolio-text-secondary);
   font-style: italic;
-  padding: 0.5rem 0;
 }
 
 .cerebra-signal-tile__event-raw {
   padding: 0.3rem 0.5rem;
-  background: var(--portfolio-surface);
+  background: var(--portfolio-bg);
   border: 1px solid var(--portfolio-border);
   border-radius: 3px;
   font-size: 0.8rem;

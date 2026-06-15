@@ -63,38 +63,32 @@ export function CerebraSignalTile() {
 
   return (
     <div className="cerebra-signal-tile">
-      <div className="cerebra-signal-tile__header">
-        <span className="cerebra-signal-tile__title">Cerebra Signal Feed</span>
-        <span className="cerebra-signal-tile__count">{events.length}</span>
-      </div>
-      <div className="cerebra-signal-tile__events">
-        {events.length === 0 ? (
-          <div className="cerebra-signal-tile__empty">
-            Waiting for Cerebra signals…
-          </div>
-        ) : (
-          events.map((event) => {
-            const entry = getPayloadRenderer(event.event_type, event.stream_id);
-            if (entry) {
-              const Renderer = entry.component;
-              return (
-                <Renderer
-                  key={event.id}
-                  payload={event.payload}
-                  event_id={event.id}
-                />
-              );
-            }
+      {events.length === 0 ? (
+        <div className="cerebra-signal-tile__empty">
+          Waiting for Cerebra signals…
+        </div>
+      ) : (
+        events.map((event) => {
+          const entry = getPayloadRenderer(event.event_type, event.stream_id);
+          if (entry) {
+            const Renderer = entry.component;
             return (
-              <div key={event.id} className="cerebra-signal-tile__event-raw">
-                <span className="cerebra-signal-tile__event-type">
-                  {event.event_type}
-                </span>
-              </div>
+              <Renderer
+                key={event.id}
+                payload={event.payload}
+                event_id={event.id}
+              />
             );
-          })
-        )}
-      </div>
+          }
+          return (
+            <div key={event.id} className="cerebra-signal-tile__event-raw">
+              <span className="cerebra-signal-tile__event-type">
+                {event.event_type}
+              </span>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 }

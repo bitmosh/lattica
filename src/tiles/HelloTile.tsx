@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { tileSectionRegistry } from "../control-plane/tile-section/tileSectionRegistry";
+import type { TileSectionEntry } from "../control-plane/tile-section/types";
 import { sendToEmbedded } from "../ipc/postMessageBridge";
 import { getAllPayloadRenderers } from "../control-plane/payload-renderer/payloadRendererRegistry";
 import "./HelloTile.css";
@@ -19,7 +20,7 @@ interface FossicEventPayload {
 export function HelloTile() {
   const [storeStatus, setStoreStatus] = useState<StoreStatus | null>(null);
   const [canaryCount, setCanaryCount] = useState(0);
-  const [tileCount, setTileCount] = useState(() => tileSectionRegistry.list().length);
+  const [tileEntries, setTileEntries] = useState<TileSectionEntry[]>(() => tileSectionRegistry.list());
   const [rendererCount] = useState(() => getAllPayloadRenderers().length);
   const [postMessageLog, setPostMessageLog] = useState<string[]>([]);
 
@@ -59,10 +60,9 @@ export function HelloTile() {
   }, []);
 
   useEffect(() => {
-    const unsub = tileSectionRegistry.subscribe?.((updated) => {
-      setTileCount(updated.length);
+    return tileSectionRegistry.subscribe?.((updated) => {
+      setTileEntries(updated);
     });
-    return unsub;
   }, []);
 
   function handlePostMessageDemo() {
@@ -102,7 +102,7 @@ export function HelloTile() {
         <section className="hello-tile__card">
           <h2>tile registry</h2>
           <p className="hello-tile__status">
-            {tileCount} tile(s) · {rendererCount} payload renderer(s)
+            {tileEntries.length} tile(s) · {rendererCount} payload renderer(s)
           </p>
         </section>
 
@@ -120,6 +120,13 @@ export function HelloTile() {
           )}
         </section>
       </div>
+
+      {tileEntries.filter((e) => e.content).map((entry) => (
+        <section key={entry.id} className="hello-tile__registered-card">
+          <h2>{entry.label}</h2>
+          {entry.content!()}
+        </section>
+      ))}
     </div>
   );
 }

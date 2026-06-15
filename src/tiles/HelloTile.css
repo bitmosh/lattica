@@ -96,3 +96,20 @@
   padding: 0.25rem 0;
   border-top: 1px solid var(--portfolio-border);
 }
+
+.hello-tile__registered-card {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 8px;
+}
+
+.hello-tile__registered-card h2 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--portfolio-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
+}

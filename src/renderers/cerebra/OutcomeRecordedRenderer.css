@@ -1,0 +1,134 @@
+.cerebra-outcome-recorded {
+  font-family: monospace;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 4px;
+  color: var(--portfolio-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cerebra-outcome-recorded--severe {
+  border-color: var(--portfolio-color-danger);
+}
+
+.cerebra-outcome-recorded--notable {
+  border-color: var(--portfolio-color-warning);
+}
+
+.cerebra-outcome-recorded--invalid {
+  color: var(--portfolio-color-danger);
+  font-style: italic;
+}
+
+.cerebra-outcome-recorded__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-outcome-recorded__label {
+  color: var(--portfolio-accent);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+}
+
+.cerebra-outcome-recorded__error {
+  color: var(--portfolio-color-danger);
+}
+
+.cerebra-outcome-recorded__classification {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.cerebra-outcome-recorded__classification--noise {
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  color: var(--portfolio-text-secondary);
+}
+
+.cerebra-outcome-recorded__classification--notable {
+  background: var(--portfolio-color-warning);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-outcome-recorded__classification--severe {
+  background: var(--portfolio-color-danger);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-outcome-recorded__delta {
+  font-size: 0.78rem;
+  font-weight: bold;
+}
+
+.cerebra-outcome-recorded__delta--above {
+  color: var(--portfolio-color-success);
+}
+
+.cerebra-outcome-recorded__delta--below {
+  color: var(--portfolio-color-danger);
+}
+
+.cerebra-outcome-recorded__score-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-outcome-recorded__bar {
+  color: var(--portfolio-color-success);
+  letter-spacing: 0.02em;
+}
+
+.cerebra-outcome-recorded__pct {
+  color: var(--portfolio-text-secondary);
+  min-width: 3ch;
+}
+
+.cerebra-outcome-recorded__signals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.15rem 0.5rem;
+  padding: 0.2rem 0;
+}
+
+.cerebra-outcome-recorded__signal {
+  display: flex;
+  gap: 0.3rem;
+  align-items: baseline;
+}
+
+.cerebra-outcome-recorded__signal-name {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
+.cerebra-outcome-recorded__signal-error {
+  font-size: 0.78rem;
+}
+
+.cerebra-outcome-recorded__signal-error--pos {
+  color: var(--portfolio-color-success);
+}
+
+.cerebra-outcome-recorded__signal-error--neg {
+  color: var(--portfolio-color-danger);
+}
+
+.cerebra-outcome-recorded__meta {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.cerebra-outcome-recorded__sep {
+  opacity: 0.4;
+}

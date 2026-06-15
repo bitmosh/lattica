@@ -337,3 +337,13 @@ confirmed on disk. Tagged `(backfilled)`.
 ### Pass v0.3.2
 
 2026-06-14 · [lattica → platform]      · unified-passage          · UP-001/POST_FLIGHT.md
+
+### 2026-06-15 — P-013 host correction
+
+2026-06-15 · [lattica → policy-scout]  · outbound                 · 2026-06-15_lattica_to_policy-scout_p013-host-correction.md
+2026-06-15 · [policy-scout → lattica]  · inbound (close)          · 2026-06-15_policy-scout_to_lattica_p013-host-correction-ack.md
+
+### Pass v0.3.4
+
+2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/OutcomeRecordedRenderer.tsx
+2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/OutcomeRecordedRenderer.css

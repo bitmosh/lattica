@@ -347,3 +347,8 @@ confirmed on disk. Tagged `(backfilled)`.
 
 2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/OutcomeRecordedRenderer.tsx
 2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/OutcomeRecordedRenderer.css
+
+### Pass v0.3.5
+
+2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/ClutchDecisionMadeRenderer.tsx
+2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/ClutchDecisionMadeRenderer.css

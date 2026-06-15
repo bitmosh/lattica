@@ -1,0 +1,105 @@
+.cerebra-clutch-decision {
+  font-family: monospace;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 4px;
+  color: var(--portfolio-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cerebra-clutch-decision--stop {
+  border-color: var(--portfolio-color-danger);
+}
+
+.cerebra-clutch-decision--refine {
+  border-color: var(--portfolio-color-warning);
+}
+
+.cerebra-clutch-decision--invalid {
+  color: var(--portfolio-color-danger);
+  font-style: italic;
+}
+
+.cerebra-clutch-decision__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-clutch-decision__label {
+  color: var(--portfolio-accent);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+}
+
+.cerebra-clutch-decision__error {
+  color: var(--portfolio-color-danger);
+}
+
+.cerebra-clutch-decision__action {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.cerebra-clutch-decision__action--accept {
+  background: var(--portfolio-color-success);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-clutch-decision__action--refine {
+  background: var(--portfolio-color-warning);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-clutch-decision__action--stop {
+  background: var(--portfolio-color-danger);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-clutch-decision__catalyst-badge {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-color-info);
+  color: var(--portfolio-color-info);
+}
+
+.cerebra-clutch-decision__rule {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.cerebra-clutch-decision__rule-depth {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+}
+
+.cerebra-clutch-decision__rule-name {
+  color: var(--portfolio-text-primary);
+  font-size: 0.8rem;
+}
+
+.cerebra-clutch-decision__rule-name--no-match {
+  color: var(--portfolio-text-secondary);
+  font-style: italic;
+}
+
+.cerebra-clutch-decision__meta {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.cerebra-clutch-decision__sep {
+  opacity: 0.4;
+}

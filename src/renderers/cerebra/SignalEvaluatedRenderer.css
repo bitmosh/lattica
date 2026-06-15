@@ -1,0 +1,71 @@
+.cerebra-signal-evaluated {
+  font-family: monospace;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 4px;
+  color: var(--portfolio-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cerebra-signal-evaluated--low-confidence {
+  border-color: var(--portfolio-color-warning);
+}
+
+.cerebra-signal-evaluated--invalid {
+  color: var(--portfolio-color-danger);
+  font-style: italic;
+}
+
+.cerebra-signal-evaluated__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-signal-evaluated__signal-name {
+  color: var(--portfolio-accent);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+}
+
+.cerebra-signal-evaluated__badge {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.cerebra-signal-evaluated__badge--warn {
+  background: var(--portfolio-color-warning);
+  color: var(--portfolio-bg);
+}
+
+.cerebra-signal-evaluated__score-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-signal-evaluated__bar {
+  color: var(--portfolio-color-success);
+  letter-spacing: 0.02em;
+}
+
+.cerebra-signal-evaluated__pct {
+  color: var(--portfolio-text-secondary);
+  min-width: 3ch;
+}
+
+.cerebra-signal-evaluated__meta {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.cerebra-signal-evaluated__sep {
+  opacity: 0.4;
+}

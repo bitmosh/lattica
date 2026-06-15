@@ -1,6 +1,6 @@
 ---
 title: Deviation — Living Report (Lattica)
-last_reviewed: v0.3.0
+last_reviewed: v0.3.2
 ---
 
 # Deviation — Living Report
@@ -98,3 +98,87 @@ ADR-009 model in this pass (lattica_round1.md files). Their original
 requirements deposits assumed the implicit single-bundle model; ADR-009 hybrid
 is compatible with that assumption for projects without standalone frontends
 and additive for projects with them.
+
+---
+
+---
+id: DV-003
+type: deviation
+status: open
+pass_opened: v0.3.2
+severity: LOW
+---
+
+### DV-003 — UP-001 SignalEvaluatedRenderer visual polish deferred
+
+**Surfaced:** UP-001 POST_FLIGHT, v0.3.2
+**Severity:** post-MVP polish; not blocking
+
+Cerebra's `SignalEvaluatedRenderer` renders functionally correct output (signal
+name, score bar, strength, session, timestamp) but is not visually optimized.
+Score bars use block characters; layout uses default monospace spacing; no
+hover states, no transitions, no responsive sizing. Adequate for UP-001's
+"render real event end-to-end" invariant; refinement deferred to post-MVP
+visual-design pass.
+
+---
+
+---
+id: DV-004
+type: deviation
+status: open
+pass_opened: v0.3.2
+severity: LOW
+---
+
+### DV-004 — UP-001 concurrent-event rendering not validated
+
+**Surfaced:** UP-001 POST_FLIGHT, v0.3.2
+**Severity:** post-MVP; not blocking
+
+The cerebra signal feed renders events as they arrive but was not tested under
+concurrent-load conditions. Cerebra cycles emit ~30 SignalEvaluated events per
+cycle plus other event types; rapid arrival was observed but not stress-tested
+(e.g., multiple cycles in parallel, or replay of stored events). UP-001
+satisfied "renders a real event" — multi-event stress test belongs in
+UP-002+ or a dedicated performance pass.
+
+---
+
+---
+id: DV-005
+type: deviation
+status: open
+pass_opened: v0.3.2
+severity: LOW
+---
+
+### DV-005 — UP-001 error-state rendering not stress-tested
+
+**Surfaced:** UP-001 POST_FLIGHT, v0.3.2
+**Severity:** post-MVP; not blocking
+
+Cerebra's renderer includes a payload-defensive `isSignalEvaluatedPayload` type
+guard that returns an "invalid payload" rendering for malformed inputs. The
+guard is correct by inspection but was not stress-tested with intentionally
+malformed payloads (missing fields, wrong types, etc.). Post-MVP work.
+
+---
+
+---
+id: DV-006
+type: deviation
+status: open
+pass_opened: v0.3.2
+severity: LOW
+---
+
+### DV-006 — UP-001 performance characterization deferred
+
+**Surfaced:** UP-001 POST_FLIGHT, v0.3.2
+**Severity:** post-MVP; not blocking
+
+End-to-end latency was observed as "~1-2 seconds" subjectively during smoke
+test but not measured precisely. Sustained-volume behavior, memory footprint
+under long sessions, and React render cost per event were not characterized.
+Performance work is post-MVP and likely needs telemetry hooks first.

@@ -2,110 +2,96 @@
 unified-passage: UP-001
 status: complete
 date: 2026-06-14
-pass: v0.3.0
-filed-by: Lattica Claude Code
 ---
 
-# UP-001 POST_FLIGHT
+# UP-001 — Post-Flight Verification
 
-## Lattica EXECUTE phase verification
+## Smoke test execution
 
-### Typecheck (Check 1 deferred from Cerebra ARM)
+A live `npm run tauri dev` instance was launched. In a separate terminal, the
+developer ran:
 
-`npx tsc --noEmit` — **PASS.** Zero errors. All new files
-(`SignalEvaluatedRenderer.tsx`, `registrations.ts`, `CerebraSignalTile.tsx`)
-type-check cleanly against Lattica's tsconfig.
-
-### Build verification
-
-`npm run tauri dev` — **PASS.** Two clean runs:
-- Vite: `VITE v7.3.5  ready in 108–109 ms`
-- Rust: `Finished dev profile target(s) in 0.12s`
-- Binary: `Running target/debug/lattica` — no panics
-
-### Registration path (Check 4 deferred from Cerebra ARM)
-
-`src/registrations.ts` is a side-effect import in `src/main.tsx` (runs before
-React renders). It calls `registerPayloadRenderer()` and
-`tileSectionRegistry.register()` at module scope. Clean build with no type
-errors confirms neither call throws on load.
-
-### Structural marker (Check 5 deferred from Cerebra ARM)
-
-`data-cerebra-renderer="SignalEvaluated"` is on the root `<div>` of
-`SignalEvaluatedRenderer.tsx` on both the valid-payload and invalid-payload
-code paths. Verifiable via DOM inspection when the app runs.
-
----
-
-## What requires manual developer verification
-
-The following POST_FLIGHT checks from OVERVIEW.md require the developer to
-run a live Cerebra cycle with Lattica open:
-
-**Check 1 — Live smoke test**
-
-> Developer triggers a Cerebra cycle manually. Within ~5 seconds, the
-> Cerebra signal tile in Lattica's UI shows a rendered `SignalEvaluated`
-> event.
-
-```sh
-# Launch Lattica dev environment
-npm run tauri dev
-
-# In a separate terminal, trigger a Cerebra cycle
+```
 cd ~/Projects/cerebra
 CEREBRA_PLATFORM_STORE=~/.lattica/fossic/store.db uv run cerebra run-cycle \
-  --goal "UP-001 smoke test" simple.planning.v0
+  --goal "UP-001 smoke test" \
+  simple.planning.v0
 ```
 
-Expected: `CerebraSignalTile` receives events on `cerebra/agent-trace/*`,
-`getPayloadRenderer("SignalEvaluated", ...)` returns the registered entry,
-`SignalEvaluatedRenderer` renders with the signal name, score bar, and
-session metadata visible.
+The cycle ran to completion (5 steps), emitting events to the platform store
+on `cerebra/agent-trace/<session_id>` stream. The Lattica window updated in
+real time as events arrived via fossic-tauri's PostCommit subscription
+dispatch.
 
-**Check 2 — Structural marker**
+## Critical invariants
 
-DOM inspection of the rendered event card confirms
-`data-cerebra-renderer="SignalEvaluated"` on the root element.
+- [x] **A real Cerebra `SignalEvaluated` event renders in Lattica's UI** —
+      VERIFIED. Multiple events appeared in the CEREBRA SIGNAL FEED card from
+      session `sess_33028cede2a` (and earlier sessions). Events include
+      COHERENCE, GROUNDEDNESS, GENERATIVITY, RELEVANCE, PRECISION signal
+      types with the agreed render structure.
 
-**Check 3 — Repeat test**
+- [x] **The render uses Cerebra's contributed component, not the fallback** —
+      VERIFIED. Rendered events show the score-bar (block-character pattern),
+      "low confidence" badge styling in amber, signal-name accent color,
+      strength percentage, session ID truncated to 16 chars, and timestamp —
+      all unique to Cerebra's `SignalEvaluatedRenderer` component. Other event
+      types (SessionOpened, CycleStarted, etc.) fall through to the registry's
+      JSON-fallback path, confirming the registry's per-type lookup works
+      correctly and routes `SignalEvaluated` specifically to Cerebra's component.
 
-Second cycle produces a second rendered event in the tile.
+- [x] **End-to-end render latency is observable** — VERIFIED. Events appear in
+      the UI within ~1-2 seconds of being emitted by Cerebra cycles. No specific
+      threshold required for UP-001 success per OVERVIEW.md; observation alone
+      satisfies this invariant.
 
-**Check 4 — End-to-end latency**
+- [x] **The smoke test is repeatable** — VERIFIED. The developer ran the cycle
+      multiple times across distinct sessions
+      (sess_69e2ed7c70e7, sess_fb94183c506f, sess_33028cede2a). Each run
+      produced fresh events that rendered in the cerebra signal feed without
+      requiring restart of Lattica.
 
-Informational only — note observed latency between cycle completion and
-tile render.
+## Optional invariants
 
----
+- [-] **Visual polish on the renderer** — not optimized; structural correctness
+      only. Logged as DV-003.
+- [-] **Multiple concurrent events render correctly** — UP-001 tile shows
+      events as a feed; not stress-tested under concurrent load. Logged as
+      DV-004.
+- [-] **Error states render gracefully** — Cerebra's payload-defensive type
+      guard handles malformed payloads, but not stress-tested with intentionally
+      malformed inputs. Logged as DV-005.
+- [-] **Performance under sustained event volume** — not characterized;
+      single-cycle observation only. Logged as DV-006.
 
-## Wiring summary
+## Cross-project integration smoke test results
 
-| File | Role |
-|---|---|
-| `src/renderers/cerebra/SignalEvaluatedRenderer.tsx` | Cerebra-authored renderer (guest-author-in-host-repo) |
-| `src/renderers/cerebra/SignalEvaluatedRenderer.css` | Renderer styles |
-| `src/registrations.ts` | Registers renderer + tile metadata at startup |
-| `src/tiles/cerebra-signal/CerebraSignalTile.tsx` | Subscribes `cerebra/agent-trace/*`, routes events through `payloadRendererRegistry` |
-| `src/tiles/cerebra-signal/CerebraSignalTile.css` | Tile styles |
-| `src/App.tsx` | Added `<CerebraSignalTile />` alongside `<HelloTile />` |
-| `src/main.tsx` | Added `import "./registrations"` before React mount |
+- **Cycle 1 (sess_69e2ed7c70e7):** PASS — events emitted to platform store,
+  dispatched via PostCommit, received by Lattica's subscription, rendered.
+- **Cycle 2 (sess_fb94183c506f):** PASS — repeatability verified.
+- **Cycle 3 (sess_33028cede2a):** PASS — third repeat, captured in screenshot
+  evidence shared by developer.
 
-## API deviations from prompt assumptions
+## Final state
 
-Discovered during source survey; corrected in implementation:
+- **lattica:** v0.3.2 (this commit closes UP-001), prior shipping versions
+  in this passage: v0.3.0 (initial EXECUTE), v0.3.1 (Pattern B refinement)
+- **cerebra:** v0.3.8 (shipped at ARM phase; three bug fixes — stream key,
+  emit path, FTS5 sanitization)
+- **fossic:** no version change (verify-only role; pre-flight passed via
+  setup-hook evidence)
 
-| Field | Prompt assumed | Actual |
-|---|---|---|
-| `fossic_subscribe` stream param | `query.stream_glob` | `streamPattern` |
-| `fossic_unsubscribe` | `subscription_id` | `subscriptionId` |
-| `payloadRendererRegistry` lookup | `.find({...})` method | `getPayloadRenderer(type, path?)` |
-| `FossicEventPayload.event` | flat payload | nested `SerializedEvent` |
-| `App.tsx` rendering | tile registry driven | direct component import |
+## Result
 
-All deviations corrected before commit; implementation matches actual API.
+**COMPLETE.** UP-001 has validated the unified-passage methodology across all
+five phases: DRAFT → REVIEW → ARM → EXECUTE → POST_FLIGHT.
 
----
+The platform now renders real Cerebra events in Lattica's UI via the
+guest-author-in-host-repo pattern. This is the first user-observable feature
+in Lattica beyond the v0.2.0 scaffold.
 
-*UP-001 passage is complete pending developer live smoke test above.*
+Methodology learnings banked for retrospective and P-013 promotion. The
+retrospective is a separate pass (v0.3.2z) that also addresses hardcoded
+display values surfaced during smoke testing (header version text, tile
+registry count) and adds P-014 (Don't hardcode dynamic values) to
+COORDINATION_PATTERNS.md.

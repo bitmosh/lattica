@@ -1,10 +1,10 @@
 ---
 pass: 0.3.0
 version: v0.3.0
-sha_content: PLACEHOLDER_CONTENT
-sha_blast_radius: PLACEHOLDER_BLAST
+sha_content: 100377d
+sha_blast_radius: 68ef976
 date: 2026-06-14
-pushed: false
+pushed: true
 summary: UP-001 EXECUTE — Cerebra SignalEvaluated renderer wired end-to-end; payloadRendererRegistry + CerebraSignalTile + fossic subscription pipeline active
 ---
 

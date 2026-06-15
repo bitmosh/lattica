@@ -1,6 +1,6 @@
 ---
 title: Tech Debt — Living Report (Lattica)
-last_reviewed: v0.2.1v
+last_reviewed: v0.2.1u
 ---
 
 # Tech Debt — Living Report
@@ -74,3 +74,47 @@ LumaWeave origin constant. Also add `event.origin` check on the LumaWeave receiv
 side (already documented in ADR-010).
 
 **Evidence:** `src/ipc/postMessageBridge.ts` line with `target.postMessage(msg, "*")`.
+
+---
+
+---
+id: TD-003
+type: tech_debt
+status: resolved
+pass_opened: v0.2.1u
+pass_resolved: v0.2.1u
+severity: MEDIUM
+---
+
+### ~~TD-003 — v0.2.0 Tauri scaffold had three latent bugs that escaped review without a single `npm run tauri dev` invocation~~
+
+> **Resolved in v0.2.1u** — all three bugs fixed and build verified end-to-end.
+
+**Surfaced:** v0.2.1u (UP-001 ARM phase — first actual `npm run tauri dev` invocation)
+
+The v0.2.0 Tauri scaffold pass committed code with three compilation/runtime errors
+that escaped review because no actual build was run between v0.2.0 and v0.2.1u
+(roughly six descending-letter cleanup passes):
+
+1. **Missing `use tauri::Manager;` import** in `src-tauri/src/lib.rs` — called
+   `app.path()` and `app.manage(store)` without the trait in scope (E0599).
+
+2. **Missing icon files** at `src-tauri/icons/` — `tauri.conf.json` declared five
+   icon paths (`32x32.png`, `128x128.png`, `128x128@2x.png`, `icon.icns`,
+   `icon.ico`) that didn't exist. The proc macro panicked at compile time. Icons
+   also had to be RGBA format specifically — a second iteration required.
+
+3. **`lattica/canary` stream not declared before `append()`** — fossic requires
+   `Store::declare_stream()` before the first write to a stream. The setup hook
+   panicked at runtime.
+
+All three bugs were caught only by actually running the build. Code-read review
+missed all three.
+
+**Lesson banked:** Any pass that introduces or modifies build-relevant code must
+include an actual build verification step before merge. "Code looks right" is not
+sufficient; "code builds and runs" is the bar. Going forward, build-relevant passes
+include `npm run tauri dev` or equivalent end-to-end verification as a pre-merge-gate
+check, not just a documentation checklist item.
+
+**Three bugs; zero caught by code review; all three caught by `npm run tauri dev`.**

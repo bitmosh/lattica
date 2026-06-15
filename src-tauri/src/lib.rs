@@ -1,4 +1,5 @@
 use fossic::{Append, OpenOptions, Store};
+use tauri::Manager;
 
 // ── Store status command ──────────────────────────────────────────────────────
 
@@ -31,6 +32,8 @@ pub fn run() {
             }
 
             let store = Store::open(&store_path, OpenOptions::default())?;
+
+            store.declare_stream("lattica/canary", "lattica", Some("Startup health ping — proves write path is alive"))?;
 
             // Canary: prove the write path is alive on startup (ADR-014)
             store.append(Append {

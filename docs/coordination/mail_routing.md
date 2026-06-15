@@ -357,3 +357,9 @@ confirmed on disk. Tagged `(backfilled)`.
 
 2026-06-15 · [lattica → all]           · outbound                 · 2026-06-15_lattica_to_all_design-request-invitation.md
 2026-06-15 · [lattica → platform]      · design                   · docs/coordination/design/requests/lattica/design-request.md
+2026-06-15 · [lumaweave → design]      · design/request            · docs/coordination/design/requests/lumaweave/design-request.md
+
+### Pass v0.3.5y
+
+2026-06-15 · [lattica → all]           · outbound                 · 2026-06-15_lattica_to_all_design-architectural-update.md
+2026-06-15 · [lattica → platform]      · design                   · docs/coordination/design/requests/lattica/design-request.md (architectural reframe)

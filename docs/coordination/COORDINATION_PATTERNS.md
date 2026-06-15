@@ -1,8 +1,8 @@
 ---
 title: Coordination Patterns — Cross-Claude Methodology
 status: live
-version: v0.3.2z
-last_reviewed: v0.3.2z
+version: v0.3.2y
+last_reviewed: v0.3.2y
 ---
 
 # Coordination Patterns
@@ -278,11 +278,24 @@ content; the host owns build integration.
 
 **When to use:**
 
-- A project contributes a payload renderer, tile, or other UI component to
-  Lattica
-- The contributing project has no compatible build system (e.g., Cerebra is
-  Python-only; Policy Scout is Python-only; Bo is Python-only)
-- The receiving project has the build/lint/type-check infrastructure
+- A project contributes UI code (renderer, tile, component) to another project's repo
+- The contributing project lacks compatible build infrastructure (e.g., a Python-only
+  project contributes to a TypeScript-based host)
+- The host project has the build/lint/type-check infrastructure that the contribution
+  needs
+
+**Host and guest are positional roles, not project identities.** Any project can be
+a host (any project with the build infrastructure another project lacks). Any project
+can be a guest (any project authoring content for another project's tree). The same
+project can be host for one contribution and guest for another:
+
+- **Cerebra is guest, Lattica is host** for SignalEvaluatedRenderer (validated UP-001)
+- **Policy Scout will be guest, LumaWeave is host** when Policy Scout contributes a
+  renderer to LumaWeave's payloadRendererRegistry
+- **Future: ai-stack as guest, Lattica as host** when ai-stack contributes a
+  ResponseGeneratedRenderer to Lattica's cerebra signal feed
+
+The pattern generalizes across the platform.
 
 **Ownership boundaries:**
 
@@ -313,6 +326,10 @@ The renderer compiled cleanly under Lattica's `tsconfig.json` (Cerebra Claude
 verified against `jsx: react-jsx`, `strict`, `noUnusedLocals`, etc. before
 handoff). End-to-end smoke test showed real `SignalEvaluated` events rendering
 via the guest-authored component without integration friction.
+
+The pattern generalizes — host/guest pairings are emergent from build-infrastructure
+asymmetries, not from specific project identities. Future UP candidates that exercise
+this pattern between different host/guest pairings further validate the generalization.
 
 **Generalization:**
 
@@ -377,6 +394,41 @@ When in doubt, eyeball the UI and ask:
 
 If multiple display values match patterns from your training data ("Lattica v0.2.0"
 literally appears as text in the source), they're almost certainly hardcoded.
+
+**The audit identifies two failure modes, not one:**
+
+1. **Static-should-be-live:** values displayed as literals that should derive from a
+   source of truth (e.g., header version, counts, paths). Fix: wire to source.
+2. **Live-should-be-static-with-rationale:** values that ARE genuinely static (e.g.,
+   no source of truth exists, or staticness is intentional for the use case) but
+   appear as bare literals without explanation. Fix: leave the literal, but add
+   a comment explaining WHY it's static.
+
+**Empirical example (v0.3.2y refinement):**
+
+LumaWeave's P-014 audit (post-UP-001 check-in) found `<em>Contract registry v0.1.0</em>`
+in QaPanel.tsx. The contract registry has no `REGISTRY_VERSION` export — there IS no
+source of truth to derive from. The right fix isn't to wire it up (no wire to make);
+it's to make the staticness explicit:
+
+```typescript
+<em>
+  Contract registry v0.1.0{/* static — no REGISTRY_VERSION export exists yet */}
+  • Source: src/control-plane/contracts/controlSurfaceContract.registry.ts
+</em>
+```
+
+This satisfies P-014's intent without adding infrastructure complexity. Future readers
+see immediately that the version is intentionally static and know why.
+
+**When to leave a value static:**
+
+- No source of truth exists in the codebase
+- Adding a source of truth would be over-engineering for the value's actual mutability
+  (e.g., a label that genuinely doesn't change)
+- The value is locked by external contract (e.g., a vendored API version)
+
+In each case, the discipline is the comment, not the wiring.
 
 See also: ADR-014 (canary stream startup), `src/control-plane/tile-section/tileSectionRegistry.ts`
 (`list()` returns current state).

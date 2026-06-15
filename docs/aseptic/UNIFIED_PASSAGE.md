@@ -1,8 +1,8 @@
 ---
 title: Unified Passage — Synchronized Cross-Project Execution
 status: live
-version: v0.2.1.c
-last_reviewed: v0.2.1.c
+version: v0.3.2y
+last_reviewed: v0.3.2y
 ---
 
 # Unified Passage
@@ -116,6 +116,25 @@ project explains and waits for ACK before continuing. If PASS: project is armed 
 awaits EXECUTE signal.
 
 ARM phase ends when all participating projects show `status: pass`.
+
+**Internal pre-verification before REVIEW (refined v0.3.2y):**
+
+Each project runs their own internal pre-verification BEFORE filing their UP REVIEW
+acknowledgment — not during ARM. ARM phase is for *cross-project* verification (substrate
+authorization, integration readiness), not for catching project-internal bugs that should
+have been caught by the project's own discipline.
+
+UP-001 surfaced this lesson empirically: Cerebra's ARM pre-flight caught three Cerebra-
+internal bugs (stream key, emit path, FTS5 sanitization) that pre-dated UP-001 and were
+not UP-001-specific. Lattica's ARM pre-flight caught three v0.2.0-scaffold bugs (Manager
+import, icons, declare_stream) that similarly pre-dated UP-001. Both absorptions consumed
+methodology bandwidth that ideally belongs to substrate verification, not bug-hunting.
+
+Going forward: each project Claude smoke-tests their own contribution path end-to-end
+before filing the REVIEW ACK. For renderer contributions, this means actually running
+a real cycle and verifying events emit and store correctly. For substrate verification
+(fossic-style), this means running the relevant tests and confirming the API surface
+matches what the assignment references. ACK only after self-verification.
 
 ### Phase 4 — EXECUTE (dependency-ordered)
 

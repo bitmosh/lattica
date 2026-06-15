@@ -352,3 +352,8 @@ confirmed on disk. Tagged `(backfilled)`.
 
 2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/ClutchDecisionMadeRenderer.tsx
 2026-06-15 · [cerebra → lattica]       · cross-pollination (P-013) · src/renderers/cerebra/ClutchDecisionMadeRenderer.css
+
+### Pass v0.3.5z
+
+2026-06-15 · [lattica → all]           · outbound                 · 2026-06-15_lattica_to_all_design-request-invitation.md
+2026-06-15 · [lattica → platform]      · design                   · docs/coordination/design/requests/lattica/design-request.md

@@ -380,3 +380,23 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-15 · [lattica → all]           · outbound                 · 2026-06-15_lattica_to_all_backend-prep-investigation.md
 2026-06-15 · [policy-scout → lattica]  · design/request            · docs/coordination/design/requests/policy-scout/design-request.md
 2026-06-15 · [lattica → lumaweave]     · inbound                   · 2026-06-15_lattica_to_lumaweave_v035y-design-arch-update.md
+2026-06-15 · [lumaweave → lattica]     · design/backend-prep       · backend-prep/lumaweave/investigation.md
+2026-06-15 · [ai-stack/bo → lattica]   · design/backend-prep       · backend-prep/ai-stack-bo/investigation.md
+2026-06-15 · [ai-stack/bo → lattica]   · cross-pollination (P-013) · src/tiles/ai-stack/AiStackTopologyTile.tsx
+2026-06-15 · [ai-stack/bo → lattica]   · cross-pollination (P-013) · src/tiles/ai-stack/AiStackTopologyTile.css
+2026-06-15 · [ai-stack/bo → lattica]   · inbound                   · 2026-06-15_ai-stack-bo_to_lattica_p013-topology-tile-authored.md
+2026-06-15 · [ai-stack/bo → lattica]   · cross-pollination         · cross-pollination/ai-stack/pass-topology-tile-lattica.md
+2026-06-15 · [ai-stack/bo → fossic]    · cross-pollination         · cross-pollination/ai-stack/pass-topology-tile-fossic.md
+2026-06-15 · [policy-scout → lattica]  · design/backend-prep       · backend-prep/policy-scout/investigation.md
+2026-06-15 · [policy-scout → lattica]  · cross-pollination         · lockdown-bundle-and-timeout.md
+2026-06-15 · [policy-scout → fossic]   · cross-pollination         · approval-timeout-vocab-note.md
+2026-06-15 · [lumaweave → fossic]      · cross-pollination         · r-lw-005-fossic-emitter.md
+2026-06-15 · [lumaweave → lattica]     · cross-pollination         · reverse-channel-analysis.md
+
+### Pass v0.3.5v
+
+2026-06-15 · [cerebra → lattica]       · design/backend-prep       · backend-prep/cerebra/investigation.md
+2026-06-15 · [cerebra → lattica]       · cross-pollination         · cross-pollination/cerebra/daemon-v1-lattica.md
+2026-06-15 · [cerebra → fossic]        · cross-pollination         · cross-pollination/cerebra/daemon-v1-fossic.md
+2026-06-15 · [cerebra → fossic]        · cross-pollination (close) · cross-pollination/cerebra/daemon-v1-fossic-ack.md
+2026-06-15 · [lattica → platform]      · design/backend-prep-compile · docs/coordination/design/iterations/backend-prep/BACKEND_PREP_REPORT.md

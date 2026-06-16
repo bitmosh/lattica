@@ -1,0 +1,480 @@
+/* AiStackTopologyTile — ai-stack/bo guest-author contribution (P-013)
+   Tokens: --portfolio-* namespace (ADR-015). Typography: monospace for
+   all data values; sans-serif for structural labels. */
+
+.aistack-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--portfolio-surface);
+  color: var(--portfolio-text-primary);
+  font-size: 0.82rem;
+  min-width: 340px;
+}
+
+/* ── shared utilities ──────────────────────────────────────────────────── */
+
+.aistack-mono {
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.aistack-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--portfolio-text-secondary);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* ── status dot ────────────────────────────────────────────────────────── */
+
+.aistack-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.aistack-dot--up      { background: var(--portfolio-color-success); }
+.aistack-dot--down    { background: var(--portfolio-color-danger); }
+.aistack-dot--unknown { background: var(--portfolio-text-secondary); opacity: 0.5; }
+
+/* ── header ─────────────────────────────────────────────────────────────── */
+
+.aistack-tile__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.aistack-tile__header-left,
+.aistack-tile__header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.aistack-tile__title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--portfolio-text-primary);
+}
+
+.aistack-badge {
+  font-size: 0.68rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  background: var(--portfolio-color-success);
+  color: var(--portfolio-bg);
+  letter-spacing: 0.04em;
+}
+
+.aistack-badge--idle {
+  background: var(--portfolio-color-warning);
+}
+
+.aistack-pill {
+  font-size: 0.68rem;
+  font-family: monospace;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--portfolio-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--portfolio-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.aistack-pill:hover {
+  border-color: var(--portfolio-accent);
+  color: var(--portfolio-text-primary);
+}
+
+.aistack-pill--active {
+  border-color: var(--portfolio-accent);
+  color: var(--portfolio-accent);
+}
+
+.aistack-tile__spinner {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--portfolio-accent);
+  opacity: 0.7;
+  animation: aistack-pulse 1s ease-in-out infinite;
+}
+
+@keyframes aistack-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.9; }
+}
+
+/* ── error ──────────────────────────────────────────────────────────────── */
+
+.aistack-error {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--portfolio-color-danger);
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--portfolio-color-danger);
+  border-radius: 3px;
+  opacity: 0.85;
+}
+
+/* ── VRAM gauge ─────────────────────────────────────────────────────────── */
+
+.aistack-vram {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 1px solid var(--portfolio-border);
+  border-radius: 4px;
+}
+
+.aistack-vram__bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.aistack-vram__track {
+  flex: 1;
+  height: 5px;
+  background: var(--portfolio-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.aistack-vram__fill {
+  height: 100%;
+  background: var(--portfolio-color-success);
+  border-radius: 3px;
+  transition: width 0.4s ease, background-color 0.3s;
+}
+
+.aistack-vram__fill--warn {
+  background: var(--portfolio-color-warning);
+}
+
+.aistack-vram__label {
+  font-size: 0.75rem;
+  color: var(--portfolio-text-primary);
+  white-space: nowrap;
+}
+
+.aistack-vram__pct {
+  color: var(--portfolio-text-secondary);
+}
+
+.aistack-vram__pct--warn {
+  color: var(--portfolio-color-warning);
+}
+
+.aistack-vram__controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.aistack-vram__slider-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: default;
+}
+
+.aistack-slider {
+  width: 80px;
+  accent-color: var(--portfolio-accent);
+}
+
+.aistack-input {
+  width: 72px;
+  padding: 0.1rem 0.3rem;
+  background: var(--portfolio-bg);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 3px;
+  color: var(--portfolio-text-primary);
+  font-size: 0.78rem;
+}
+
+/* ── topology view ──────────────────────────────────────────────────────── */
+
+.aistack-topo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aistack-topo__flow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.aistack-topo__secondary {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-left: 0.25rem;
+  border-left: 2px solid var(--portfolio-border);
+  margin-left: 0.25rem;
+}
+
+/* ── nodes ──────────────────────────────────────────────────────────────── */
+
+.aistack-node {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--portfolio-border);
+  border-radius: 4px;
+  min-width: 100px;
+}
+
+.aistack-node--up    { border-color: var(--portfolio-color-success); }
+.aistack-node--down  { border-color: var(--portfolio-color-danger); opacity: 0.7; }
+.aistack-node--unknown { border-color: var(--portfolio-border); }
+
+.aistack-node__header {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.aistack-node__name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.aistack-node__port {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.72rem;
+}
+
+.aistack-node__note {
+  font-size: 0.68rem;
+  color: var(--portfolio-text-secondary);
+  font-style: italic;
+}
+
+.aistack-node__detail {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+}
+
+.aistack-node__models {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.aistack-node__model {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--portfolio-text-primary);
+}
+
+.aistack-node__model-vram {
+  color: var(--portfolio-text-secondary);
+  white-space: nowrap;
+}
+
+/* ── edges ──────────────────────────────────────────────────────────────── */
+
+.aistack-topo__edges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.aistack-edge {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--portfolio-text-secondary);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.aistack-edge--dormant {
+  opacity: 0.45;
+}
+
+.aistack-edge--muted {
+  text-decoration: line-through;
+  opacity: 0.3;
+}
+
+.aistack-edge__label {
+  font-size: 0.68rem;
+}
+
+.aistack-edge__arrow {
+  color: var(--portfolio-accent);
+  opacity: 0.7;
+}
+
+/* ── list view ──────────────────────────────────────────────────────────── */
+
+.aistack-list {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.aistack-list__row {
+  border-bottom: 1px solid var(--portfolio-border);
+}
+
+.aistack-list__row:last-child {
+  border-bottom: none;
+}
+
+.aistack-list__dot {
+  padding: 0.35rem 0.4rem 0.35rem 0;
+  width: 20px;
+}
+
+.aistack-list__detail {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+  padding: 0.35rem 0;
+}
+
+/* ── model actions ──────────────────────────────────────────────────────── */
+
+.aistack-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.aistack-actions__load {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.aistack-select {
+  padding: 0.15rem 0.35rem;
+  background: var(--portfolio-bg);
+  border: 1px solid var(--portfolio-border);
+  border-radius: 3px;
+  color: var(--portfolio-text-primary);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.aistack-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aistack-actions__status {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+}
+
+.aistack-btn {
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  border: 1px solid var(--portfolio-border);
+  background: transparent;
+  color: var(--portfolio-text-primary);
+  font-family: monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.aistack-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aistack-btn--danger {
+  border-color: var(--portfolio-color-danger);
+  color: var(--portfolio-color-danger);
+}
+
+.aistack-btn--danger:hover:not(:disabled) {
+  background: var(--portfolio-color-danger);
+  color: var(--portfolio-bg);
+}
+
+/* ── alias chips ────────────────────────────────────────────────────────── */
+
+.aistack-aliases {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--portfolio-border);
+  border-radius: 4px;
+}
+
+.aistack-aliases__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.aistack-chip {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--portfolio-border);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--portfolio-text-secondary);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.aistack-chip:hover {
+  border-color: var(--portfolio-accent);
+  color: var(--portfolio-text-primary);
+}
+
+/* topology-relevant aliases get a faint accent outline */
+.aistack-chip--topology {
+  border-color: var(--portfolio-accent);
+  opacity: 0.75;
+  color: var(--portfolio-text-primary);
+}
+
+.aistack-chip--muted {
+  text-decoration: line-through;
+  opacity: 0.35;
+}
+
+/* ── footer ─────────────────────────────────────────────────────────────── */
+
+.aistack-tile__footer {
+  border-top: 1px solid var(--portfolio-border);
+  padding-top: 0.4rem;
+}
+
+.aistack-tile__footer-ts {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.7rem;
+}

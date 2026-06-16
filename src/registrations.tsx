@@ -5,6 +5,7 @@ import { PredictionMadeRenderer } from "./renderers/cerebra/PredictionMadeRender
 import { OutcomeRecordedRenderer } from "./renderers/cerebra/OutcomeRecordedRenderer";
 import { ClutchDecisionMadeRenderer } from "./renderers/cerebra/ClutchDecisionMadeRenderer";
 import { CerebraSignalTile } from "./tiles/cerebra-signal/CerebraSignalTile";
+import { AiStackTopologyTile } from "./tiles/ai-stack/AiStackTopologyTile";
 
 registerPayloadRenderer({
   project: "cerebra",
@@ -49,4 +50,17 @@ tileSectionRegistry.register({
   defaultVisible: true,
   defaultExpanded: true,
   content: () => <CerebraSignalTile />,
+});
+
+tileSectionRegistry.register({
+  id: "ai-stack-topology",
+  label: "AI Stack Topology",
+  category: "right-panel",
+  defaultWidth: 480,
+  defaultHeight: 520,
+  collapsible: true,
+  defaultAnchor: { edge: "right", offset: 420 },
+  defaultVisible: true,
+  defaultExpanded: true,
+  content: () => <AiStackTopologyTile />,
 });

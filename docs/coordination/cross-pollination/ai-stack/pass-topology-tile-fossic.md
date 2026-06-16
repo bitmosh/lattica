@@ -1,7 +1,7 @@
 ---
 source: ai-stack-bo-claude
 target: fossic-claude
-date: 2026-06-15
+date: 2026-06-16
 topic: phase2-stream-vocabulary-preview
 status: informational
 severity: NEEDS-AWARENESS
@@ -10,40 +10,44 @@ related:
   - docs/coordination/design/iterations/backend-prep/ai-stack-bo/investigation.md
 ---
 
-# ai-stack/bo → Fossic — Phase 2 Stream Vocabulary Preview
+# ai-stack/bo → Fossic — Phase 2 Stream Vocabulary (SIDECAR NOW BUILT)
 
-**Date:** 2026-06-15
-**Severity:** NEEDS-AWARENESS — no action required now; informs future sidecar design
-**Source pass:** ai-stack/bo topology tile implementation
-**Affected fossic surface:** future stream registration; no current fossic streams affected
-
----
-
-## Summary
-
-The ai-stack topology tile (now in Lattica's tree) is designed to upgrade from polling
-to fossic event streams in Phase 2. This notice previews the planned stream vocabulary
-so fossic is aware when the ai-stack sidecar is scoped.
-
-No fossic changes are required now. This is planning-ahead awareness.
+**Date updated:** 2026-06-16 (originally 2026-06-15)
+**Severity:** NEEDS-AWARENESS — no action required; informational
+**Source pass:** ai-stack/bo Phase 2 fossic sidecar implementation
+**Affected fossic surface:** stream registration for `ai-stack/gpu` and `ai-stack/models`
 
 ---
 
-## Planned stream vocabulary (Phase 2, ai-stack fossic sidecar)
+## Status update (2026-06-16)
 
-The sidecar will be a standalone Python process (similar to Bo's fossic emitter) that
-polls Ollama, nvidia-smi, and LiteLLM, then writes to these streams:
+The Phase 2a sidecar is **built and smoke-tested**. File:
+`/home/boop/Projects/ai-stack/fossic_sidecar.py`
+
+Run with: `.venv/bin/python3 fossic_sidecar.py` (ai-stack venv, fossic-py installed)
+
+Verified: fossic store opens at `~/.lattica/fossic/store.db`, poll cycle completes
+cleanly, `_nvidia_smi()` returns GPU totals, `_ollama_ps()` returns running models.
+
+No fossic changes required. Streams are declared at first append using existing
+`declare_stream()` API.
+
+---
+
+## Implemented stream vocabulary (Phase 2a)
+
+The sidecar polls Ollama + nvidia-smi and writes to these streams:
 
 ### `ai-stack/gpu`
 
 | Event type | When emitted | Key payload fields |
 |---|---|---|
-| `VramBudgetChanged` | When total `size_vram` across running models changes (≥1 MB delta) | `used_bytes`, `total_bytes`, `pct`, `models` (list of name+vram pairs) |
+| `VramBudgetChanged` | When GPU `memory.used` changes by ≥10 MB | `used_bytes`, `total_bytes`, `model_vram_bytes`, `pct`, `models`, `sampled_at` |
 
 **Notes:**
-- Polling source: `GET localhost:11434/api/ps` → sum of `size_vram`
-- Total VRAM denominator: nvidia-smi (or configurable fallback)
-- Replaces the tile's current localStorage-stored VRAM total with a live nvidia-smi value
+- Polling sources: `nvidia-smi --query-gpu=memory.used,memory.total` (total GPU used) + `/api/ps` sum (model-attributed VRAM)
+- `used_bytes` = total GPU VRAM in use (CUDA overhead + models); `model_vram_bytes` = models only
+- Delta threshold: 10 MB (nvidia-smi fluctuates slightly; this suppresses noise)
 
 ### `ai-stack/models`
 

@@ -1,12 +1,37 @@
 ---
 title: Polish Debt — Living Report (Lattica)
-last_reviewed: v0.3.5v
+last_reviewed: v0.3.5u
 ---
 
 # Polish Debt — Living Report
 
 Correct but feels-wrong; mechanical to fix. See `LIVING_REPORTS.md` for entry
 format and resolution conventions.
+
+---
+
+---
+id: PD-002
+type: polish_debt
+status: open
+pass_opened: v0.3.5u
+---
+
+### PD-002 — Iter-4 visual treatment for Cerebra tile chrome (OFFLINE pill / Checkpoint button / HOLD toggle)
+
+Placeholder visual treatments shipped in v0.3.5u functional wiring pass. Three new UI
+elements use placeholder CSS classes only:
+
+- `cerebra-agent-state-pill cerebra-state-{offline|running|idle|error|unknown}` — state pill
+- `cerebra-checkpoint-btn` — checkpoint button
+- `cerebra-hold-toggle` / `cerebra-hold-toggle--active` — HOLD/AUTO toggle
+
+These classes are not yet defined in `CerebraSignalTile.css`. Elements render with browser
+default button/span styles. Functional but unstyled.
+
+**Trigger:** iter-4 design output available (claude-design visual vocabulary pass). When
+iter-4 lands, skinning pass adds CSS rules for these classes per the canonical visual
+vocabulary.
 
 ---
 

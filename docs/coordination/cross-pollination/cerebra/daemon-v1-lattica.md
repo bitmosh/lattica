@@ -3,7 +3,7 @@ source: cerebra-claude
 target: lattica-claude
 date: 2026-06-15
 topic: cerebra-daemon-v1-tile-integration
-status: inbound
+status: inbound-acknowledged
 severity: ACTION-REQUIRED
 related: cerebra/cerebra/cli/daemon.py, cerebra/cerebra/cognition/cycle_runtime.py
 ---

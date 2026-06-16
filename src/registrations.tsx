@@ -4,6 +4,7 @@ import { SignalEvaluatedRenderer } from "./renderers/cerebra/SignalEvaluatedRend
 import { PredictionMadeRenderer } from "./renderers/cerebra/PredictionMadeRenderer";
 import { OutcomeRecordedRenderer } from "./renderers/cerebra/OutcomeRecordedRenderer";
 import { ClutchDecisionMadeRenderer } from "./renderers/cerebra/ClutchDecisionMadeRenderer";
+import { CheckpointSavedRenderer } from "./renderers/cerebra/CheckpointSavedRenderer";
 import { CerebraSignalTile } from "./tiles/cerebra-signal/CerebraSignalTile";
 import { AiStackTopologyTile } from "./tiles/ai-stack/AiStackTopologyTile";
 
@@ -36,6 +37,14 @@ registerPayloadRenderer({
   event_type: "ClutchDecisionMade",
   component: ClutchDecisionMadeRenderer,
   label: "Cerebra — Clutch Decision Made",
+  stream_glob: "cerebra/agent-trace/*",
+});
+
+registerPayloadRenderer({
+  project: "cerebra",
+  event_type: "CheckpointSaved",
+  component: CheckpointSavedRenderer,
+  label: "Cerebra — Checkpoint Saved",
   stream_glob: "cerebra/agent-trace/*",
 });
 

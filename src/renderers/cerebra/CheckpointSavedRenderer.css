@@ -1,0 +1,66 @@
+.cerebra-checkpoint {
+  font-family: monospace;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--portfolio-surface);
+  border: 1px solid var(--portfolio-color-info);
+  border-radius: 4px;
+  color: var(--portfolio-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cerebra-checkpoint--invalid {
+  border-color: var(--portfolio-color-danger);
+  color: var(--portfolio-color-danger);
+  font-style: italic;
+}
+
+.cerebra-checkpoint__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cerebra-checkpoint__label {
+  color: var(--portfolio-color-info);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+}
+
+.cerebra-checkpoint__bundle-id {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cerebra-checkpoint__error {
+  color: var(--portfolio-color-danger);
+}
+
+.cerebra-checkpoint__counts {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--portfolio-text-secondary);
+}
+
+.cerebra-checkpoint__counts strong {
+  color: var(--portfolio-text-primary);
+  font-weight: 600;
+}
+
+.cerebra-checkpoint__meta {
+  color: var(--portfolio-text-secondary);
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.cerebra-checkpoint__sep {
+  opacity: 0.4;
+}

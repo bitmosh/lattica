@@ -1,4 +1,5 @@
 use fossic::{Append, OpenOptions, Store};
+use std::process::Command;
 use tauri::Manager;
 
 // ── Store status command ──────────────────────────────────────────────────────
@@ -16,6 +17,110 @@ fn lattica_store_status(store: tauri::State<'_, Store>) -> Result<StoreStatus, S
         ok: true,
         stream_count: streams.len(),
     })
+}
+
+// ── Policy Scout CLI commands ─────────────────────────────────────────────────
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct CliJsonResponse {
+    ok: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    active: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reason: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    already_active: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    already_inactive: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+}
+
+fn run_cli_json(args: &[&str]) -> CliJsonResponse {
+    let output = match Command::new(args[0]).args(&args[1..]).output() {
+        Ok(o) => o,
+        Err(e) => {
+            return CliJsonResponse {
+                ok: false,
+                error: Some(format!("subprocess failed to start: {}", e)),
+                active: None,
+                reason: None,
+                already_active: None,
+                already_inactive: None,
+            }
+        }
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    match serde_json::from_str::<CliJsonResponse>(&stdout) {
+        Ok(parsed) => parsed,
+        Err(e) => CliJsonResponse {
+            ok: false,
+            error: Some(format!(
+                "could not parse CLI JSON: {} — stdout: {}",
+                e, stdout
+            )),
+            active: None,
+            reason: None,
+            already_active: None,
+            already_inactive: None,
+        },
+    }
+}
+
+fn validate_reason(reason: &str) -> Result<(), CliJsonResponse> {
+    if reason.len() > 500 {
+        return Err(CliJsonResponse {
+            ok: false,
+            error: Some("reason exceeds 500 characters".into()),
+            active: None,
+            reason: None,
+            already_active: None,
+            already_inactive: None,
+        });
+    }
+    if reason.contains('\0') {
+        return Err(CliJsonResponse {
+            ok: false,
+            error: Some("reason contains NUL byte".into()),
+            active: None,
+            reason: None,
+            already_active: None,
+            already_inactive: None,
+        });
+    }
+    Ok(())
+}
+
+#[tauri::command]
+fn activate_lockdown(reason: Option<String>) -> CliJsonResponse {
+    let reason_str = reason.unwrap_or_default();
+    if let Err(e) = validate_reason(&reason_str) {
+        return e;
+    }
+    if reason_str.is_empty() {
+        run_cli_json(&["policy-scout", "lockdown", "on", "--json"])
+    } else {
+        run_cli_json(&[
+            "policy-scout",
+            "lockdown",
+            "on",
+            "--reason",
+            &reason_str,
+            "--json",
+        ])
+    }
+}
+
+#[tauri::command]
+fn deactivate_lockdown() -> CliJsonResponse {
+    run_cli_json(&["policy-scout", "lockdown", "off", "--json"])
+}
+
+#[tauri::command]
+fn restart_watch() -> CliJsonResponse {
+    // best-effort stop; result ignored
+    let _ = Command::new("policy-scout").args(["watch", "stop"]).output();
+    run_cli_json(&["policy-scout", "watch", "start", "--json"])
 }
 
 // ── Entry point ───────────────────────────────────────────────────────────────
@@ -59,6 +164,9 @@ pub fn run() {
             fossic_tauri::commands::fossic_read_by_correlation,
             fossic_tauri::commands::fossic_walk_causation,
             lattica_store_status,
+            activate_lockdown,
+            deactivate_lockdown,
+            restart_watch,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

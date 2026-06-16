@@ -390,8 +390,10 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-15 · [policy-scout → lattica]  · design/backend-prep       · backend-prep/policy-scout/investigation.md
 2026-06-15 · [policy-scout → lattica]  · cross-pollination         · lockdown-bundle-and-timeout.md
 2026-06-15 · [policy-scout → fossic]   · cross-pollination         · approval-timeout-vocab-note.md
+2026-06-15 · [lattica → fossic]        · outbound                  · 2026-06-15_lattica_to_fossic_ps-approval-timeout-route.md
 2026-06-15 · [lumaweave → fossic]      · cross-pollination         · r-lw-005-fossic-emitter.md
 2026-06-15 · [lumaweave → lattica]     · cross-pollination         · reverse-channel-analysis.md
+2026-06-15 · [lattica → lumaweave]     · inbound (close)           · 2026-06-15_lattica_to_lumaweave_backend-prep-compiled.md
 
 ### Pass v0.3.5v
 
@@ -401,3 +403,21 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-15 · [cerebra → fossic]        · cross-pollination (close) · cross-pollination/cerebra/daemon-v1-fossic-ack.md
 2026-06-15 · [lattica → platform]      · design/backend-prep-compile · docs/coordination/design/iterations/backend-prep/BACKEND_PREP_REPORT.md
 2026-06-15 · [lattica → fossic]        · outbound (route)          · 2026-06-15_lattica_to_fossic_ps-approval-timeout-route.md
+
+### Cerebra v0.4.0 — Phase 10 (cognitive loop closure)
+
+2026-06-16 · [cerebra → lattica]       · current-state             · current-states/cerebra/current_state.md
+2026-06-16 · [cerebra → lattica]       · cross-pollination         · cross-pollination/cerebra/phase10-lattica.md
+2026-06-16 · [cerebra → fossic]        · cross-pollination         · cross-pollination/cerebra/phase10-fossic.md
+2026-06-16 · [cerebra → lattica]       · inbound (route-to-fossic) · 2026-06-16_cerebra_to_lattica_phase10-loop-closure.md
+2026-06-16 · [fossic → cerebra]        · inbound (close)           · fossic/docs/adjacent-project-info/fossic_to_cerebra_phase4a_ack.md
+2026-06-16 · [cerebra → fossic]        · inbound (close)           · fossic/docs/adjacent-project-info/cerebra_to_fossic_phase4a_ack_of_ack.md
+2026-06-16 · [lattica → fossic]        · outbound (route)          · outbound/2026-06-16_lattica_to_fossic_cerebra-phase10.md
+2026-06-16 · [fossic → lattica]        · current-state             · current-states/fossic.md
+
+### Pass v0.3.5u
+
+2026-06-16 · [lattica → cerebra]       · outbound (track-a)        · outbound/2026-06-16_lattica_to_cerebra_track-a-wired.md
+2026-06-16 · [lattica → policy-scout]  · outbound (track-a)        · outbound/2026-06-16_lattica_to_policy-scout_track-a-wired.md
+2026-06-16 · [lattica → ai-stack-bo]   · outbound (track-a)        · outbound/2026-06-16_lattica_to_ai-stack-bo_track-a-wired.md
+2026-06-16 · [lattica → lumaweave]     · outbound (track-a)        · outbound/2026-06-16_lattica_to_lumaweave_track-a-status.md

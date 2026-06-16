@@ -400,3 +400,4 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-15 · [cerebra → fossic]        · cross-pollination         · cross-pollination/cerebra/daemon-v1-fossic.md
 2026-06-15 · [cerebra → fossic]        · cross-pollination (close) · cross-pollination/cerebra/daemon-v1-fossic-ack.md
 2026-06-15 · [lattica → platform]      · design/backend-prep-compile · docs/coordination/design/iterations/backend-prep/BACKEND_PREP_REPORT.md
+2026-06-15 · [lattica → fossic]        · outbound (route)          · 2026-06-15_lattica_to_fossic_ps-approval-timeout-route.md

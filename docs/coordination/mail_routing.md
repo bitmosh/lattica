@@ -430,9 +430,19 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-16 · [ai-stack/bo → fossic]    · cross-pollination (update) · cross-pollination/ai-stack/pass-topology-tile-fossic.md
 2026-06-16 · [lumaweave → lattica]     · baseline                  · baselines/2026-06-16/lumaweave/current_state.md
 2026-06-16 · [ai-stack/bo → lattica]   · baseline (federation-prep)  · baselines/2026-06-16/ai-stack-bo/current_state.md
+2026-06-16 · [lumaweave → lattica]     · reconciliation (baseline)   · baselines/2026-06-16/lumaweave/reconciliation.md
 
 ### Pass v0.3.5t
 
 2026-06-16 · [cerebra → lattica]       · baseline                  · baselines/2026-06-16/cerebra/current_state.md
 2026-06-16 · [fossic → lattica]        · baseline                  · baselines/2026-06-16/fossic/current_state.md
 2026-06-16 · [lattica internal]        · baseline compile          · baselines/2026-06-16/PLATFORM_BASELINE_2026-06-16.md
+2026-06-16 · [ai-stack/bo → lattica]   · reconciliation (baseline)   · baselines/2026-06-16/ai-stack-bo/reconciliation.md
+2026-06-16 · [policy-scout → lattica]  · reconciliation (baseline)   · baselines/2026-06-16/policy-scout/reconciliation.md
+
+### Pass v0.3.5s
+
+2026-06-16 · [cerebra → lattica]       · reconciliation (baseline)   · baselines/2026-06-16/cerebra/reconciliation.md
+2026-06-16 · [fossic → lattica]        · reconciliation (baseline)   · baselines/2026-06-16/fossic/reconciliation.md
+2026-06-16 · [lattica internal]        · reconciliation brief        · baselines/2026-06-16/LATTICA_RECONCILIATION_BRIEF.md
+2026-06-16 · [lattica internal]        · baseline compile (v2)       · baselines/2026-06-16/PLATFORM_BASELINE_2026-06-16_v2.md

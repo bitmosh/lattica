@@ -1,6 +1,6 @@
 ---
 title: Polish Debt — Living Report (Lattica)
-last_reviewed: v0.3.5u
+last_reviewed: v0.3.5s
 ---
 
 # Polish Debt — Living Report

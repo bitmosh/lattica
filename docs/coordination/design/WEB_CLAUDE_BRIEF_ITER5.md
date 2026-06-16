@@ -72,8 +72,7 @@ Guest projects author renderer components (`.tsx` + `.css`) and write them direc
 **Cerebra tile:**
 - Live event feed for `cerebra/agent-trace/*` streams
 - Payload renderers for: `SignalEvaluated`, `PredictionMade`, `OutcomeRecorded`, `ClutchDecisionMade` (all P-013, authored by Cerebra)
-- Agent state pills: RUNNING / IDLE / ERROR (HOLD deferred to iter 5)
-- JSON fallback card for unrecognized event types
+- event_type label fallback for unrecognized event types (renders the `event_type` string only; payload is not displayed)
 
 **ai-stack topology tile (just landed, iter 5 prep):**
 - VRAM fill gauge (polls `localhost:11434/api/ps`)
@@ -113,6 +112,8 @@ A design packet (`docs/coordination/design/packets/PACKET-001.md`) was compiled 
 
 Iteration 4 design work (visual vocabulary, component specs) is **in progress** with claude-design. Iteration 5 implementation waits on those assets.
 
+**What exists in-tree as running code:** the Cerebra signal feed tile, four Cerebra payload renderers, and the ai-stack topology tile (all per §8). **What exists as claude-design HTML mockups only (not yet in Lattica's source tree):** the Policy Scout pane, the Fossic substrate horizontal-lanes layout, the archive view, and the divisible-pane workspace shell. The mockups define the target visual vocabulary; they are not components.
+
 ---
 
 ## 5. Backend-Prep Investigation Findings
@@ -129,7 +130,7 @@ Full report: `docs/coordination/design/iterations/backend-prep/BACKEND_PREP_REPO
 |---|---|---|
 | Checkpoint (save-only) | **S** | `BundleDistiller`, `write_bundle`, `FossicStore.at_platform_path` all exist. New CLI command (30-50 lines). Emits `CheckpointSaved` to `cerebra/agent-trace/<session_id>`. |
 | Checkpoint (restore) | M | `--continue SESSION_ID` stub exists; not implemented. Save and restore scoped apart. |
-| HOLD mechanism | **M** | File-sentinel approach (`cerebra posture hold/release`). `run-cycle` checks sentinel at startup; exits code 4 if HOLD. `PostureChanged` event to `cerebra/control` stream. True queueing requires a daemon (L scope). |
+| HOLD mechanism | **S** | Daemon (`cerebra serve`) shipped post-investigation, superseding the file-sentinel approach. Now a Lattica wiring task: HOLD button + state + `POST /posture` fetch. `PostureChanged` events land on `cerebra/control` stream (explicit fossic subscribe required — not covered by `*/agent-trace/*`). |
 | New cycle trigger | **S (Cerebra side)** | CLI already exists (`cerebra run-cycle`). Cerebra's contribution is an optional stdin/env alias. Bulk of work is Lattica IPC. **Mis-labeled [API-NEW] on Cerebra's side.** |
 
 **Since filed:** Cerebra shipped `cerebra serve` — a full HTTP daemon — as a proactive response to the daemon concern latent across all three items. Endpoint spec:
@@ -142,7 +143,22 @@ Discovery: `$CEREBRA_DAEMON_URL` env var, default `http://127.0.0.1:7432`. Tile 
 
 **Critical fossic constraint:** `cerebra/control` is NOT covered by a `*/agent-trace/*` wildcard subscription. It requires an explicit separate subscribe. Load-bearing for Lattica's HOLD pill implementation.
 
-**Recommended order:** Checkpoint save-only → HOLD → New cycle trigger (when Lattica IPC approach confirmed)
+**Iteration 5 Lattica wiring items (Lattica-side work, independent of Cerebra):**
+- Explicit `fossic_subscribe` to `cerebra/control` stream — required before HOLD pill can render `PostureChanged` events
+- `CEREBRA_DAEMON_URL` env var read on tile mount; default `http://127.0.0.1:7432`
+- OFFLINE agent state pill + `GET /status` health check on mount (~500ms timeout) + 30s auto-recover poll
+
+**Recommended order:** Checkpoint save-only → HOLD (+ cerebra/control subscribe) → New cycle trigger (when Lattica IPC approach confirmed)
+
+**Daemon constraints flagged by Cerebra Claude (load-bearing for Track A wiring):**
+
+- **`/status` is ephemeral; fossic is truth for state history.** The daemon returns `posture: auto`, `cycle_running: false`, `active_session_id: null` after restart even if a session was previously active. Lattica's tile should derive RUNNING/IDLE/ERROR state from the `cerebra/agent-trace/*` fossic event stream, NOT from `/status`. `/status` is only for "is daemon reachable right now" health checks.
+
+- **No explicit CycleCompleted event from the daemon.** Cycle runtime emits events during the cycle (ClutchDecisionMade, etc.) and session open/close events, but the daemon does not emit a clean terminal "cycle just ended" fossic event. Lattica should detect cycle end via `cycle_running: false` transition on `/status` poll, not via a fossic-based completion signal.
+
+- **Checkpoint is point-in-time snapshot, not atomic with a cycle.** A checkpoint captures whatever is committed to SQLite at that moment (through the last completed step write). In-flight step output is not flushed first. UX should not promise "checkpoint in progress" or pause-then-capture semantics — it's a snapshot, not a pause.
+
+- **Daemon binds strictly to 127.0.0.1; no auth.** Acceptable for single-developer localhost-only use. Iteration 5 Track A wiring should not introduce any configuration that exposes the daemon to non-localhost interfaces.
 
 ---
 
@@ -152,12 +168,14 @@ Discovery: `$CEREBRA_DAEMON_URL` env var, default `http://127.0.0.1:7432`. Tile 
 
 All five items share one hard blocker: **shared platform fossic store** (`~/.lattica/fossic/store.db` as the confirmed path). LumaWeave currently writes to `<project_root>/.lumaweave/fossic.db`. Until the shared store is operational, none of these items can be built.
 
+**gwells physics bug fixed (commit `4f28c47`):** During the Re-settle audit, LumaWeave Claude discovered and fixed a silent bug in gwells: `interactionsBySourceWellType` was being populated correctly but `.get()` returned `undefined` at force-application time, causing inter-node forces to be silently skipped for all node types. The fix is in the audit commit. 12/12 validation checks pass. This is a pre-existing correctness issue, not introduced by iteration 5 work — but it means the physics engine was not operating as designed prior to this fix. Re-settle implementation should proceed against the fixed engine.
+
 | Item | Cost | Key finding |
 |---|---|---|
 | Source switcher | **M** (→ S if store in place) | Command handler writes `settings.sources.active`. Blocked on shared store + `AdapterListChanged` emission. |
 | Retry | **S** (once channel exists) | `settings.sources.refreshToken` increment. Bundle with source switcher. |
 | Layout freeze | **S–M** | gwells `GWRuntimeState` has `paused`/`running`. New Tauri command + `LayoutFreezeChanged` event. |
-| Re-settle | **? (S or M–L)** | gwells restart behavior with position preservation unknown. S if preserving; M–L if positions reset to seed values (would scatter graph). **gwells audit required before building.** |
+| Re-settle | **S** | gwells audit complete (LumaWeave Claude). Correct implementation: new `reheat()` method — zero node velocities, optionally update `__gwellsSeedPositions`. `applyConfigOverride({ seedParams })` would scatter the graph (wrong). No `restart()` call. Position preservation confirmed feasible at S cost. |
 | Physics preset write | **M** | Lowest priority. `↗ OPEN` covers the case. Recommend indefinite deferral. |
 | AdapterListChanged (hidden) | **S** | Not in original spec. Source switcher dropdown can't be populated without it. New fossic event type. |
 
@@ -216,7 +234,7 @@ All five items share one hard blocker: **shared platform fossic store** (`~/.lat
 | RESTART node | **M** | Management sidecar (Option 2, recommended) or Tauri Rust backend (Option 1, coupling smell). Sidecar = ai-stack owns restart API; Lattica calls HTTP. |
 | FORCE FAILOVER | **M** (incr. S on sidecar) | LiteLLM native `fallbacks` config + toggle via sidecar. External endpoint decision required from developer. Dormant config entry can be added now. |
 
-**Since filed:** ai-stack topology tile (VRAM gauge, ALIAS MUTE, LOAD MODEL, UNLOAD ALL, STACK status, TOPO/LIST toggle) authored via P-013 and now **live in Lattica** (`src/tiles/ai-stack/AiStackTopologyTile.tsx`).
+**Since filed:** ai-stack topology tile (VRAM gauge, ALIAS MUTE, LOAD MODEL, UNLOAD ALL, STACK status dot, TOPO/LIST toggle, DORMANT edge toggle) authored via P-013 and now **live in Lattica** (`src/tiles/ai-stack/AiStackTopologyTile.tsx`).
 
 **Recommended order:**
 1. Iteration 5 (zero new infra): already shipped in tile
@@ -261,7 +279,6 @@ These are the unresolved questions that should be answered before or during iter
 | **ai-stack external failover endpoint** | FORCE FAILOVER cannot be specified without it | Developer config decision |
 | **Policy Scout session ID source for human/CLI actors** | ALLOW SESSION enforcement design | No decision yet |
 | **FORCE FAILOVER external fallback model** | What does LiteLLM route to when Ollama is down? | Developer config decision |
-| **Cerebra HOLD: exit-code-4 or true queue?** | M vs L scope for HOLD | Architect decision (file-flag approach delivers tile behavior without daemon) |
 
 ---
 
@@ -299,11 +316,11 @@ Based on the backend-prep findings, a reasonable iteration 5 scope (in rough pri
 **Tier 1 — Zero new backend, highest ROI:**
 - Policy Scout tile: LOCK DOWN + CLEAR LOCKDOWN + RESTART WATCH + posture pill (4-state) — CLI subprocess pattern; all backend ready
 - Policy Scout approval timeout (S; CLI shipped)
-- Cerebra OFFLINE pill + daemon health check on tile mount (daemon exists; just needs Lattica wiring)
+- Cerebra OFFLINE pill + daemon health check on tile mount (S; daemon exists; Lattica wiring only)
 - Cerebra Checkpoint button (S; `cerebra serve POST /checkpoint` ready)
+- Cerebra HOLD toggle + `cerebra/control` stream subscribe (S; `POST /posture` on daemon; explicit `fossic_subscribe` to `cerebra/control` required — not covered by `*/agent-trace/*` wildcard)
 
 **Tier 2 — Small backend, high value:**
-- Cerebra HOLD toggle (M; `POST /posture` endpoint ready on daemon)
 - Cerebra New Cycle button (S on Cerebra side; Lattica shell-exec pattern from policy-scout)
 - ai-stack SLEEP TIMER basic (S; client-side only)
 

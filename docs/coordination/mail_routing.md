@@ -373,5 +373,10 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-15 · [fossic → design]         · design/request           · docs/coordination/design/requests/fossic/design-request.md
 2026-06-15 · [cerebra → design]        · design/request           · docs/coordination/design/requests/cerebra/design-request.md
 2026-06-15 · [lattica → frontend-design] · design/packet          · docs/coordination/design/packets/PACKET-001.md
+
+### Pass v0.3.5w
+
+2026-06-15 · [lattica → platform]      · design                   · docs/coordination/design/iterations/iter-4/REQUEST.md
+2026-06-15 · [lattica → all]           · outbound                 · 2026-06-15_lattica_to_all_backend-prep-investigation.md
 2026-06-15 · [policy-scout → lattica]  · design/request            · docs/coordination/design/requests/policy-scout/design-request.md
 2026-06-15 · [lattica → lumaweave]     · inbound                   · 2026-06-15_lattica_to_lumaweave_v035y-design-arch-update.md

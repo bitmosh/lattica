@@ -185,3 +185,35 @@ ambient awareness of graph state — not function as a diagnostic tool.
 **Framing note:** the live-tail + ambient indicator IS the primary product.
 The archive view is depth, not the starting point. Design should not bias
 toward the archive-first pattern.
+
+---
+
+## Section 11 — Persistent control surface spec
+
+*Added 2026-06-15 in response to PACKET-001 control surface request.*
+
+| Element | Type | Always visible? | What it shows / does | Why it earns tile chrome |
+|---|---|---|---|---|
+| **Graph health pill** | pill | yes | `LOADED` (green neon) · `FAILED` (red neon, bold) · `LOADING` (amber pulse) · `IDLE` (gray). Click → scroll feed to most recent SourceLoad event. [STREAM] | Instant up/down read without scanning the feed. Primary at-a-glance signal; covers the most user-actionable state. At rest: `LOADED` or `IDLE`. |
+| **Node / edge count** | badge | yes | `145n · 312e` from last SourceLoaded payload. Resets to `— · —` on FAILED or IDLE. [STREAM] | Core graph identity. "Is this a big graph?" answered without opening LumaWeave. |
+| **Active source label** | pill | yes | Adapter display name or `source_key` basename if no label. Shows `no source` when IDLE. [STREAM] | Which dataset is loaded? Must be visible without drilling into events. |
+| **Source switcher** | dropdown | yes | Lists all configured adapters; current one highlighted. Selecting one triggers a source-switch command in LumaWeave. [API-NEW — reverse channel required] | LumaWeave is a visualization tool; switching what it visualizes is the primary tile action. Idle default: shows current or `no source`. |
+| **Retry** | btn | on-event (FAILED only) | `↺ RETRY` — triggers source reload in LumaWeave. Visible only when health = FAILED. [API-NEW — reverse channel] | SourceLoadFailed is the one event requiring user action. Retry must not require opening LumaWeave. Hidden at rest. |
+| **Layout freeze** | toggle | yes | `LIVE` / `FROZEN`. LIVE = gwells physics active; FROZEN = layout pinned, no animation. [API-NEW — reverse channel] | gwells animation is distracting in a side panel. Freeze lets the graph stabilize once and hold. Default: `LIVE`. |
+| **Re-settle** | btn | cond. (after SourceLoaded/Switched) | `⟳ SETTLE` — re-triggers gwells convergence from current node positions. [API-NEW — reverse channel] | After a source switch, node positions scatter. Re-settle without opening LumaWeave. Visible when LOADED; hidden when FAILED or IDLE. |
+| **Open LumaWeave** | btn | yes | `↗ OPEN` — focuses the LumaWeave window. | Escape hatch for everything not on the tile: theme changes, adapter config, physics tuning, visual inspection. Small, always present. |
+| **Event type filter** | toggle set | yes | Three micro-toggles: `[SRC]` `[LAYOUT]` `[THEME]`. SRC = SourceLoaded + Failed + Switched (on by default); LAYOUT = GraphLayoutSettled (off by default); THEME = ThemeChanged (off by default). [STREAM, client-side] | LumaWeave emits noisy low-signal events. Filter defaults match the priority hierarchy from Section 3; user can surface them without config. |
+| **Idle / standby** | state | yes (when idle) | Health pill = `IDLE`, count = `— · —`, source label = `no source`, feed shows `waiting for source` placeholder. Source switcher remains interactive as the CTA. [STREAM] | Tile must be usable before LumaWeave has loaded a graph. Source switcher is the primary call-to-action in idle state. |
+| **Settings panel** | panel | collapsible | Adapter labels list (no raw paths), gwells physics preset selector (`ORGANIC` / `TIGHT` / `SPARSE`), store path info (project-local vs platform store status). [API-NEW for preset write; store info is [STREAM]] | Adapter and physics config is infrequent but needed when something's wrong. Keeps tile chrome clean; depth on demand. |
+
+**On the theme picker question:** No theme picker in the tile. Theme affects LumaWeave's rendering engine, not a stream signal. The tile shows current theme label (from ThemeChanged events, [STREAM]) in the settings panel only. Changing theme belongs in LumaWeave proper — the `↗ OPEN` button is the path.
+
+**On [API-NEW] items — reverse channel note:**
+
+Source switcher, Retry, Layout freeze, Re-settle, and physics preset write all require Lattica to send commands TO LumaWeave. LumaWeave's Tauri backend exposes commands, but Lattica cannot call them directly without an inter-process bridge.
+
+Two realistic paths:
+- **Option A (post shared-store):** Use fossic as a bidirectional bus. LumaWeave polls a `lumaweave/tile/commands` stream; Lattica appends command events. Natural fit once the shared platform store is in place (the same blocker as Section 8's operational flag).
+- **Option B (v1 read-only tile):** Defer all [API-NEW] controls. Tile is read-only in v1 — health + count + source label + event feed only. `↗ OPEN` is the action path. Retry and switcher added in v2 when the shared store is confirmed.
+
+LumaWeave recommends **Option B for v1**. The read-only ambient surface is the 80% value; the control surface is additive. This also keeps the tile design decoupled from the IPC architecture question.

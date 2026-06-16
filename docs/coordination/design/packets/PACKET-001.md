@@ -2,7 +2,7 @@
 packet: PACKET-001
 compiled: 2026-06-15
 compiled_by: lattica-claude
-status: draft — awaiting developer review before frontend-design handoff
+status: draft — awaiting developer review before claude design handoff
 sources:
   - docs/coordination/design/requests/lattica/design-request.md
   - docs/coordination/design/requests/cerebra/design-request.md
@@ -14,7 +14,7 @@ sources:
 
 # PACKET-001 — Lattica Visual Design Iteration 1
 
-> **For frontend-design:** this packet is a briefing document. Read it fully
+> **For claude design:** this packet is a briefing document. Read it fully
 > before producing any layouts or proposals. It synthesizes six project design
 > requests into a coherent design brief. File outputs in
 > `docs/coordination/design/iterations/<iteration-name>/`.
@@ -28,7 +28,7 @@ workspace that needs a visual system for displaying live event streams from six
 projects, with a clean split between ambient observability (always-on, low
 cognitive load) and diagnostic investigation (on-demand, deliberate effort).
 
-**What frontend-design should produce in this iteration:**
+**What claude design should produce in this iteration:**
 
 1. **Layout proposals** for the divisible-pane workspace — what the shell looks
    like, how panes are divided, what pane chrome looks like, where status panels
@@ -52,7 +52,7 @@ cognitive load) and diagnostic investigation (on-demand, deliberate effort).
 6. **Cross-project visual system** — how project identity is communicated
    when multiple panes are visible side-by-side.
 
-**What frontend-design does NOT need to produce:**
+**What claude design does NOT need to produce:**
 
 - Per-project tile components (there are none; see §2)
 - Complete design for all event types across all six projects — start with
@@ -160,7 +160,7 @@ pattern is shared across all of them.
 
 Design question: how many events in the live tail? Cerebra's request suggests
 5–10. More than 10 risks re-creating the scroll problem at smaller scale. Less
-than 5 risks losing context. Cerebra defers to frontend-design on the exact
+than 5 risks losing context. Cerebra defers to claude design on the exact
 number; the tile frame should make this a configurable parameter.
 
 ---
@@ -302,7 +302,7 @@ should make this visible without requiring investigation.
 When a Cerebra cycle triggers a LumaWeave graph rebuild, the two project panes
 side-by-side should make this relationship ambient-visible. No renderer change
 is required from either project; the layout relationship communicates the
-trigger. Frontend-design should note this as a desirable pane pairing.
+trigger. claude design should note this as a desirable pane pairing.
 
 ### 6.3 Fossic ↔ all projects (substrate correlation)
 
@@ -329,7 +329,7 @@ to be visible.
 When Cerebra and Policy Scout panes are visible side-by-side, project identity
 needs to be immediately legible. Options: per-project accent colors (pane
 header border tint, icon color, or background hue), or universal neutral with
-project identity signaled via labels only. Frontend-design should propose how
+project identity signaled via labels only. claude design should propose how
 project identity is communicated and choose or recommend the accent approach.
 
 Accent colors from the Fossic blog bumper theme (informational only; not binding):
@@ -429,7 +429,7 @@ A "compact renderer" might still be too tall for a useful live tail at N=10.
 Summary chips solve density but lose per-event structure.
 
 **Cerebra's note:** the latter (summary chip) may be necessary if card
-reduction still produces 10-card tiles that are too tall. Frontend-design
+reduction still produces 10-card tiles that are too tall. claude design
 should sketch both and identify the crossover point.
 
 ### 8.3 [HIGH] Per-step arc grouping in archive
@@ -440,7 +440,7 @@ adjacent cards with a visual separator ("step N" header)?
 
 The grouped-card approach is cleaner for archive reading but requires the
 archive view to group by `step_id` before rendering — a non-trivial data
-model. Frontend-design should propose which approach to implement and
+model. claude design should propose which approach to implement and
 note the data-model implication.
 
 ### 8.4 [HIGH] Status panel placement in divisible-pane workspace
@@ -471,7 +471,7 @@ user action, may persist for seconds to minutes, and blocks a running agent.
   resolved card
 
 Option A (persistent panel) keeps approval never-off-screen. Option B keeps
-the UI simpler. Frontend-design should propose which one and sketch the UX
+the UI simpler. claude design should propose which one and sketch the UX
 for the approval-resolution flow.
 
 ### 8.6 [HIGH] Fossic substrate tile option selection
@@ -481,7 +481,7 @@ Fossic: **B for speed, C for correctness**. Option C requires a small
 fossic-tauri pass for `fossic_list_subscribers()`. Option D is not recommended
 as first iteration.
 
-Frontend-design should select the option, note what it requires from fossic-
+claude design should select the option, note what it requires from fossic-
 tauri, and sketch the density-reduction strategy for the chosen option.
 
 ### 8.7 [MEDIUM] Project accent color system
@@ -527,7 +527,7 @@ escalation:
 
 The `LiteLLM → external (bot-escalated → Anthropic)` edge is currently dormant.
 How to render a "wired but inactive" connection? Dashed line? Grayed out?
-Separate from an "unreachable" edge? Frontend-design should establish the visual
+Separate from an "unreachable" edge? claude design should establish the visual
 vocabulary for dormant-but-valid vs. degraded vs. absent edges in topology views.
 
 ---
@@ -686,7 +686,7 @@ Phase 2 comes online.
 subordinate to Ollama in weight. Gets a status dot (running/offline) and
 last-heartbeat timestamp.
 
-**Key open questions for frontend-design:**
+**Key open questions for claude design:**
 - VRAM as gauge/fill bar vs. numeric % (observability-first → gauge)
 - Idle Ollama state treatment (no models loaded)
 - Edge animation transient vs. persistent call counter
@@ -702,7 +702,7 @@ investigative.
 **Surface type:** substrate health visualization (not event-feed tile). No
 domain events to display. Infrastructure health and optional topology.
 
-**Four design options (enumerate; developer + frontend-design choose):**
+**Four design options (enumerate; developer + claude design choose):**
 
 **Option A — Enhanced status panel (minimal)**
 Enhanced version of the current FOSSIC STORE panel in the header. Adds:

@@ -11,4 +11,4 @@ status: complete
 
 Two commits:
 - `7b51c36` — content (FEDERATION_DESIGN_2026-06-16.md + blast-radius + mail_routing + living reports + README)
-- `TBD` — sha close (this file with SHAs filled)
+- `c1e918c` — sha close (this file with SHAs filled)

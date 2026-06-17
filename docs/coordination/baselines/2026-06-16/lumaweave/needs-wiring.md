@@ -59,11 +59,11 @@
 
 **Assumed correct token/variable:** `hub_store_path = "~/.lattica/fossic/store.db"` (or resolved absolute path equivalent).
 
-**Who needs to confirm:** Lattica — must confirm `~/.lattica/fossic/store.db` is stable and accessible from a Python process on the same host (§8.5 action item). Specifically: (a) the path is stable (won't move between sessions), (b) a Python process with fossic-py can open it at that path without Tauri being involved.
+**Who needs to confirm:** CLOSED — confirmed by Lattica 2026-06-16.
 
-**Confidence level:** high that this is the correct path; confirmation from Lattica needed before hardcoding in relay agent.
+**Confidence level:** confirmed.
 
-**Brief context:** The relay agent is a standalone Python process separate from Tauri. It reads the local store at `<project_root>/.lumaweave/fossic.db` and writes to the hub. The hub path must be confirmed stable — if it's created/managed by Tauri at startup, there may be a lifecycle question about whether a standalone Python process can open it safely outside Tauri's lifecycle.
+**Brief context:** The relay agent is a standalone Python process separate from Tauri. It reads the local store at `<project_root>/.lumaweave/fossic.db` and writes to the hub. **Confirmed by Lattica:** the hub store is WAL-mode SQLite; `Store.open()` is designed for concurrent multi-process access — relay agents appending and Tauri tile subscriptions reading is the intended use pattern. No conflict. Hub path `~/.lattica/fossic/store.db` is stable across sessions. Relay agent config can hardcode this path.
 
 ---
 

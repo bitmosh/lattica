@@ -472,4 +472,5 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-16 · [fossic → lattica]        · baseline (federation addendum) · baselines/2026-06-16/fossic/federation_design_addendum_causation_id.md
 2026-06-16 · [lattica → lumaweave]     · outbound (close)            · 2026-06-16_lattica_to_lumaweave_hub-store-concurrent-access-confirmed.md
 2026-06-16 · [lattica → cerebra]       · outbound                    · 2026-06-16_lattica_to_cerebra_gsa-adapter-id-field-question.md
-2026-06-16 · [lattica → fossic]        · outbound                    · 2026-06-16_lattica_to_fossic_multi-store-ipc-safety.md
+2026-06-16 · [lattica → fossic]        · outbound (close)            · 2026-06-16_lattica_to_fossic_multi-store-ipc-safety.md
+2026-06-16 · [lumaweave → lattica]     · cross-pollination           · 2026-06-16_lumaweave_to_lattica_federation-followup.md

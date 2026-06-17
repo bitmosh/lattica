@@ -446,3 +446,30 @@ confirmed on disk. Tagged `(backfilled)`.
 2026-06-16 · [fossic → lattica]        · reconciliation (baseline)   · baselines/2026-06-16/fossic/reconciliation.md
 2026-06-16 · [lattica internal]        · reconciliation brief        · baselines/2026-06-16/LATTICA_RECONCILIATION_BRIEF.md
 2026-06-16 · [lattica internal]        · baseline compile (v2)       · baselines/2026-06-16/PLATFORM_BASELINE_2026-06-16_v2.md
+2026-06-16 · [policy-scout → lattica]  · cross-pollination           · post-federation-impl-briefing.md
+
+### Federation Interview Round — 2026-06-16
+
+2026-06-16 · [lattica internal]        · baseline (federation)       · baselines/2026-06-16/lattica/federation_design.md
+2026-06-16 · [lattica internal]        · baseline (federation)       · baselines/2026-06-16/lattica/needs-wiring.md
+2026-06-16 · [cerebra → lattica]       · cross-pollination           · federation-post-2026-06-16.md
+2026-06-16 · [cerebra → lattica]       · baseline (federation)       · baselines/2026-06-16/cerebra/federation_design.md
+2026-06-16 · [cerebra → lattica]       · baseline (federation)       · baselines/2026-06-16/cerebra/needs-wiring.md
+2026-06-16 · [cerebra → lattica]       · baseline (federation addendum) · baselines/2026-06-16/cerebra/federation_design_addendum_causation_id.md
+2026-06-16 · [lumaweave → lattica]     · cross-pollination           · 2026-06-16_lumaweave_to_lattica_post-federation-briefing.md
+2026-06-16 · [lumaweave → lattica]     · baseline (federation)       · baselines/2026-06-16/lumaweave/federation_design.md
+2026-06-16 · [lumaweave → lattica]     · baseline (federation)       · baselines/2026-06-16/lumaweave/needs-wiring.md
+2026-06-16 · [lumaweave → lattica]     · inbound (close)             · 2026-06-16_lumaweave_to_lattica_binding-question-s031-causation-relay.md
+2026-06-16 · [policy-scout → lattica]  · baseline (federation)       · baselines/2026-06-16/policy-scout/federation_design.md
+2026-06-16 · [policy-scout → lattica]  · baseline (federation)       · baselines/2026-06-16/policy-scout/needs-wiring.md
+2026-06-16 · [policy-scout → cerebra]  · outbound (routed-through)   · 2026-06-16_policy-scout_to_cerebra_binding-question-upstream-causation-id.md
+2026-06-16 · [ai-stack → lattica]      · cross-pollination           · 2026-06-16_post-federation-briefing.md
+2026-06-16 · [ai-stack → lattica]      · baseline (federation)       · baselines/2026-06-16/ai-stack/federation_design.md
+2026-06-16 · [ai-stack → lattica]      · baseline (federation)       · baselines/2026-06-16/ai-stack/needs-wiring.md
+2026-06-16 · [fossic → lattica]        · cross-pollination           · relay-impl.md
+2026-06-16 · [fossic → lattica]        · baseline (federation)       · baselines/2026-06-16/fossic/federation_design.md
+2026-06-16 · [fossic → lattica]        · baseline (federation)       · baselines/2026-06-16/fossic/needs-wiring.md
+2026-06-16 · [fossic → lattica]        · baseline (federation addendum) · baselines/2026-06-16/fossic/federation_design_addendum_causation_id.md
+2026-06-16 · [lattica → lumaweave]     · outbound (close)            · 2026-06-16_lattica_to_lumaweave_hub-store-concurrent-access-confirmed.md
+2026-06-16 · [lattica → cerebra]       · outbound                    · 2026-06-16_lattica_to_cerebra_gsa-adapter-id-field-question.md
+2026-06-16 · [lattica → fossic]        · outbound                    · 2026-06-16_lattica_to_fossic_multi-store-ipc-safety.md

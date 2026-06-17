@@ -19,6 +19,7 @@ interface TopologySnapshot {
   ollama: NodeStatus;
   litellm: NodeStatus;
   openwebui: NodeStatus;
+  cerebra: NodeStatus;
   runningModels: RunningModel[];
   localModels: LocalModel[];
   totalVramBytes: number;
@@ -31,14 +32,16 @@ interface TopologySnapshot {
 const OLLAMA = "http://localhost:11434";
 const LITELLM = "http://localhost:4000";
 const OPENWEBUI = "http://localhost:3000";
+const CEREBRA = "http://localhost:7432";
 const POLL_MS = 10_000;
 
 // RTX 4070 Super — no Ollama API source for total VRAM; override via
 // localStorage key aistack.vramTotalMb if hardware changes.
 const DEFAULT_VRAM_TOTAL_MB = 12_282;
 
-// These two aliases have topology edges visible in the graph (Bo routing path).
-// All others are general-purpose model aliases with no edge representation.
+// Cerebra routing aliases with topology edges. Alias names stay in LiteLLM config.
+// bot-local may go dormant if Cerebra routes via OllamaDirectAdapter directly;
+// bot-escalated stays if escalation path uses LiteLLM.
 const TOPOLOGY_ALIASES = new Set(["bot-local", "bot-escalated"]);
 
 // ---- localStorage prefs ---------------------------------------------------
@@ -69,16 +72,18 @@ async function fetchWithTimeout(url: string, ms: number, init?: RequestInit): Pr
 }
 
 async function pollTopology(): Promise<TopologySnapshot> {
-  const [psResult, tagsResult, modelsResult, webuiResult] = await Promise.allSettled([
+  const [psResult, tagsResult, modelsResult, webuiResult, cerebraResult] = await Promise.allSettled([
     fetchWithTimeout(`${OLLAMA}/api/ps`, 4_000).then((r) => r.json()),
     fetchWithTimeout(`${OLLAMA}/api/tags`, 4_000).then((r) => r.json()),
     fetchWithTimeout(`${LITELLM}/v1/models`, 4_000).then((r) => r.json()),
     fetchWithTimeout(OPENWEBUI, 4_000, { method: "HEAD" }),
+    fetchWithTimeout(`${CEREBRA}/status`, 4_000),
   ]);
 
   const ollama: NodeStatus = psResult.status === "fulfilled" ? "up" : "down";
   const litellm: NodeStatus = modelsResult.status === "fulfilled" ? "up" : "down";
   const openwebui: NodeStatus = webuiResult.status === "fulfilled" ? "up" : "down";
+  const cerebra: NodeStatus = cerebraResult.status === "fulfilled" ? "up" : "down";
 
   const runningModels: RunningModel[] =
     psResult.status === "fulfilled" &&
@@ -116,6 +121,7 @@ async function pollTopology(): Promise<TopologySnapshot> {
     ollama,
     litellm,
     openwebui,
+    cerebra,
     runningModels,
     localModels,
     totalVramBytes,
@@ -308,7 +314,7 @@ export function AiStackTopologyTile() {
     { key: "litellm", name: "LITELLM", status: snap?.litellm ?? "unknown", detail: `:4000 · ${allAliases.length} alias${allAliases.length !== 1 ? "es" : ""}` },
     { key: "openwebui", name: "OPEN-WEBUI", status: snap?.openwebui ?? "unknown", detail: ":3000" },
     { key: "tts", name: "TTS", status: "unknown", detail: "no host port exposed" },
-    { key: "bo", name: "BO", status: "unknown", detail: "heartbeat: phase 2 pending" },
+    { key: "bo", name: "BO", status: snap?.cerebra ?? "unknown", detail: ":7432 · cerebra daemon" },
   ];
 
   return (
@@ -406,9 +412,7 @@ export function AiStackTopologyTile() {
         <div className="aistack-topo">
           {/* Bo → LiteLLM → Ollama flow */}
           <div className="aistack-topo__flow">
-            <NodeCard name="BO" status="unknown" note="phase 2">
-              <span className="aistack-node__detail aistack-mono">heartbeat pending</span>
-            </NodeCard>
+            <NodeCard name="BO" status={snap?.cerebra ?? "unknown"} />
 
             <div className="aistack-topo__edges">
               {topoAliases.map((alias) => {

@@ -1,0 +1,226 @@
+.ps-tile {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  color: var(--la-text-primary, #E8ECF0);
+  background: transparent;
+  overflow: hidden;
+}
+
+/* ── Top strip: tracks + posture ───────────────────────────── */
+
+.ps-tile__top-strip {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(28, 37, 48, 0.5);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-tile__tracks-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ps-tile__mono-label {
+  font-size: 9px;
+  color: #6B7A8A;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ps-tile__posture-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ps-tile__posture-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #1C2530;
+  background: rgba(20, 26, 31, 0.4);
+  min-width: 0;
+}
+
+.ps-tile__posture-cell--lockdown {
+  border-color: rgba(207, 10, 92, 0.4);
+  background: rgba(207, 10, 92, 0.08);
+}
+
+.ps-tile__posture-name {
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ps-tile__posture-sub {
+  font-size: 8px;
+  color: #a28fc0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Scrollable body ──────────────────────────────────────── */
+
+.ps-tile__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ps-tile__body::-webkit-scrollbar { width: 4px; }
+.ps-tile__body::-webkit-scrollbar-track { background: transparent; }
+.ps-tile__body::-webkit-scrollbar-thumb { background: #1C2530; border-radius: 9999px; }
+
+.ps-tile__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ps-tile__section-hd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ps-tile__section-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: #6B7A8A;
+  text-transform: uppercase;
+}
+
+.ps-tile__section-meta {
+  margin-left: auto;
+  font-size: 8px;
+  color: #6B7A8A;
+}
+
+.ps-tile__prelay-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1px dashed rgba(74, 122, 155, 0.35);
+  background: rgba(74, 122, 155, 0.05);
+}
+
+.ps-tile__prelay-row--block {
+  /* uses the same prelay styling but stands alone outside a section */
+}
+
+.ps-tile__prelay-note {
+  font-size: 8.5px;
+  color: #6B7A8A;
+}
+
+.ps-tile__empty-note {
+  font-size: 10px;
+  color: #6B7A8A;
+  padding: 6px 0;
+}
+
+/* ── Action bar ───────────────────────────────────────────── */
+
+.ps-tile__action-bar {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(28, 37, 48, 0.6);
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-tile__reason-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ps-tile__reason-input {
+  flex: 1;
+  min-width: 0;
+  background: #141A1F;
+  border: 1px solid #1C2530;
+  border-radius: 4px;
+  color: #E8ECF0;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color 120ms;
+}
+
+.ps-tile__reason-input:focus {
+  border-color: rgba(207, 10, 92, 0.45);
+}
+
+.ps-tile__btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ps-tile__action-btn {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid #1C2530;
+  color: #6B7A8A;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 120ms;
+  white-space: nowrap;
+}
+
+.ps-tile__action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ps-tile__action-btn:hover:not(:disabled) {
+  border-color: rgba(107, 122, 138, 0.45);
+  color: #C4CDD6;
+}
+
+.ps-tile__action-btn--flex {
+  flex: 1;
+}
+
+.ps-tile__action-btn--danger {
+  color: #cf0a5c;
+  background: rgba(207, 10, 92, 0.08);
+  border-color: rgba(207, 10, 92, 0.4);
+}
+
+.ps-tile__action-btn--danger:hover:not(:disabled) {
+  background: rgba(207, 10, 92, 0.14);
+  border-color: rgba(207, 10, 92, 0.6);
+  color: #cf0a5c;
+}
+
+.ps-tile__error {
+  font-size: 9px;
+  color: #e05c5c;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}

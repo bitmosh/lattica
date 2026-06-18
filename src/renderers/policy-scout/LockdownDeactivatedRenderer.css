@@ -1,0 +1,17 @@
+.ps-lockdown-off {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(20, 26, 31, 0.4);
+  border: 1px solid #1C2530;
+  border-radius: 5px;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+}
+
+.ps-lockdown-off__label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6B7A8A;
+  letter-spacing: 0.06em;
+}

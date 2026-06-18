@@ -1,0 +1,22 @@
+.aistack-sidecar-started {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 10px;
+  border: 1px solid rgba(166,243,90,0.3);
+  border-radius: 6px;
+  background: rgba(166,243,90,0.04);
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+}
+
+.aistack-sidecar-started__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #A6F35A;
+}
+
+.aistack-sidecar-started__note {
+  font-size: 9px;
+  color: var(--la-text-muted, #6B7A8A);
+}

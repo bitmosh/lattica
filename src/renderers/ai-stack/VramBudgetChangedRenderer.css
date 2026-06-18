@@ -1,0 +1,84 @@
+.aistack-vram-renderer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255,91,199,0.3);
+  border-radius: 6px;
+  background: rgba(255,91,199,0.04);
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+}
+
+.aistack-vram-renderer--warn {
+  border-color: rgba(224,160,0,0.5);
+  background: rgba(224,160,0,0.06);
+}
+
+.aistack-vram-renderer--invalid {
+  border-color: rgba(224,92,92,0.4);
+  background: transparent;
+}
+
+.aistack-vram-renderer__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aistack-vram-renderer__label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #FF5BC7;
+}
+
+.aistack-vram-renderer__warn-badge {
+  font-size: 8px;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgba(224,160,0,0.15);
+  color: #e0a800;
+  border: 1px solid rgba(224,160,0,0.4);
+  letter-spacing: 0.08em;
+}
+
+.aistack-vram-renderer__bar-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.aistack-vram-renderer__bar {
+  font-size: 11px;
+  color: #FF5BC7;
+  letter-spacing: -0.5px;
+}
+
+.aistack-vram-renderer--warn .aistack-vram-renderer__bar {
+  color: #e0a800;
+}
+
+.aistack-vram-renderer__pct {
+  font-size: 10px;
+  color: var(--la-text-secondary, #C4CDD6);
+}
+
+.aistack-vram-renderer__pct--warn {
+  color: #e0a800;
+}
+
+.aistack-vram-renderer__meta {
+  display: flex;
+  gap: 6px;
+  font-size: 9px;
+  color: var(--la-text-muted, #6B7A8A);
+}
+
+.aistack-vram-renderer__sep {
+  color: rgba(107,122,138,0.5);
+}
+
+.aistack-vram-renderer__error {
+  font-size: 9px;
+  color: #e05c5c;
+}

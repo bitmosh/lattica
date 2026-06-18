@@ -1,0 +1,68 @@
+.ps-appr {
+  border: 1px solid rgba(207, 10, 92, 0.35);
+  border-radius: 6px;
+  padding: 9px;
+  background: rgba(207, 10, 92, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  animation: la-pin 2.6s ease-in-out infinite;
+}
+
+.ps-appr--invalid {
+  border-color: #e05c5c;
+  animation: none;
+}
+
+.ps-appr__row1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ps-appr__band {
+  font-size: 8.5px;
+  color: #fff;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ps-appr__cmd {
+  font-size: 10px;
+  color: #C4CDD6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.ps-appr__row2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 8.5px;
+  color: #6B7A8A;
+  flex-wrap: wrap;
+}
+
+.ps-appr__cause {
+  color: #22E0C4;
+  padding: 1px 6px;
+  border: 1px solid rgba(34, 224, 196, 0.35);
+  border-radius: 9999px;
+  animation: la-anchor-pulse 5s ease-in-out infinite;
+}
+
+.ps-appr__label {
+  color: #6B7A8A;
+  font-size: 9px;
+}
+
+.ps-appr__error {
+  color: #e05c5c;
+  font-size: 9px;
+}

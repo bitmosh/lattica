@@ -1,0 +1,33 @@
+.ps-lockdown-on {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(180, 108, 255, 0.08);
+  border: 1px solid rgba(180, 108, 255, 0.4);
+  border-radius: 5px;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+}
+
+.ps-lockdown-on--invalid {
+  border-color: #e05c5c;
+  background: rgba(224, 92, 92, 0.06);
+  font-size: 9px;
+  color: #e05c5c;
+}
+
+.ps-lockdown-on__label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--project-accent-policy-scout, #B46CFF);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.ps-lockdown-on__reason {
+  font-size: 9px;
+  color: #a28fc0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

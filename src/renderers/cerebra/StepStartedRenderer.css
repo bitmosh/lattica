@@ -1,0 +1,31 @@
+.cs-step-started {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  color: var(--la-text-muted, #6B7A8A);
+  letter-spacing: 0.06em;
+}
+
+.cs-step-started__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--la-text-muted, #6B7A8A);
+  flex-shrink: 0;
+}
+
+.cs-step-started__text {
+  flex: 1;
+}
+
+.cs-step-started__ts {
+  opacity: 0.6;
+}
+
+.cs-step-started__cycle {
+  font-size: 9px;
+  opacity: 0.45;
+}

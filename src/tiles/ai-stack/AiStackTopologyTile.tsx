@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { LiveValueChip } from "../../components/livevalue/LiveValueChip";
 import "./AiStackTopologyTile.css";
 
 // ---- types ----------------------------------------------------------------
@@ -39,10 +40,19 @@ const POLL_MS = 10_000;
 // localStorage key aistack.vramTotalMb if hardware changes.
 const DEFAULT_VRAM_TOTAL_MB = 12_282;
 
-// Cerebra routing aliases with topology edges. Alias names stay in LiteLLM config.
-// bot-local may go dormant if Cerebra routes via OllamaDirectAdapter directly;
-// bot-escalated stays if escalation path uses LiteLLM.
+// Cerebra routing aliases with topology edges. bot-local may go dormant if
+// Cerebra routes via OllamaDirectAdapter directly; bot-escalated stays if
+// escalation path uses LiteLLM.
 const TOPOLOGY_ALIASES = new Set(["bot-local", "bot-escalated"]);
+
+// Per-node accent colors (iter-4 palette).
+const NODE_COLORS = {
+  bo:        "#7aa2ff",
+  litellm:   "#FF5BC7",
+  ollama:    "#22E0C4",
+  openwebui: "#A6F35A",
+  tts:       "#8A96A3",
+} as const;
 
 // ---- localStorage prefs ---------------------------------------------------
 
@@ -160,8 +170,8 @@ async function ollamaUnload(model: string): Promise<void> {
 
 // ---- formatters -----------------------------------------------------------
 
-function fmtMb(bytes: number): string {
-  return `${Math.round(bytes / (1024 * 1024))} MB`;
+function fmtGb(bytes: number): string {
+  return (bytes / (1024 * 1024 * 1024)).toFixed(1);
 }
 
 function vramPct(usedBytes: number, totalMb: number): number {
@@ -179,20 +189,36 @@ function NodeCard({
   name,
   port,
   status,
+  color,
   children,
   note,
 }: {
   name: string;
   port?: string;
   status: NodeStatus;
+  color?: string;
   children?: React.ReactNode;
   note?: string;
 }) {
+  const borderColor =
+    status === "up" && color ? `${color}66`
+    : status === "down" ? "rgba(224,92,92,0.5)"
+    : "var(--la-surface, #1C2530)";
+
   return (
-    <div className={`aistack-node aistack-node--${status}`} data-testid={`aistack-node-${name.toLowerCase()}`}>
+    <div
+      className="aistack-node"
+      style={{ borderColor }}
+      data-testid={`aistack-node-${name.toLowerCase()}`}
+    >
       <div className="aistack-node__header">
         <StatusDot status={status} />
-        <span className="aistack-node__name">{name}</span>
+        <span
+          className="aistack-node__name"
+          style={color ? { color } : undefined}
+        >
+          {name}
+        </span>
         {port && <span className="aistack-mono aistack-node__port">{port}</span>}
         {note && <span className="aistack-node__note">{note}</span>}
       </div>
@@ -210,7 +236,7 @@ export function AiStackTopologyTile() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // preferences — persisted in localStorage
-  const [vramWarnPct, setVramWarnPct] = useState(() => loadPref("aistack.vramWarnPct", 80));
+  const [vramWarnPct, setVramWarnPct] = useState(() => loadPref("aistack.vramWarnPct", 90));
   const [vramTotalMb, setVramTotalMb] = useState(() =>
     loadPref("aistack.vramTotalMb", DEFAULT_VRAM_TOTAL_MB),
   );
@@ -317,6 +343,10 @@ export function AiStackTopologyTile() {
     { key: "bo", name: "BO", status: snap?.cerebra ?? "unknown", detail: ":7432 · cerebra daemon" },
   ];
 
+  const lastPolledTime = snap
+    ? new Date(snap.lastPolled).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : null;
+
   return (
     <div className="aistack-tile" data-testid="aistack-topology-tile">
       {/* ── header chrome ── */}
@@ -335,13 +365,13 @@ export function AiStackTopologyTile() {
         </div>
         <div className="aistack-tile__header-right">
           <button
-            className={`aistack-pill ${view === "topo" ? "aistack-pill--active" : ""}`}
+            className={`aistack-pill aistack-mono ${view === "topo" ? "aistack-pill--active" : ""}`}
             onClick={() => updateView(view === "topo" ? "list" : "topo")}
           >
             {view === "topo" ? "TOPO" : "LIST"}
           </button>
           <button
-            className={`aistack-pill ${showDormant ? "aistack-pill--active" : ""}`}
+            className={`aistack-pill aistack-mono ${showDormant ? "aistack-pill--active" : ""}`}
             onClick={() => updateShowDormant(!showDormant)}
           >
             DORMANT
@@ -361,25 +391,31 @@ export function AiStackTopologyTile() {
         <div className="aistack-vram">
           <div className="aistack-vram__bar-row">
             <span className="aistack-label">VRAM</span>
-            <div className="aistack-vram__track" aria-label={`VRAM ${usedPct}%`}>
-              <div
-                className={`aistack-vram__fill ${vramExceeded ? "aistack-vram__fill--warn" : ""}`}
-                style={{ width: `${Math.min(usedPct, 100)}%` }}
-              />
+            <div className="aistack-vram__track-wrap">
+              <div className="aistack-vram__track" aria-label={`VRAM ${usedPct}%`}>
+                <div
+                  className={`aistack-vram__fill ${vramExceeded ? "aistack-vram__fill--warn" : ""}`}
+                  style={{ width: `${Math.min(usedPct, 100)}%` }}
+                />
+                <div
+                  className="aistack-vram__warn-marker"
+                  style={{ left: `${vramWarnPct}%` }}
+                />
+              </div>
             </div>
             <span className="aistack-mono aistack-vram__label">
-              {fmtMb(snap.totalVramBytes)}
-              {vramTotalMb > 0 && ` / ${vramTotalMb} MB`}
-              {vramTotalMb > 0 && (
-                <span className={`aistack-vram__pct ${vramExceeded ? "aistack-vram__pct--warn" : ""}`}>
-                  {" "}({usedPct}%)
-                </span>
-              )}
+              <span className={vramExceeded ? "aistack-vram__pct--warn" : ""}>
+                {fmtGb(snap.totalVramBytes)} / {(vramTotalMb / 1024).toFixed(1)} GB
+              </span>
+              {" "}
+              <span className={`aistack-vram__pct ${vramExceeded ? "aistack-vram__pct--warn" : ""}`}>
+                {usedPct}%
+              </span>
             </span>
           </div>
           <div className="aistack-vram__controls">
             <label className="aistack-vram__slider-label">
-              <span className="aistack-label">WARN AT</span>
+              <span className="aistack-label">WARN</span>
               <input
                 type="range"
                 min={50}
@@ -389,7 +425,7 @@ export function AiStackTopologyTile() {
                 onChange={(e) => updateVramWarnPct(Number(e.target.value))}
                 className="aistack-slider"
               />
-              <span className="aistack-mono">{vramWarnPct}%</span>
+              <span className="aistack-mono aistack-vram__warn-val">{vramWarnPct}%</span>
             </label>
             <label className="aistack-vram__slider-label">
               <span className="aistack-label">GPU MB</span>
@@ -410,9 +446,14 @@ export function AiStackTopologyTile() {
       {/* ── topology / list view ── */}
       {view === "topo" ? (
         <div className="aistack-topo">
-          {/* Bo → LiteLLM → Ollama flow */}
+          {/* Bo → LiteLLM → Ollama main flow */}
           <div className="aistack-topo__flow">
-            <NodeCard name="BO" status={snap?.cerebra ?? "unknown"} />
+            <NodeCard
+              name="BO"
+              port=":7432"
+              status={snap?.cerebra ?? "unknown"}
+              color={NODE_COLORS.bo}
+            />
 
             <div className="aistack-topo__edges">
               {topoAliases.map((alias) => {
@@ -436,7 +477,12 @@ export function AiStackTopologyTile() {
               )}
             </div>
 
-            <NodeCard name="LITELLM" port=":4000" status={snap?.litellm ?? "unknown"}>
+            <NodeCard
+              name="LITELLM"
+              port=":4000"
+              status={snap?.litellm ?? "unknown"}
+              color={NODE_COLORS.litellm}
+            >
               {allAliases.length > 0 && (
                 <span className="aistack-node__detail aistack-mono">
                   {allAliases.length} alias{allAliases.length !== 1 ? "es" : ""}
@@ -451,28 +497,45 @@ export function AiStackTopologyTile() {
               </div>
             </div>
 
-            <NodeCard name="OLLAMA" port=":11434" status={snap?.ollama ?? "unknown"}>
-              {hasRunning ? (
-                <ul className="aistack-node__models">
-                  {snap!.runningModels.map((m) => (
-                    <li key={m.name} className="aistack-node__model aistack-mono">
-                      <span>{m.name}</span>
-                      <span className="aistack-node__model-vram">{fmtMb(m.size_vram)}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                snap?.ollama === "up" && (
-                  <span className="aistack-node__detail aistack-mono">no models in VRAM</span>
-                )
-              )}
-            </NodeCard>
+            <NodeCard
+              name="OLLAMA"
+              port=":11434"
+              status={snap?.ollama ?? "unknown"}
+              color={NODE_COLORS.ollama}
+            />
           </div>
+
+          {/* Running models — below main flow per iter-4 design */}
+          {hasRunning ? (
+            <ul className="aistack-running-models">
+              {snap!.runningModels.map((m) => (
+                <li key={m.name} className="aistack-running-models__row aistack-mono">
+                  <span className="aistack-running-models__dot" />
+                  <span className="aistack-running-models__name">{m.name}</span>
+                  <span className="aistack-running-models__vram">{fmtGb(m.size_vram)} GB</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            snap?.ollama === "up" && (
+              <div className="aistack-running-models--empty aistack-mono">no models in VRAM</div>
+            )
+          )}
 
           {/* Secondary nodes */}
           <div className="aistack-topo__secondary">
-            <NodeCard name="OPEN-WEBUI" port=":3000" status={snap?.openwebui ?? "unknown"} />
-            <NodeCard name="TTS" status="unknown" note="no host port" />
+            <NodeCard
+              name="OPEN-WEBUI"
+              port=":3000"
+              status={snap?.openwebui ?? "unknown"}
+              color={NODE_COLORS.openwebui}
+            />
+            <NodeCard
+              name="TTS"
+              status="unknown"
+              color={NODE_COLORS.tts}
+              note="no host port"
+            />
           </div>
         </div>
       ) : (
@@ -530,40 +593,47 @@ export function AiStackTopologyTile() {
         )}
       </section>
 
-      {/* ── alias mute panel ── */}
+      {/* ── alias chips ── */}
       {allAliases.length > 0 && (
         <section className="aistack-aliases">
-          <span className="aistack-label">ALIASES</span>
+          <span className="aistack-label">LITELLM ALIASES</span>
           <div className="aistack-aliases__chips">
-            {allAliases.map((alias) => (
-              <button
-                key={alias}
-                className={[
-                  "aistack-chip",
-                  "aistack-mono",
-                  mutedAliases.has(alias) ? "aistack-chip--muted" : "",
-                  TOPOLOGY_ALIASES.has(alias) ? "aistack-chip--topology" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                onClick={() => toggleAliasMute(alias)}
-                title={mutedAliases.has(alias) ? "unmute" : "mute in topology"}
-              >
-                {alias}
-              </button>
-            ))}
+            {allAliases.map((alias) => {
+              const isTopology = TOPOLOGY_ALIASES.has(alias);
+              const isDormant = alias === "bot-escalated";
+              const isMuted = mutedAliases.has(alias);
+              return (
+                <button
+                  key={alias}
+                  className={[
+                    "aistack-chip",
+                    "aistack-mono",
+                    isTopology ? "aistack-chip--topology" : "",
+                    isDormant ? "aistack-chip--dormant" : "",
+                    isMuted ? "aistack-chip--muted" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onClick={() => toggleAliasMute(alias)}
+                  title={isMuted ? "unmute" : "mute in topology"}
+                >
+                  {alias}{isDormant ? " · dormant" : ""}
+                </button>
+              );
+            })}
           </div>
         </section>
       )}
 
-      {/* ── footer ── */}
-      {snap && (
-        <footer className="aistack-tile__footer">
-          <span className="aistack-mono aistack-tile__footer-ts">
-            polled {new Date(snap.lastPolled).toLocaleTimeString()}
-          </span>
-        </footer>
-      )}
+      {/* ── Phase 2 footer — pre-relay event feeds (blocked on ai-stack-relay.py running live) ── */}
+      <footer className="aistack-phase2">
+        <span className="aistack-label">PHASE 2</span>
+        <LiveValueChip state="pre-relay" label="VramBudgetChanged" />
+        <LiveValueChip state="pre-relay" label="ModelLoaded" />
+        <span className="aistack-phase2__ts aistack-mono">
+          {lastPolledTime ? `polled ${lastPolledTime}` : ""}
+        </span>
+      </footer>
     </div>
   );
 }

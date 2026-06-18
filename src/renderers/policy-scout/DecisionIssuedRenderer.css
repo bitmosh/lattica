@@ -1,0 +1,44 @@
+.ps-dec {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(20, 26, 31, 0.3);
+  border-left: 3px solid transparent;
+  border-radius: 0 3px 3px 0;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 9.5px;
+}
+
+.ps-dec--invalid {
+  border-left-color: #e05c5c;
+}
+
+.ps-dec__verdict {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.ps-dec__cmd {
+  color: #C4CDD6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ps-dec__age {
+  font-size: 8.5px;
+  color: #6B7A8A;
+  white-space: nowrap;
+}
+
+.ps-dec__label {
+  color: #6B7A8A;
+}
+
+.ps-dec__error {
+  color: #e05c5c;
+  font-size: 9px;
+}

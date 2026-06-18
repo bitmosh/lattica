@@ -1,5 +1,56 @@
 # iter-4 Extraction — Pushback Notes
 
+## Cerebra
+
+### Phase 2 — Tile Extraction
+
+**SignalEvaluated renders as individual cards, not grouped "× N"**
+iter-4 fires one synthetic `SignalEvaluated` event with `count: 6` and renders "SIGNAL EVALUATED × 6" as a single batch card. Real Cerebra fires 6 separate `SignalEvaluated` events (one per signal name). Phase 2 renders each as its own compact row (`cst-card--signal`) showing signal abbreviation + block bar + %. Grouping consecutive events by `step_id` is deferred — the 6 individual rows convey the same data at slightly higher visual density.
+
+**composite score source differs from prototype**
+iter-4's signal panel uses `PredictionMade.composite` (expected score) for the composite bar. Phase 2 prefers `OutcomeRecorded.actual_composite_score` (the real evaluated composite) and falls back to `PredictionMade.expected_composite_score` when no outcome exists yet. This is a more accurate display and matches what a running Cerebra produces.
+
+**ClutchDecisionMade included in sparkline, not in cycle feed body**
+`ClutchDecisionMade` events are included in `FEED_EVENT_TYPES` for sparkline height contribution (70%) but `renderCard` returns null for them — they don't render in the cycle feed body, only the clutch strip. This matches iter-4 intent where clutch state lives in the control band, not the event feed.
+
+## Policy Scout
+
+### Phase 2 — Tile Extraction
+
+**ps_watch_status and ps_approvals_list Tauri commands not yet in lib.rs**
+Track A live state (lockdown status, watch daemon status, approvals list) requires `ps_watch_status` and `ps_approvals_list` commands in Lattica's `src-tauri/src/lib.rs`. Neither exists as of Phase 2. PolicyScoutTile starts in `no-data-yet` state for Track A and transitions to `source-unreachable` once the poll attempt fails. The action commands (`activate_lockdown`, `deactivate_lockdown`, `restart_watch`) exist and are wired. State query wiring is a Phase 3 item. See tile_spec.md §8.4 (CP-PS-5, CP-PS-6) and §9 open items.
+
+**ps_approve_once and ps_deny not yet in lib.rs**
+Approve/Deny buttons on the pending approvals panel require `ps_approve_once` and `ps_deny` Tauri commands. These don't exist yet. Pending approvals are shown in pre-relay treatment only (no live approval rows rendered). Buttons are deferred to Phase 3 wiring. See tile_spec.md §9.6.
+
+**Pending approvals shown as pre-relay, not as live rows**
+The iter-4 prototype renders approval rows with band tags, cmd, score, expiry, causation chips, and Approve/Deny buttons. Phase 2 renders the section header with pre-relay treatment (LiveValueChip + note). The row structure will be wired once `ps_approvals_list` + `ps_approve_once` / `ps_deny` land in lib.rs (Phase 3). Visual structure of approval rows is preserved in ApprovalRequestedRenderer.tsx for fossic-path rendering.
+
+**Recent decisions section shows empty state**
+The iter-4 prototype renders recent decisions from CLI history. No CLI query command exists for decisions history in lib.rs yet. Section renders with empty-state note. Wiring deferred to Phase 3.
+
+**defaultAnchor: { edge: "right" } without offset**
+tile_spec.md §6 explicitly removes the `defaultAnchor` offset (compositor concern, not worker concern). tileSectionRegistry validator requires `defaultAnchor` to be present (checked in validateShape). Registered with `{ edge: "right" }` — offset absent, compositor decides position. This diverges from existing cerebra-signal-feed and ai-stack-topology registrations which have explicit offsets.
+
+## ai-stack
+
+### Phase 2 — Tile Extraction
+
+**defaultAnchor kept as `{ edge: "right" }` — tile_spec.md micro-fix cannot be applied**
+tile_spec.md §6 (micro-fix pass) removed `defaultAnchor` entirely, arguing first-placement is compositor concern. The `TileSectionEntry` type declares `defaultAnchor` as required and `tileSectionRegistry.validateShape` rejects entries that omit it. Registered with `{ edge: "right" }` — no offset — so compositor can position freely. Type change would require a registry-contract update beyond Phase 2 scope.
+
+**vramWarnPct default was 80 in Phase 1 — corrected to 90**
+The original tile had `loadPref("aistack.vramWarnPct", 80)`. Phase 2 aligns to CP-C-6 (VRAM_WARN_PCT_THRESHOLD = 90 in fossic_sidecar.py). Existing localStorage values for users who previously loaded the tile will be overridden on their next cold-load if no stored value exists; stored values are unaffected.
+
+**VRAM display changed from MB to GB**
+iter-4 prototype shows "X.X / Y.Y GB" format. Phase 1 tile showed "XXXX MB / YYYY MB". Updated to GB for consistency with iter-4.
+
+**Running models moved outside OLLAMA NodeCard**
+iter-4 renders the running model list below the main BO→LITELLM→OLLAMA flow row, not inside the OLLAMA node card. Phase 2 matches this layout. Functionally equivalent; no data change.
+
+**Renderer registrations commented — not activated**
+tile_spec.md §8 specifies renderer registrations are added at relay ship time (ai-stack-relay.py running live). The 5 renderer files are created and the registration block is present but commented in registrations.tsx. Uncomment block when relay ships.
+
 ## Lattica
 
 ### Phase 1 — Foundation Extraction

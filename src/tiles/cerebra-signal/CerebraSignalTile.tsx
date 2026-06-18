@@ -440,6 +440,42 @@ export function CerebraSignalTile() {
           setEvents((prev) => [...prev, e.payload.event]);
         }
       });
+
+      // Backfill historical events — fossic_subscribe is PostCommit (live tail only);
+      // events already in the hub before this session opened are invisible without this.
+      try {
+        const allStreams = await invoke<{ id: string; declared_at: number }[]>(
+          "fossic_list_streams",
+        );
+        const traceStreams = allStreams
+          .filter((s) => s.id.startsWith("cerebra/agent-trace/"))
+          .sort((a, b) => b.declared_at - a.declared_at)
+          .slice(0, 10);
+        const batches = await Promise.all(
+          traceStreams.map((s) =>
+            invoke<SerializedEvent[]>("fossic_read_range", {
+              streamId: s.id,
+              branch: null,
+              fromVersion: null,
+              toVersion: null,
+              limit: 200,
+              eventTypeFilter: null,
+            }),
+          ),
+        );
+        const historical = batches.flat();
+        if (historical.length > 0) {
+          setEvents((prev) => {
+            const liveIds = new Set(prev.map((e) => e.id));
+            const fresh = historical.filter((e) => !liveIds.has(e.id));
+            return [...fresh, ...prev].sort(
+              (a, b) => a.timestamp_us - b.timestamp_us,
+            );
+          });
+        }
+      } catch (err) {
+        console.error("[CerebraSignalTile] history backfill:", err);
+      }
     }
 
     setup().catch((e: unknown) =>

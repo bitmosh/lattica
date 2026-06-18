@@ -34,7 +34,6 @@ export const tileSectionRegistry: TileSectionRegistry = {
       "defaultWidth",
       "defaultHeight",
       "collapsible",
-      "defaultAnchor",
       "defaultVisible",
       "defaultExpanded",
     ]) {

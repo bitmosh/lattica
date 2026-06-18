@@ -4,6 +4,8 @@ import { FreezeOverlay } from './FreezeOverlay';
 import { EmptyPane } from './EmptyPane';
 import { CerebraSignalTile } from '../../tiles/cerebra-signal/CerebraSignalTile';
 import { PolicyScoutTile } from '../../tiles/policy-scout/PolicyScoutTile';
+import { AiStackTopologyTile } from '../../tiles/ai-stack/AiStackTopologyTile';
+import { LumaWeaveTile } from '../../tiles/lumaweave/LumaWeaveTile';
 
 interface Props {
   paneId: PaneId;
@@ -89,6 +91,14 @@ export function Pane({
         ) : tileKey === 'policy' ? (
           <div className="la-pane-tile-slot">
             <PolicyScoutTile />
+          </div>
+        ) : tileKey === 'aistack' ? (
+          <div className="la-pane-tile-slot">
+            <AiStackTopologyTile />
+          </div>
+        ) : tileKey === 'lumaweave' ? (
+          <div className="la-pane-tile-slot">
+            <LumaWeaveTile />
           </div>
         ) : (
           <div className="la-pane-tile-slot">

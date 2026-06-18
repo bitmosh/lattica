@@ -81,8 +81,8 @@ export interface TileSectionEntry {
    */
   sourceTestId?: string;
 
-  /** @required Where the tile sits when "returned to anchor". */
-  defaultAnchor: TileAnchor;
+  /** Where the tile sits when "returned to anchor". Optional — compositor assigns position when absent. */
+  defaultAnchor?: TileAnchor;
   /** @required Whether the tile appears on first app load. Toggleable via Tiles popover. */
   defaultVisible: boolean;
   /** @required Whether the tile body is expanded (vs. collapsed to title bar) on first load. */

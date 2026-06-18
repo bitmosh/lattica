@@ -72,3 +72,17 @@ The count of queued events while frozen requires a live event buffer per pane. T
 
 **`min-width: 1280px; min-height: 760px` from prototype not enforced**
 The prototype declared those minimum dimensions. Omitted from the Phase 1 shell to avoid layout constraints at Tauri dev window sizes. Can be added to `la-shell` once window sizing is finalized.
+
+### Phase 3 — Wiring + Integration
+
+**Fossic pane: no tile wired yet**
+TilePicker exposes `key: 'fossic'` and Pane.tsx has a fallthrough for unrecognized keys (renders EmptyPane). A `FossicTile` stub following the same pre-relay pattern as `LumaWeaveTile` would round out the picker. Deferred: fossic substrate data is already visible via `fossic_subscribe` in CerebraSignalTile; a dedicated Fossic tile adds stream-browser UI not yet specced. Add to Phase 4 scope if desired.
+
+**policy-scout-relay.py still unshipped — Track B permanently pre-relay**
+`policy-scout-relay.py` is the only blocker for Track B going live. The fossic store path must use `os.path.expanduser()` when calling `Store.open()` in Python (see tile_spec.md §9.3). The relay filter logic and event type list are defined in the spec; implementation is a standalone PS pass.
+
+**Recent decisions section still empty**
+`ps_approvals_list` returns pending approvals only. Recent decisions (DENY/ALLOW history) requires either Track B fossic feed or a `policy-scout audit` CLI query. `audit` does not currently have a `--json` flag verified. Deferred to Phase 4 or Track B shipment.
+
+**`defaultAnchor` now optional in TileSectionEntry**
+Phase 3 removed `defaultAnchor` from the required fields list in `tileSectionRegistry.validateShape` and made it optional in the `TileSectionEntry` type. Existing registrations that supply `defaultAnchor` remain valid. New registrations (LumaWeave) may omit it; the compositor assigns placement from category.

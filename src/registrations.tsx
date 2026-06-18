@@ -9,6 +9,7 @@ import { CheckpointSavedRenderer } from "./renderers/cerebra/CheckpointSavedRend
 import { CerebraSignalTile } from "./tiles/cerebra-signal/CerebraSignalTile";
 import { AiStackTopologyTile } from "./tiles/ai-stack/AiStackTopologyTile";
 import { PolicyScoutTile } from "./tiles/policy-scout/PolicyScoutTile";
+import { LumaWeaveTile } from "./tiles/lumaweave/LumaWeaveTile";
 import { DecisionIssuedRenderer } from "./renderers/policy-scout/DecisionIssuedRenderer";
 import { ApprovalRequestedRenderer } from "./renderers/policy-scout/ApprovalRequestedRenderer";
 import { LockdownActivatedRenderer } from "./renderers/policy-scout/LockdownActivatedRenderer";
@@ -142,6 +143,22 @@ tileSectionRegistry.register({
   defaultVisible: true,
   defaultExpanded: true,
   content: () => <PolicyScoutTile />,
+});
+
+// NOTE (B4): Pane.tsx is authoritative for workspace tile routing. The registry
+// entries above are retained for the LumaWeave floating tile system (FloatingTile
+// path) and future compositor use. Pane.tsx routes by TileKey directly and does
+// NOT call registry.content().
+tileSectionRegistry.register({
+  id: "lumaweave-graph",
+  label: "LumaWeave Graph",
+  category: "right-panel",
+  defaultWidth: 480,
+  defaultHeight: 520,
+  collapsible: true,
+  defaultVisible: true,
+  defaultExpanded: true,
+  content: () => <LumaWeaveTile />,
 });
 
 registerPayloadRenderer({

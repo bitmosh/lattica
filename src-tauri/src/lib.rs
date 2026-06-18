@@ -108,6 +108,38 @@ fn lattica_store_status(store: tauri::State<'_, Store>) -> Result<StoreStatus, S
 // ── Policy Scout CLI commands ─────────────────────────────────────────────────
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct WatchStatusResponse {
+    running: bool,
+    pid: Option<u32>,
+    stale: Option<bool>,
+    pid_file: String,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct ApprovalItem {
+    approval_id: String,
+    request_id: String,
+    decision_id: String,
+    created_at: String,
+    expires_at: String,
+    status: String,
+    actor: Option<String>,
+    command: String,
+    cwd: String,
+    risk_score: f64,
+    decision: String,
+    reasons: Vec<String>,
+    recommended_action: String,
+    scope: String,
+    schema_version: u32,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct ApprovalsListResponse {
+    approvals: Vec<ApprovalItem>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 struct CliJsonResponse {
     ok: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -203,10 +235,42 @@ fn deactivate_lockdown() -> CliJsonResponse {
 }
 
 #[tauri::command]
-fn restart_watch() -> CliJsonResponse {
-    // best-effort stop; result ignored
+async fn restart_watch() -> CliJsonResponse {
+    // watch stop takes ~1.6s (waits for daemon death) — moved off IPC thread.
     let _ = Command::new("policy-scout").args(["watch", "stop"]).output();
     run_cli_json(&["policy-scout", "watch", "start", "--json"])
+}
+
+#[tauri::command]
+fn ps_watch_status() -> Result<WatchStatusResponse, String> {
+    let output = Command::new("policy-scout")
+        .args(["watch", "status", "--json"])
+        .output()
+        .map_err(|e| format!("subprocess failed to start: {}", e))?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    serde_json::from_str::<WatchStatusResponse>(&stdout)
+        .map_err(|e| format!("could not parse watch status JSON: {} — stdout: {}", e, stdout))
+}
+
+#[tauri::command]
+fn ps_approvals_list() -> Result<ApprovalsListResponse, String> {
+    let output = Command::new("policy-scout")
+        .args(["approvals", "list", "--json"])
+        .output()
+        .map_err(|e| format!("subprocess failed to start: {}", e))?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    serde_json::from_str::<ApprovalsListResponse>(&stdout)
+        .map_err(|e| format!("could not parse approvals list JSON: {} — stdout: {}", e, stdout))
+}
+
+#[tauri::command]
+fn ps_approve_once(approval_id: String) -> CliJsonResponse {
+    run_cli_json(&["policy-scout", "approvals", "approve", &approval_id, "--json"])
+}
+
+#[tauri::command]
+fn ps_deny(approval_id: String) -> CliJsonResponse {
+    run_cli_json(&["policy-scout", "approvals", "deny", &approval_id, "--json"])
 }
 
 // ── Entry point ───────────────────────────────────────────────────────────────
@@ -253,6 +317,10 @@ pub fn run() {
             activate_lockdown,
             deactivate_lockdown,
             restart_watch,
+            ps_watch_status,
+            ps_approvals_list,
+            ps_approve_once,
+            ps_deny,
             fossic_query_remote_store,
         ])
         .run(tauri::generate_context!())

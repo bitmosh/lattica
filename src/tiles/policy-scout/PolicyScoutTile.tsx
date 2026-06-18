@@ -21,27 +21,85 @@ interface WatchStatusResponse {
   pid_file: string;
 }
 
+interface ApprovalItem {
+  approval_id: string;
+  request_id: string;
+  decision_id: string;
+  created_at: string;
+  expires_at: string;
+  status: string;
+  actor: string | null;
+  command: string;
+  cwd: string;
+  risk_score: number;
+  decision: string;
+  reasons: string[];
+  recommended_action: string;
+  scope: string;
+  schema_version: number;
+}
+
+interface ApprovalsListResponse {
+  approvals: ApprovalItem[];
+}
+
 type WatchState = 'running' | 'stopped' | 'stale' | 'unknown';
 
-// ── Constants ────────────────────────────────────────────────────────────────
+// ── Constants + helpers ──────────────────────────────────────────────────────
 
 const POLL_MS = 15_000;
+
+function riskBand(score: number): string {
+  if (score >= 8) return 'critical';
+  if (score >= 6) return 'high';
+  if (score >= 3) return 'medium';
+  if (score >= 1) return 'low';
+  return 'none';
+}
+
+const RISK_BAND_STYLE: Record<string, { bg: string; text: string }> = {
+  critical: { bg: '#b91c1c', text: '#fff' },
+  high:     { bg: '#c97b00', text: '#fff' },
+  medium:   { bg: '#b45309', text: '#fff' },
+  low:      { bg: '#166534', text: '#fff' },
+  none:     { bg: 'var(--la-surface, #1C2530)', text: 'inherit' },
+};
+
+function relExpiry(iso: string): string {
+  const diff = new Date(iso).getTime() - Date.now();
+  const abs = Math.abs(diff);
+  const past = diff < 0;
+  if (abs < 60_000) return past ? 'just expired' : 'in <1 min';
+  if (abs < 3_600_000) {
+    const m = Math.floor(abs / 60_000);
+    return past ? `expired ${m}m ago` : `in ${m} min`;
+  }
+  if (abs < 86_400_000) {
+    const h = Math.floor(abs / 3_600_000);
+    return past ? `expired ${h}h ago` : `in ${h} h`;
+  }
+  const d = Math.floor(abs / 86_400_000);
+  return past ? `expired ${d}d ago` : `in ${d} d`;
+}
 
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function PolicyScoutTile() {
-  // Track A: CLI poll. ps_watch_status not yet in lib.rs — transitions to
-  // source-unreachable on first failed invoke.
+  // Track A: CLI poll. Starts no-data-yet; transitions to live/source-unreachable.
   const [trackAState, setTrackAState] = useState<LvStateKind>('no-data-yet');
 
   // Track B: fossic subscribe. Always pre-relay until policy-scout-relay.py ships.
   const trackBState: LvStateKind = 'pre-relay';
 
-  // Posture state — updated by action results
+  // Posture state — updated by ps_watch_status poll and action results
   const [lockdown, setLockdown] = useState(false);
   const [lockdownReason, setLockdownReason] = useState('');
   const [watchState, setWatchState] = useState<WatchState>('unknown');
   const [watchRestarting, setWatchRestarting] = useState(false);
+
+  // Approvals state
+  const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
+  const [inFlightIds, setInFlightIds] = useState<string[]>([]);
 
   // UI
   const [showReasonInput, setShowReasonInput] = useState(false);
@@ -58,6 +116,12 @@ export function PolicyScoutTile() {
     } catch {
       setTrackAState('source-unreachable');
       setWatchState('unknown');
+    }
+    try {
+      const resp = await invoke<ApprovalsListResponse>('ps_approvals_list');
+      setApprovals(resp.approvals.filter(a => a.status === 'pending'));
+    } catch {
+      // non-fatal — approval list stays stale on error
     }
   }, []);
 
@@ -122,6 +186,38 @@ export function PolicyScoutTile() {
     }
   };
 
+  const handleApproveOnce = async (approvalId: string) => {
+    setInFlightIds(prev => [...prev, approvalId]);
+    try {
+      const resp = await invoke<CliJsonResponse>('ps_approve_once', { approvalId });
+      if (resp.ok) {
+        setApprovals(prev => prev.filter(a => a.approval_id !== approvalId));
+        void pollTrackA();
+      }
+      setActionError(resp.error ?? null);
+    } catch (e) {
+      setActionError(String(e));
+    } finally {
+      setInFlightIds(prev => prev.filter(id => id !== approvalId));
+    }
+  };
+
+  const handleDenyApproval = async (approvalId: string) => {
+    setInFlightIds(prev => [...prev, approvalId]);
+    try {
+      const resp = await invoke<CliJsonResponse>('ps_deny', { approvalId });
+      if (resp.ok) {
+        setApprovals(prev => prev.filter(a => a.approval_id !== approvalId));
+        void pollTrackA();
+      }
+      setActionError(resp.error ?? null);
+    } catch (e) {
+      setActionError(String(e));
+    } finally {
+      setInFlightIds(prev => prev.filter(id => id !== approvalId));
+    }
+  };
+
   // ── Render ───────────────────────────────────────────────────────────────
 
   const watchColor =
@@ -152,7 +248,7 @@ export function PolicyScoutTile() {
           >
             <span
               className="ps-tile__posture-name"
-              style={{ color: lockdown ? '#cf0a5c' : '#6B7A8A' }}
+              style={{ color: lockdown ? 'var(--project-accent-policy-scout, #B46CFF)' : '#6B7A8A' }}
             >
               {lockdown ? '⬤ LOCKDOWN' : '○ Unlocked'}
             </span>
@@ -176,15 +272,73 @@ export function PolicyScoutTile() {
       {/* ── Scrollable body ── */}
       <div className="ps-tile__body">
 
-        {/* Pending approvals — pre-relay until ps_approvals_list lands in lib.rs (Phase 3) */}
+        {/* Pending approvals */}
         <div className="ps-tile__section">
           <div className="ps-tile__section-hd">
             <span className="ps-tile__section-label">PENDING APPROVALS</span>
+            <span className="ps-tile__section-meta" style={{ color: '#4a7a9b' }}>
+              {trackAState === 'live' ? `${approvals.length} waiting` : 'loading…'}
+            </span>
           </div>
-          <div className="ps-tile__prelay-row">
-            <LiveValueChip state="pre-relay" label="approvals" />
-            <span className="ps-tile__prelay-note">ps_approvals_list wiring pending — Phase 3</span>
-          </div>
+          {trackAState === 'source-unreachable' ? (
+            <div className="ps-tile__prelay-row">
+              <LiveValueChip state="source-unreachable" label="approvals" />
+              <span className="ps-tile__prelay-note">CLI unreachable</span>
+            </div>
+          ) : trackAState === 'live' && approvals.length === 0 ? (
+            <div className="ps-tile__empty-note">No pending approvals</div>
+          ) : trackAState === 'live' ? (
+            <div className="ps-tile__approvals-list">
+              {approvals.map(a => {
+                const band = riskBand(a.risk_score);
+                const bandStyle = RISK_BAND_STYLE[band];
+                const inFlight = inFlightIds.includes(a.approval_id);
+                const expired = new Date(a.expires_at).getTime() < Date.now();
+                return (
+                  <div key={a.approval_id} className="ps-tile__approval-row">
+                    <div className="ps-tile__approval-top">
+                      <span
+                        className="ps-tile__risk-chip"
+                        style={{ background: bandStyle.bg, color: bandStyle.text }}
+                      >
+                        {band}
+                      </span>
+                      <span className="ps-tile__approval-cmd" title={a.command}>
+                        {a.command.length > 48 ? a.command.slice(0, 47) + '…' : a.command}
+                      </span>
+                    </div>
+                    <div className="ps-tile__approval-meta">
+                      <span>score: {a.risk_score}</span>
+                      <span style={{ color: expired ? 'var(--lv-source-unreachable, #e0a800)' : '#6B7A8A' }}>
+                        {relExpiry(a.expires_at)}
+                      </span>
+                    </div>
+                    <div className="ps-tile__approval-actions">
+                      <button
+                        className="ps-tile__action-btn ps-tile__action-btn--approve"
+                        onClick={() => void handleApproveOnce(a.approval_id)}
+                        disabled={inFlight}
+                      >
+                        {inFlight ? '…' : 'Approve'}
+                      </button>
+                      <button
+                        className="ps-tile__action-btn ps-tile__action-btn--deny"
+                        onClick={() => void handleDenyApproval(a.approval_id)}
+                        disabled={inFlight}
+                      >
+                        {inFlight ? '…' : 'Deny'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="ps-tile__prelay-row">
+              <LiveValueChip state="no-data-yet" label="approvals" />
+              <span className="ps-tile__prelay-note">loading…</span>
+            </div>
+          )}
         </div>
 
         {/* Recent decisions */}

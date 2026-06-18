@@ -52,8 +52,8 @@
 }
 
 .ps-tile__posture-cell--lockdown {
-  border-color: rgba(207, 10, 92, 0.4);
-  background: rgba(207, 10, 92, 0.08);
+  border-color: rgba(180, 108, 255, 0.4);
+  background: rgba(180, 108, 255, 0.08);
 }
 
 .ps-tile__posture-name {
@@ -170,7 +170,7 @@
 }
 
 .ps-tile__reason-input:focus {
-  border-color: rgba(207, 10, 92, 0.45);
+  border-color: rgba(180, 108, 255, 0.45);
 }
 
 .ps-tile__btn-row {
@@ -207,15 +207,15 @@
 }
 
 .ps-tile__action-btn--danger {
-  color: #cf0a5c;
-  background: rgba(207, 10, 92, 0.08);
-  border-color: rgba(207, 10, 92, 0.4);
+  color: var(--project-accent-policy-scout, #B46CFF);
+  background: rgba(180, 108, 255, 0.08);
+  border-color: rgba(180, 108, 255, 0.4);
 }
 
 .ps-tile__action-btn--danger:hover:not(:disabled) {
-  background: rgba(207, 10, 92, 0.14);
-  border-color: rgba(207, 10, 92, 0.6);
-  color: #cf0a5c;
+  background: rgba(180, 108, 255, 0.14);
+  border-color: rgba(180, 108, 255, 0.6);
+  color: var(--project-accent-policy-scout, #B46CFF);
 }
 
 .ps-tile__error {
@@ -223,4 +223,85 @@
   color: #e05c5c;
   letter-spacing: 0.02em;
   line-height: 1.4;
+}
+
+/* ── Approval rows ──────────────────────────────────────── */
+
+.ps-tile__approvals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ps-tile__approval-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(74, 122, 155, 0.2);
+  background: rgba(20, 26, 31, 0.4);
+}
+
+.ps-tile__approval-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ps-tile__risk-chip {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.ps-tile__approval-cmd {
+  font-size: 9.5px;
+  color: var(--la-text-primary, #E8ECF0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ps-tile__approval-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 8.5px;
+  color: #6B7A8A;
+}
+
+.ps-tile__approval-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.ps-tile__action-btn--approve {
+  color: #5eba7d;
+  border-color: rgba(94, 186, 125, 0.35);
+  background: rgba(94, 186, 125, 0.06);
+}
+
+.ps-tile__action-btn--approve:hover:not(:disabled) {
+  border-color: rgba(94, 186, 125, 0.6);
+  background: rgba(94, 186, 125, 0.12);
+  color: #5eba7d;
+}
+
+.ps-tile__action-btn--deny {
+  color: var(--project-accent-policy-scout, #B46CFF);
+  border-color: rgba(180, 108, 255, 0.35);
+  background: rgba(180, 108, 255, 0.06);
+}
+
+.ps-tile__action-btn--deny:hover:not(:disabled) {
+  border-color: rgba(180, 108, 255, 0.6);
+  background: rgba(180, 108, 255, 0.12);
+  color: var(--project-accent-policy-scout, #B46CFF);
 }

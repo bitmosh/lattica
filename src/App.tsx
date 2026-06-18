@@ -1,5 +1,10 @@
-import { HelloTile } from "./tiles/HelloTile";
+import { Shell } from './components/workspace/Shell';
+import { PaneWorkspace } from './components/workspace/PaneWorkspace';
 
 export default function App() {
-  return <HelloTile />;
+  return (
+    <Shell>
+      <PaneWorkspace />
+    </Shell>
+  );
 }

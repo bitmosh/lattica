@@ -1,0 +1,132 @@
+.la-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ─── Header ──────────────────────────────────────────────── */
+
+.la-pane-header {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.la-pane-header-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  animation: la-stripe-slow 3.2s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+.la-pane-header-inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  padding: 10px 14px;
+  align-items: center;
+  gap: 12px;
+}
+
+.la-pane-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.la-pane-header-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.la-pane-header-name {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.la-pane-header-sub {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  color: var(--la-text-muted, #6B7A8A);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.la-pane-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Freeze + Picker buttons ──────────────────────────────── */
+
+.la-pane-freeze-btn {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  padding: 3px 10px;
+  background: transparent;
+  border: 1px solid #1C2530;
+  border-radius: 9999px;
+  color: var(--la-text-muted, #6B7A8A);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 120ms;
+}
+
+.la-pane-freeze-btn:hover {
+  border-color: rgba(76, 201, 255, 0.4);
+  color: #4CC9FF;
+}
+
+.la-pane-freeze-btn--frozen {
+  background: rgba(76, 201, 255, 0.12);
+  border-color: rgba(76, 201, 255, 0.5);
+  color: #4CC9FF;
+}
+
+.la-pane-picker-btn {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 11px;
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px solid #1C2530;
+  border-radius: 9999px;
+  color: var(--la-text-muted, #6B7A8A);
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.la-pane-picker-btn:hover {
+  border-color: rgba(34, 224, 196, 0.4);
+  color: #22E0C4;
+}
+
+/* ─── Content ──────────────────────────────────────────────── */
+
+.la-pane-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.la-pane-tile-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}

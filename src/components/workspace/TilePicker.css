@@ -1,0 +1,82 @@
+.la-tile-picker {
+  position: absolute;
+  top: 44px;
+  z-index: 12;
+  width: 280px;
+  background: #0F1418;
+  border: 1px solid rgba(34, 224, 196, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(34, 224, 196, 0.12);
+  animation: la-tilepicker-in 160ms ease-out;
+}
+
+.la-tile-picker-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid #1C2530;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.la-tile-picker-heading {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--la-text-muted, #6B7A8A);
+}
+
+.la-tile-picker-pane-id {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 9px;
+  color: #22E0C4;
+}
+
+.la-tile-picker-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #E8ECF0;
+  transition: background 120ms;
+  align-items: start;
+}
+
+.la-tile-picker-option:hover {
+  background: rgba(34, 224, 196, 0.08);
+}
+
+.la-tile-picker-option--active {
+  background: rgba(34, 224, 196, 0.06);
+}
+
+.la-tile-picker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.la-tile-picker-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.la-tile-picker-option-title {
+  font-family: var(--la-font-sans, 'Geist', sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.la-tile-picker-option-sub {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 9px;
+  color: var(--la-text-muted, #6B7A8A);
+}

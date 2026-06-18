@@ -1,0 +1,15 @@
+.lv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 8.5px;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.lv-chip-dot {
+  font-size: 7.5px;
+}

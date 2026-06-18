@@ -1,0 +1,65 @@
+.la-freeze-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(76,201,255,0.06) 0%, rgba(76,201,255,0.02) 100%),
+    repeating-linear-gradient(135deg, rgba(76,201,255,0.04) 0 8px, transparent 8px 16px);
+  background-size: 40px 40px, 30px 30px;
+  backdrop-filter: blur(1px) saturate(0.7);
+  animation: la-freeze-drift 8s linear infinite;
+  border: 1px solid rgba(76, 201, 255, 0.3);
+}
+
+.la-freeze-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: rgba(15, 20, 24, 0.88);
+  border: 1px solid rgba(76, 201, 255, 0.5);
+  border-radius: 9999px;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  color: #4CC9FF;
+  letter-spacing: 0.08em;
+  animation: la-freeze-counter 2.4s ease-in-out infinite;
+}
+
+.la-freeze-icon {
+  font-size: 11px;
+}
+
+.la-freeze-title {
+  font-weight: 600;
+}
+
+.la-freeze-sep {
+  color: #C4CDD6;
+}
+
+.la-freeze-count {
+  color: #E8ECF0;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.la-freeze-queued {
+  color: var(--la-text-muted, #6B7A8A);
+}
+
+.la-freeze-thaw {
+  background: transparent;
+  border: none;
+  color: #A6F35A;
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.08em;
+}

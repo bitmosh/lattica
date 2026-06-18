@@ -1,0 +1,52 @@
+.la-empty-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  cursor: pointer;
+  padding: 14px;
+}
+
+.la-empty-pane-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 2px dashed rgba(242, 168, 92, 0.32);
+  border-radius: 10px;
+  transition: border-color 200ms;
+}
+
+.la-empty-pane:hover .la-empty-pane-inner {
+  border-color: rgba(242, 168, 92, 0.55);
+}
+
+.la-empty-pane-label {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 10px;
+  color: #F2A85C;
+  letter-spacing: 0.14em;
+}
+
+.la-empty-pane-select {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 11px;
+  color: #F2A85C;
+  padding: 8px 18px;
+  border: 1px solid rgba(242, 168, 92, 0.6);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  animation: la-empty-pulse 2.4s ease-in-out infinite;
+}
+
+.la-empty-pane-hint {
+  font-family: var(--la-font-mono, 'Geist Mono', monospace);
+  font-size: 9px;
+  color: var(--la-text-muted, #6B7A8A);
+}

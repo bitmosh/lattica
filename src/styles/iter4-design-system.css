@@ -1,0 +1,114 @@
+/* Geist + Geist Mono from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* iter-4 neutral palette */
+  --la-bg:             #0B0F12;
+  --la-surface:        #1C2530;
+  --la-surface-dark:   #0F1418;
+  --la-text-primary:   #E8ECF0;
+  --la-text-secondary: #C4CDD6;
+  --la-text-muted:     #6B7A8A;
+
+  --la-font-sans: 'Geist', system-ui, sans-serif;
+  --la-font-mono: 'Geist Mono', monospace;
+
+  --la-topbar-height: 72px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--la-bg);
+  color: var(--la-text-primary);
+  font-family: var(--la-font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+  overflow: hidden;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1C2530; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #2A3540; }
+
+/* Pauses all animations in frozen panes */
+.la-frozen *, .la-frozen *::before, .la-frozen *::after {
+  animation-play-state: paused !important;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────── */
+
+@keyframes la-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(1.25); }
+}
+@keyframes la-pulse-fast {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(1.4); }
+}
+@keyframes la-pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.65; transform: scale(1.15); }
+}
+@keyframes la-empty-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(242,168,92,0.45); border-color: rgba(242,168,92,0.55); }
+  50%       { box-shadow: 0 0 0 8px rgba(242,168,92,0); border-color: rgba(242,168,92,0.9); }
+}
+@keyframes la-pin {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(180,108,255,0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(180,108,255,0); }
+}
+@keyframes la-severe {
+  0%, 100% { border-color: rgba(255,91,199,0.4); }
+  50%       { border-color: rgba(255,91,199,0.9); }
+}
+@keyframes la-arrival {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes la-fade-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes la-drawer-in {
+  0%   { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes la-cycle-new {
+  0%   { transform: scale(1); filter: brightness(1); }
+  40%  { transform: scale(1.04); filter: brightness(1.3); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@keyframes la-stripe-fast {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
+}
+@keyframes la-stripe-slow {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.85; }
+}
+@keyframes la-anchor-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,224,196,0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(34,224,196,0); }
+}
+@keyframes la-freeze-drift {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 40px 40px, 30px 30px; }
+}
+@keyframes la-freeze-counter {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
+}
+@keyframes la-flare {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 0.8; transform: scale(1.15); }
+}
+@keyframes la-tilepicker-in {
+  0%   { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}

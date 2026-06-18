@@ -9,7 +9,7 @@
   padding: 0.75rem;
   background: var(--la-bg, #0B0F12);
   color: var(--la-text-primary, #E8ECF0);
-  font-size: 0.82rem;
+  font-size: 0.945rem;
   min-width: 340px;
 }
 
@@ -17,11 +17,11 @@
 
 .aistack-mono {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 0.8rem;
+  font-size: 0.925rem;
 }
 
 .aistack-label {
-  font-size: 0.7rem;
+  font-size: 0.825rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--la-text-muted, #6B7A8A);
@@ -61,14 +61,14 @@
 
 .aistack-tile__title {
   font-family: var(--la-font-mono, monospace);
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   color: #FF5BC7;
 }
 
 .aistack-badge {
-  font-size: 0.68rem;
+  font-size: 0.805rem;
   padding: 1px 6px;
   border-radius: 9999px;
   background: rgba(255,91,199,0.12);
@@ -84,7 +84,7 @@
 }
 
 .aistack-pill {
-  font-size: 0.68rem;
+  font-size: 0.805rem;
   letter-spacing: 0.06em;
   padding: 2px 10px;
   border: 1px solid var(--la-surface, #1C2530);
@@ -125,7 +125,7 @@
 
 .aistack-error {
   font-family: var(--la-font-mono, monospace);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: #e05c5c;
   padding: 0.25rem 0.5rem;
   border: 1px solid rgba(224,92,92,0.5);
@@ -188,7 +188,7 @@
 }
 
 .aistack-vram__label {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--la-text-secondary, #C4CDD6);
   white-space: nowrap;
 }
@@ -205,7 +205,7 @@
   color: #e0a800;
   min-width: 32px;
   text-align: right;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
 }
 
 .aistack-vram__controls {
@@ -234,7 +234,7 @@
   border: 1px solid var(--la-surface, #1C2530);
   border-radius: 3px;
   color: var(--la-text-primary, #E8ECF0);
-  font-size: 0.78rem;
+  font-size: 0.905rem;
   outline: none;
 }
 
@@ -280,7 +280,7 @@
 
 .aistack-node__name {
   font-family: var(--la-font-mono, monospace);
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--la-text-secondary, #C4CDD6);
@@ -288,18 +288,18 @@
 
 .aistack-node__port {
   color: var(--la-text-muted, #6B7A8A);
-  font-size: 0.68rem;
+  font-size: 0.805rem;
 }
 
 .aistack-node__note {
   font-family: var(--la-font-mono, monospace);
-  font-size: 0.65rem;
+  font-size: 0.775rem;
   color: var(--la-text-muted, #6B7A8A);
 }
 
 .aistack-node__detail {
   color: var(--la-text-muted, #6B7A8A);
-  font-size: 0.68rem;
+  font-size: 0.805rem;
 }
 
 /* ── running models (below topo flow, iter-4) ──────────────────────────── */
@@ -317,7 +317,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
 }
 
 .aistack-running-models__dot {
@@ -338,7 +338,7 @@
 }
 
 .aistack-running-models--empty {
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   color: var(--la-text-muted, #6B7A8A);
   padding-left: 2px;
 }
@@ -357,7 +357,7 @@
   align-items: center;
   gap: 0.2rem;
   color: var(--la-text-muted, #6B7A8A);
-  font-size: 0.68rem;
+  font-size: 0.805rem;
   white-space: nowrap;
 }
 
@@ -371,7 +371,7 @@
 }
 
 .aistack-edge__label {
-  font-size: 0.65rem;
+  font-size: 0.775rem;
 }
 
 .aistack-edge__arrow {
@@ -401,7 +401,7 @@
 
 .aistack-list__detail {
   color: var(--la-text-muted, #6B7A8A);
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   padding: 4px 0;
 }
 
@@ -431,7 +431,7 @@
   border-radius: 4px;
   color: var(--la-text-secondary, #C4CDD6);
   font-family: var(--la-font-mono, monospace);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   cursor: pointer;
   outline: none;
 }
@@ -443,7 +443,7 @@
 
 .aistack-actions__status {
   color: var(--la-text-muted, #6B7A8A);
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   white-space: nowrap;
 }
 
@@ -454,7 +454,7 @@
   background: transparent;
   color: var(--la-text-primary, #E8ECF0);
   font-family: var(--la-font-mono, monospace);
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
@@ -495,7 +495,7 @@
   border-radius: 9999px;
   background: rgba(20,26,31,0.4);
   color: var(--la-text-muted, #8A96A3);
-  font-size: 0.68rem;
+  font-size: 0.805rem;
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
@@ -535,5 +535,5 @@
 .aistack-phase2__ts {
   margin-left: auto;
   color: var(--la-text-muted, #6B7A8A);
-  font-size: 0.65rem;
+  font-size: 0.775rem;
 }

@@ -7,7 +7,7 @@
 }
 
 .hello-tile__title {
-  font-size: 1.75rem;
+  font-size: 1.875rem;
   font-weight: 700;
   color: var(--portfolio-text-primary);
   margin-bottom: 0.25rem;
@@ -18,7 +18,7 @@
 }
 
 .hello-tile__subtitle {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--portfolio-text-secondary);
   margin-bottom: 2rem;
 }
@@ -37,7 +37,7 @@
 }
 
 .hello-tile__card h2 {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--portfolio-text-secondary);
   text-transform: uppercase;
@@ -46,7 +46,7 @@
 }
 
 .hello-tile__status {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--portfolio-text-primary);
   line-height: 1.5;
 }
@@ -61,7 +61,7 @@
 
 .hello-tile__status code {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   background: rgba(255, 255, 255, 0.06);
   padding: 0.125rem 0.25rem;
   border-radius: 3px;
@@ -74,7 +74,7 @@
   color: var(--portfolio-accent);
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-family: inherit;
   transition: background 0.15s, color 0.15s;
 }
@@ -87,7 +87,7 @@
 .hello-tile__log {
   margin-top: 0.75rem;
   list-style: none;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--portfolio-text-secondary);
   font-family: "IBM Plex Mono", monospace;
 }
@@ -106,7 +106,7 @@
 }
 
 .hello-tile__registered-card h2 {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--portfolio-text-secondary);
   text-transform: uppercase;

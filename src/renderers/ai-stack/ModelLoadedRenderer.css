@@ -15,14 +15,14 @@
 }
 
 .aistack-model-loaded__label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
   color: #22E0C4;
 }
 
 .aistack-model-loaded__name {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--la-text-primary, #E8ECF0);
 }
@@ -30,7 +30,7 @@
 .aistack-model-loaded__meta {
   display: flex;
   gap: 6px;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
 }
 
@@ -39,11 +39,11 @@
 }
 
 .aistack-model-loaded__digest {
-  font-size: 8px;
+  font-size: 10px;
   opacity: 0.7;
 }
 
 .aistack-model-loaded__error {
-  font-size: 9px;
+  font-size: 11px;
   color: #e05c5c;
 }

@@ -8,7 +8,7 @@
   border-left: 3px solid transparent;
   border-radius: 0 3px 3px 0;
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9.5px;
+  font-size: 11.5px;
 }
 
 .ps-dec--invalid {
@@ -29,7 +29,7 @@
 }
 
 .ps-dec__age {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: #6B7A8A;
   white-space: nowrap;
 }
@@ -40,5 +40,5 @@
 
 .ps-dec__error {
   color: #e05c5c;
-  font-size: 9px;
+  font-size: 11px;
 }

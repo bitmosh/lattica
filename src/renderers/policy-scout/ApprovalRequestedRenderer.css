@@ -22,7 +22,7 @@
 }
 
 .ps-appr__band {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: #fff;
   padding: 1px 7px;
   border-radius: 9999px;
@@ -32,7 +32,7 @@
 }
 
 .ps-appr__cmd {
-  font-size: 10px;
+  font-size: 12px;
   color: #C4CDD6;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -44,7 +44,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: #6B7A8A;
   flex-wrap: wrap;
 }
@@ -59,10 +59,10 @@
 
 .ps-appr__label {
   color: #6B7A8A;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .ps-appr__error {
   color: #e05c5c;
-  font-size: 9px;
+  font-size: 11px;
 }

@@ -19,7 +19,7 @@
 }
 
 .lw-tile__title {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--project-accent-lumaweave, #A6F35A);
   letter-spacing: 0.06em;
@@ -46,7 +46,7 @@
 }
 
 .lw-tile__prelay-note {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: #6B7A8A;
 }
 
@@ -67,13 +67,13 @@
 }
 
 .lw-tile__meta-label {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.1em;
   color: #6B7A8A;
   text-transform: uppercase;
 }
 
 .lw-tile__meta-value {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--la-text-secondary, #C4CDD6);
 }

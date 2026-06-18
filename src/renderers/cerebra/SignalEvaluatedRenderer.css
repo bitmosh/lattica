@@ -1,6 +1,6 @@
 .cerebra-signal-evaluated {
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: 0.945rem;
   padding: 0.5rem 0.75rem;
   background: var(--portfolio-surface);
   border: 1px solid var(--portfolio-border);
@@ -33,7 +33,7 @@
 }
 
 .cerebra-signal-evaluated__badge {
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
 }
@@ -61,7 +61,7 @@
 
 .cerebra-signal-evaluated__meta {
   color: var(--portfolio-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   display: flex;
   gap: 0.3rem;
 }

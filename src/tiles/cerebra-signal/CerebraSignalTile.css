@@ -34,7 +34,7 @@
   align-items: center;
   gap: 4px;
   margin-bottom: 8px;
-  font-size: 9.5px;
+  font-size: 11.5px;
   color: var(--la-text-muted, #6B7A8A);
   flex-wrap: wrap;
 }
@@ -45,7 +45,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   padding: 2px 8px;
@@ -92,7 +92,7 @@
 
 .cst-posture-toggle {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 8.5px;
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.1em;
   padding: 2px 8px;
@@ -119,7 +119,7 @@
 
 .cst-checkpoint-btn {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 8.5px;
+  font-size: 10.5px;
   letter-spacing: 0.08em;
   padding: 2px 8px;
   border-radius: 4px;
@@ -153,24 +153,24 @@
 
 .cst-session-id {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-secondary, #C4CDD6);
 }
 
 .cst-meta-sep {
   color: var(--la-text-muted, #6B7A8A);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .cst-cycle-config {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
 }
 
 .cst-goal-preview {
   font-family: var(--la-font-sans, 'Geist', system-ui, sans-serif);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
   max-width: 220px;
   overflow: hidden;
@@ -180,7 +180,7 @@
 
 .cst-cycle-count {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
 }
 
@@ -193,7 +193,7 @@
   padding: 6px 0 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9.5px;
+  font-size: 11.5px;
   min-height: 28px;
   margin-top: 2px;
 }
@@ -201,12 +201,12 @@
 .cst-clutch-label {
   color: var(--la-text-muted, #6B7A8A);
   letter-spacing: 0.06em;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .cst-clutch-action {
   font-weight: 700;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   padding: 1px 6px;
   border-radius: 9999px;
@@ -228,7 +228,7 @@
 }
 
 .cst-clutch-rule {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: var(--la-text-muted, #6B7A8A);
   padding: 1px 6px;
   border: 1px solid rgba(107, 122, 138, 0.25);
@@ -240,13 +240,13 @@
 }
 
 .cst-clutch-catalyst {
-  font-size: 8px;
+  font-size: 10px;
   color: #B46CFF;
   letter-spacing: 0.06em;
 }
 
 .cst-clutch-awaiting {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: rgba(107, 122, 138, 0.45);
   font-style: italic;
 }
@@ -280,7 +280,7 @@
 
 .cst-body__empty {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 10px;
+  font-size: 12px;
   color: rgba(107, 122, 138, 0.45);
   letter-spacing: 0.06em;
   padding: 24px 0;
@@ -303,7 +303,7 @@
 
 .cst-scroll-affordance__label {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 8px;
+  font-size: 10px;
   color: rgba(107, 122, 138, 0.45);
   letter-spacing: 0.1em;
 }
@@ -334,7 +334,7 @@
 
 .cst-card {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 /* StepStarted */
@@ -364,7 +364,7 @@
 }
 
 .cst-card__age {
-  font-size: 9px;
+  font-size: 11px;
   opacity: 0.5;
 }
 
@@ -393,7 +393,7 @@
 }
 
 .cst-card__basis-tag {
-  font-size: 8px;
+  font-size: 10px;
   padding: 1px 5px;
   border: 1px solid rgba(34, 224, 196, 0.25);
   border-radius: 4px;
@@ -402,7 +402,7 @@
 }
 
 .cst-card__causes {
-  font-size: 8px;
+  font-size: 10px;
   color: rgba(107, 122, 138, 0.55);
   margin-left: auto;
   letter-spacing: 0.04em;
@@ -417,7 +417,7 @@
 
 .cst-card__block-bar {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: #22E0C4;
   letter-spacing: -0.05em;
   flex: 1;
@@ -428,7 +428,7 @@
 }
 
 .cst-card__pct {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-secondary, #C4CDD6);
   min-width: 28px;
   text-align: right;
@@ -449,13 +449,13 @@
 }
 
 .cst-card__signal-abbr {
-  font-size: 7.5px;
+  font-size: 9.5px;
   color: var(--la-text-muted, #6B7A8A);
   letter-spacing: 0.04em;
 }
 
 .cst-card__signal-score {
-  font-size: 8px;
+  font-size: 10px;
   color: var(--la-text-secondary, #C4CDD6);
 }
 
@@ -472,21 +472,21 @@
 }
 
 .cst-card__signal-evaluated-label {
-  font-size: 8px;
+  font-size: 10px;
   color: rgba(107, 122, 138, 0.55);
   letter-spacing: 0.06em;
   min-width: 60px;
 }
 
 .cst-card__signal-name {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: var(--la-text-secondary, #C4CDD6);
   min-width: 26px;
   letter-spacing: 0.04em;
 }
 
 .cst-card__low-conf {
-  font-size: 7.5px;
+  font-size: 9.5px;
   padding: 0 4px;
   border: 1px solid rgba(255, 91, 199, 0.3);
   border-radius: 3px;
@@ -533,7 +533,7 @@
 }
 
 .cst-card__err-class {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.06em;
   padding: 1px 5px;
   border-radius: 4px;
@@ -556,7 +556,7 @@
 }
 
 .cst-card__pred-delta {
-  font-size: 8px;
+  font-size: 10px;
   color: rgba(107, 122, 138, 0.55);
   margin-left: auto;
   letter-spacing: 0.04em;
@@ -601,14 +601,14 @@
 
 .cst-footer__count {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 8px;
+  font-size: 10px;
   color: var(--la-text-muted, #6B7A8A);
   letter-spacing: 0.06em;
 }
 
 .cst-footer__now {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 8px;
+  font-size: 10px;
   color: var(--la-text-muted, #6B7A8A);
   letter-spacing: 0.06em;
 }

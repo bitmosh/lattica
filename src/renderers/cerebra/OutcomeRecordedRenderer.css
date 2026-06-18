@@ -1,6 +1,6 @@
 .cerebra-outcome-recorded {
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: 0.945rem;
   padding: 0.5rem 0.75rem;
   background: var(--portfolio-surface);
   border: 1px solid var(--portfolio-border);
@@ -41,7 +41,7 @@
 }
 
 .cerebra-outcome-recorded__classification {
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
 }
@@ -63,7 +63,7 @@
 }
 
 .cerebra-outcome-recorded__delta {
-  font-size: 0.78rem;
+  font-size: 0.905rem;
   font-weight: bold;
 }
 
@@ -106,12 +106,12 @@
 
 .cerebra-outcome-recorded__signal-name {
   color: var(--portfolio-text-secondary);
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   letter-spacing: 0.03em;
 }
 
 .cerebra-outcome-recorded__signal-error {
-  font-size: 0.78rem;
+  font-size: 0.905rem;
 }
 
 .cerebra-outcome-recorded__signal-error--pos {
@@ -124,7 +124,7 @@
 
 .cerebra-outcome-recorded__meta {
   color: var(--portfolio-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   display: flex;
   gap: 0.3rem;
 }

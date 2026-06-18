@@ -10,13 +10,13 @@
 }
 
 .aistack-sidecar-stopped__label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
   color: #e05c5c;
 }
 
 .aistack-sidecar-stopped__note {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
 }

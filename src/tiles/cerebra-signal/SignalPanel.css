@@ -16,14 +16,14 @@
 
 .la-signal-panel__title {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-secondary, #C4CDD6);
   letter-spacing: 0.12em;
 }
 
 .la-signal-panel__sub {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
   letter-spacing: 0.06em;
   max-width: 180px;
@@ -38,7 +38,7 @@
 
 .la-signal-panel__name {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9.5px;
+  font-size: 11.5px;
   color: var(--la-text-muted, #6B7A8A);
   letter-spacing: 0.04em;
   padding: 1.5px 0;
@@ -47,7 +47,7 @@
 
 .la-signal-panel__bar {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: #22E0C4;
   letter-spacing: -0.05em;
   align-self: center;
@@ -60,7 +60,7 @@
 
 .la-signal-panel__pct {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
   text-align: right;
   align-self: center;
@@ -81,7 +81,7 @@
 
 .la-signal-panel__composite-label {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-secondary, #C4CDD6);
   letter-spacing: 0.08em;
 }
@@ -124,7 +124,7 @@
 
 .la-signal-panel__composite-pct {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
   text-align: right;
   min-width: 28px;

@@ -1,6 +1,6 @@
 .cerebra-clutch-decision {
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: 0.945rem;
   padding: 0.5rem 0.75rem;
   background: var(--portfolio-surface);
   border: 1px solid var(--portfolio-border);
@@ -41,7 +41,7 @@
 }
 
 .cerebra-clutch-decision__action {
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
   font-weight: bold;
@@ -64,7 +64,7 @@
 }
 
 .cerebra-clutch-decision__catalyst-badge {
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
   background: var(--portfolio-surface);
@@ -80,12 +80,12 @@
 
 .cerebra-clutch-decision__rule-depth {
   color: var(--portfolio-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
 }
 
 .cerebra-clutch-decision__rule-name {
   color: var(--portfolio-text-primary);
-  font-size: 0.8rem;
+  font-size: 0.925rem;
 }
 
 .cerebra-clutch-decision__rule-name--no-match {
@@ -95,7 +95,7 @@
 
 .cerebra-clutch-decision__meta {
   color: var(--portfolio-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   display: flex;
   gap: 0.3rem;
 }

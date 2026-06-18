@@ -1,6 +1,6 @@
 .cerebra-prediction-made {
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: 0.945rem;
   padding: 0.5rem 0.75rem;
   background: var(--portfolio-surface);
   border: 1px solid var(--portfolio-border);
@@ -37,7 +37,7 @@
 }
 
 .cerebra-prediction-made__basis {
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
 }
@@ -89,18 +89,18 @@
 
 .cerebra-prediction-made__signal-name {
   color: var(--portfolio-text-secondary);
-  font-size: 0.72rem;
+  font-size: 0.845rem;
   letter-spacing: 0.03em;
 }
 
 .cerebra-prediction-made__signal-score {
   color: var(--portfolio-text-primary);
-  font-size: 0.78rem;
+  font-size: 0.905rem;
 }
 
 .cerebra-prediction-made__meta {
   color: var(--portfolio-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   display: flex;
   gap: 0.3rem;
 }

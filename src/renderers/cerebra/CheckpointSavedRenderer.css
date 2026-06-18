@@ -1,6 +1,6 @@
 .cerebra-checkpoint {
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: 0.945rem;
   padding: 0.5rem 0.75rem;
   background: var(--portfolio-surface);
   border: 1px solid var(--portfolio-color-info);
@@ -31,7 +31,7 @@
 
 .cerebra-checkpoint__bundle-id {
   color: var(--portfolio-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -45,7 +45,7 @@
   display: flex;
   align-items: baseline;
   gap: 0.3rem;
-  font-size: 0.78rem;
+  font-size: 0.905rem;
   color: var(--portfolio-text-secondary);
 }
 
@@ -56,7 +56,7 @@
 
 .cerebra-checkpoint__meta {
   color: var(--portfolio-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   display: flex;
   gap: 0.3rem;
 }

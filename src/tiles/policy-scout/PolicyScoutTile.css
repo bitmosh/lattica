@@ -27,7 +27,7 @@
 }
 
 .ps-tile__mono-label {
-  font-size: 9px;
+  font-size: 11px;
   color: #6B7A8A;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -57,14 +57,14 @@
 }
 
 .ps-tile__posture-name {
-  font-size: 10.5px;
+  font-size: 12.5px;
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .ps-tile__posture-sub {
-  font-size: 8px;
+  font-size: 10px;
   color: #a28fc0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -101,7 +101,7 @@
 }
 
 .ps-tile__section-label {
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   color: #6B7A8A;
   text-transform: uppercase;
@@ -109,7 +109,7 @@
 
 .ps-tile__section-meta {
   margin-left: auto;
-  font-size: 8px;
+  font-size: 10px;
   color: #6B7A8A;
 }
 
@@ -128,12 +128,12 @@
 }
 
 .ps-tile__prelay-note {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: #6B7A8A;
 }
 
 .ps-tile__empty-note {
-  font-size: 10px;
+  font-size: 12px;
   color: #6B7A8A;
   padding: 6px 0;
 }
@@ -163,7 +163,7 @@
   border-radius: 4px;
   color: #E8ECF0;
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 10px;
+  font-size: 12px;
   padding: 5px 8px;
   outline: none;
   transition: border-color 120ms;
@@ -180,7 +180,7 @@
 
 .ps-tile__action-btn {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 10px;
+  font-size: 12px;
   padding: 6px 10px;
   border-radius: 4px;
   background: transparent;
@@ -219,7 +219,7 @@
 }
 
 .ps-tile__error {
-  font-size: 9px;
+  font-size: 11px;
   color: #e05c5c;
   letter-spacing: 0.02em;
   line-height: 1.4;
@@ -251,7 +251,7 @@
 }
 
 .ps-tile__risk-chip {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   padding: 2px 5px;
@@ -262,7 +262,7 @@
 }
 
 .ps-tile__approval-cmd {
-  font-size: 9.5px;
+  font-size: 11.5px;
   color: var(--la-text-primary, #E8ECF0);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -272,7 +272,7 @@
 .ps-tile__approval-meta {
   display: flex;
   gap: 10px;
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: #6B7A8A;
 }
 
@@ -326,7 +326,7 @@
 }
 
 .ps-tile__verdict-chip {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   padding: 1px 5px;
@@ -337,7 +337,7 @@
 }
 
 .ps-tile__decision-cmd {
-  font-size: 9.5px;
+  font-size: 11.5px;
   color: var(--la-text-primary, #E8ECF0);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -347,7 +347,7 @@
 }
 
 .ps-tile__decision-age {
-  font-size: 8.5px;
+  font-size: 10.5px;
   color: #6B7A8A;
   white-space: nowrap;
   flex-shrink: 0;

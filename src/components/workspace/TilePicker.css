@@ -21,14 +21,14 @@
 
 .la-tile-picker-heading {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--la-text-muted, #6B7A8A);
 }
 
 .la-tile-picker-pane-id {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: #22E0C4;
 }
 
@@ -71,12 +71,12 @@
 
 .la-tile-picker-option-title {
   font-family: var(--la-font-sans, 'Geist', sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .la-tile-picker-option-sub {
   font-family: var(--la-font-mono, 'Geist Mono', monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--la-text-muted, #6B7A8A);
 }

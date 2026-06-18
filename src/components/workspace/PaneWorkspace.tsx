@@ -10,7 +10,7 @@ export function PaneWorkspace() {
   const [tiles, setTiles] = useState<TileMap>({
     left: 'cerebra',
     topRight: 'policy',
-    bottomRight: null,
+    bottomRight: 'fossic',
   });
 
   const [frozen, setFrozen] = useState<FrozenMap>({

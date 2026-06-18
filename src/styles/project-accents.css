@@ -1,0 +1,9 @@
+:root {
+  --project-accent-lattica:       #F2A85C; /* amber */
+  --project-accent-cerebra:       #22E0C4; /* teal */
+  --project-accent-lumaweave:     #A6F35A; /* lime */
+  --project-accent-policy-scout:  #B46CFF; /* purple */
+  --project-accent-fossic:        #4CC9FF; /* sky blue */
+  --project-accent-ai-stack:      #FF5BC7; /* pink */
+  --project-accent-bo:            #FF5BC7; /* same as ai-stack */
+}

@@ -1,6 +1,92 @@
-use fossic::{Append, OpenOptions, Store};
+use fossic::{Append, EventId, FirstOpenPolicy, OpenOptions, Store};
+use std::collections::HashMap;
 use std::process::Command;
 use tauri::Manager;
+
+// ── Remote store query ────────────────────────────────────────────────────────
+
+#[derive(Debug, serde::Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+enum RemoteStoreError {
+    RegistryNotFound,
+    ProjectNotRegistered { project: String },
+    StoreNotFound { path: String },
+    EventNotFound { id: String },
+    StoreError { message: String },
+}
+
+impl std::fmt::Display for RemoteStoreError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RemoteStoreError::RegistryNotFound =>
+                write!(f, "project registry not found (~/.lattica/project-registry.json)"),
+            RemoteStoreError::ProjectNotRegistered { project } =>
+                write!(f, "project '{}' not in registry", project),
+            RemoteStoreError::StoreNotFound { path } =>
+                write!(f, "vault not found at {}", path),
+            RemoteStoreError::EventNotFound { id } =>
+                write!(f, "event {} not found", id),
+            RemoteStoreError::StoreError { message } =>
+                write!(f, "store error: {}", message),
+        }
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct ProjectRegistry {
+    projects: HashMap<String, String>,
+}
+
+fn expand_tilde(path: &str) -> String {
+    if let Some(tail) = path.strip_prefix("~/") {
+        if let Ok(home) = std::env::var("HOME") {
+            return format!("{}/{}", home, tail);
+        }
+    }
+    path.to_string()
+}
+
+#[tauri::command]
+fn fossic_query_remote_store(
+    source_store: String,
+    event_id: String,
+) -> Result<Option<fossic_tauri::serialization::SerializedEvent>, RemoteStoreError> {
+    let home = std::env::var("HOME").unwrap_or_default();
+    let registry_path = format!("{}/.lattica/project-registry.json", home);
+
+    let registry_str = std::fs::read_to_string(&registry_path)
+        .map_err(|_| RemoteStoreError::RegistryNotFound)?;
+
+    let registry: ProjectRegistry = serde_json::from_str(&registry_str)
+        .map_err(|e| RemoteStoreError::StoreError { message: format!("malformed registry: {}", e) })?;
+
+    let vault_path = registry
+        .projects
+        .get(&source_store)
+        .ok_or_else(|| RemoteStoreError::ProjectNotRegistered { project: source_store.clone() })?;
+
+    let expanded = expand_tilde(vault_path);
+
+    let store = Store::open(
+        &std::path::PathBuf::from(&expanded),
+        OpenOptions { on_first_open: FirstOpenPolicy::RequireExisting, ..Default::default() },
+    )
+    .map_err(|e| match e {
+        fossic::Error::StoreNotFound { path } => RemoteStoreError::StoreNotFound { path },
+        other => RemoteStoreError::StoreError { message: other.to_string() },
+    })?;
+
+    let eid = EventId::from_hex(&event_id)
+        .map_err(|e| RemoteStoreError::StoreError { message: e.to_string() })?;
+
+    let result = store
+        .read_one(eid)
+        .map_err(|e| RemoteStoreError::StoreError { message: e.to_string() })
+        .map(|opt| opt.as_ref().map(fossic_tauri::serialization::SerializedEvent::from_stored));
+
+    let _ = store.close();
+    result
+}
 
 // ── Store status command ──────────────────────────────────────────────────────
 
@@ -167,6 +253,7 @@ pub fn run() {
             activate_lockdown,
             deactivate_lockdown,
             restart_watch,
+            fossic_query_remote_store,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

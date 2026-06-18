@@ -1,0 +1,11 @@
+:root {
+  /* LiveValue<T> error-state treatment colors (§B.2)                         */
+  /* Component applies 0.6 opacity + shimmer animation on --lv-no-data-yet   */
+  /* --lv-wiring-incomplete is dev mode only; hide or fall back in production */
+  --lv-no-data-yet:          #4a5568;                              /* muted slate — shimmer skeleton */
+  --lv-source-unreachable:   var(--portfolio-color-warning, #e0a800); /* amber — static, no animation */
+  --lv-pre-relay:            #4a7a9b;                              /* steel blue — pending, not broken */
+  --lv-wiring-incomplete:    #9b59b6;                              /* purple — dev mode only */
+  --lv-data-stale:           #c97b00;                              /* dark amber — degraded-but-present */
+  --lv-subscription-closed:  var(--portfolio-color-danger, #e05c5c);  /* red — reconnecting */
+}

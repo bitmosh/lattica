@@ -3,6 +3,12 @@ use std::collections::HashMap;
 use std::process::Command;
 use tauri::Manager;
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+fn oa(args: &[&str]) -> Vec<String> {
+    args.iter().map(|s| (*s).to_string()).collect()
+}
+
 // ── Remote store query ────────────────────────────────────────────────────────
 
 #[derive(Debug, serde::Serialize)]
@@ -47,45 +53,47 @@ fn expand_tilde(path: &str) -> String {
 }
 
 #[tauri::command]
-fn fossic_query_remote_store(
+async fn fossic_query_remote_store(
     source_store: String,
     event_id: String,
 ) -> Result<Option<fossic_tauri::serialization::SerializedEvent>, RemoteStoreError> {
-    let home = std::env::var("HOME").unwrap_or_default();
-    let registry_path = format!("{}/.lattica/project-registry.json", home);
+    tauri::async_runtime::spawn_blocking(move || {
+        let home = std::env::var("HOME").unwrap_or_default();
+        let registry_path = format!("{}/.lattica/project-registry.json", home);
 
-    let registry_str = std::fs::read_to_string(&registry_path)
-        .map_err(|_| RemoteStoreError::RegistryNotFound)?;
+        let registry_str = std::fs::read_to_string(&registry_path)
+            .map_err(|_| RemoteStoreError::RegistryNotFound)?;
 
-    let registry: ProjectRegistry = serde_json::from_str(&registry_str)
-        .map_err(|e| RemoteStoreError::StoreError { message: format!("malformed registry: {}", e) })?;
+        let registry: ProjectRegistry = serde_json::from_str(&registry_str)
+            .map_err(|e| RemoteStoreError::StoreError { message: format!("malformed registry: {}", e) })?;
 
-    let vault_path = registry
-        .projects
-        .get(&source_store)
-        .ok_or_else(|| RemoteStoreError::ProjectNotRegistered { project: source_store.clone() })?;
+        let vault_path = registry
+            .projects
+            .get(&source_store)
+            .ok_or_else(|| RemoteStoreError::ProjectNotRegistered { project: source_store.clone() })?;
 
-    let expanded = expand_tilde(vault_path);
+        let expanded = expand_tilde(vault_path);
 
-    let store = Store::open(
-        &std::path::PathBuf::from(&expanded),
-        OpenOptions { on_first_open: FirstOpenPolicy::RequireExisting, ..Default::default() },
-    )
-    .map_err(|e| match e {
-        fossic::Error::StoreNotFound { path } => RemoteStoreError::StoreNotFound { path },
-        other => RemoteStoreError::StoreError { message: other.to_string() },
-    })?;
+        let store = Store::open(
+            &std::path::PathBuf::from(&expanded),
+            OpenOptions { on_first_open: FirstOpenPolicy::RequireExisting, ..Default::default() },
+        )
+        .map_err(|e| match e {
+            fossic::Error::StoreNotFound { path } => RemoteStoreError::StoreNotFound { path },
+            other => RemoteStoreError::StoreError { message: other.to_string() },
+        })?;
 
-    let eid = EventId::from_hex(&event_id)
-        .map_err(|e| RemoteStoreError::StoreError { message: e.to_string() })?;
+        let eid = EventId::from_hex(&event_id)
+            .map_err(|e| RemoteStoreError::StoreError { message: e.to_string() })?;
 
-    let result = store
-        .read_one(eid)
-        .map_err(|e| RemoteStoreError::StoreError { message: e.to_string() })
-        .map(|opt| opt.as_ref().map(fossic_tauri::serialization::SerializedEvent::from_stored));
+        let result = store
+            .read_one(eid)
+            .map_err(|e| RemoteStoreError::StoreError { message: e.to_string() })
+            .map(|opt| opt.as_ref().map(fossic_tauri::serialization::SerializedEvent::from_stored));
 
-    let _ = store.close();
-    result
+        let _ = store.close();
+        result
+    }).await.map_err(|e| RemoteStoreError::StoreError { message: e.to_string() })?
 }
 
 // ── Store status command ──────────────────────────────────────────────────────
@@ -154,35 +162,39 @@ struct CliJsonResponse {
     error: Option<String>,
 }
 
-fn run_cli_json(args: &[&str]) -> CliJsonResponse {
-    let output = match Command::new(args[0]).args(&args[1..]).output() {
-        Ok(o) => o,
-        Err(e) => {
-            return CliJsonResponse {
+async fn run_cli_json(args: Vec<String>) -> CliJsonResponse {
+    tauri::async_runtime::spawn_blocking(move || {
+        let output = match Command::new(&args[0]).args(&args[1..]).output() {
+            Ok(o) => o,
+            Err(e) => return CliJsonResponse {
                 ok: false,
                 error: Some(format!("subprocess failed to start: {}", e)),
                 active: None,
                 reason: None,
                 already_active: None,
                 already_inactive: None,
-            }
+            },
+        };
+        let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+        match serde_json::from_str::<CliJsonResponse>(&stdout) {
+            Ok(parsed) => parsed,
+            Err(e) => CliJsonResponse {
+                ok: false,
+                error: Some(format!("could not parse CLI JSON: {} — stdout: {}", e, stdout)),
+                active: None,
+                reason: None,
+                already_active: None,
+                already_inactive: None,
+            },
         }
-    };
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    match serde_json::from_str::<CliJsonResponse>(&stdout) {
-        Ok(parsed) => parsed,
-        Err(e) => CliJsonResponse {
-            ok: false,
-            error: Some(format!(
-                "could not parse CLI JSON: {} — stdout: {}",
-                e, stdout
-            )),
-            active: None,
-            reason: None,
-            already_active: None,
-            already_inactive: None,
-        },
-    }
+    }).await.unwrap_or_else(|e| CliJsonResponse {
+        ok: false,
+        error: Some(format!("task panicked: {}", e)),
+        active: None,
+        reason: None,
+        already_active: None,
+        already_inactive: None,
+    })
 }
 
 fn validate_reason(reason: &str) -> Result<(), CliJsonResponse> {
@@ -210,67 +222,76 @@ fn validate_reason(reason: &str) -> Result<(), CliJsonResponse> {
 }
 
 #[tauri::command]
-fn activate_lockdown(reason: Option<String>) -> CliJsonResponse {
+async fn activate_lockdown(reason: Option<String>) -> CliJsonResponse {
     let reason_str = reason.unwrap_or_default();
     if let Err(e) = validate_reason(&reason_str) {
         return e;
     }
     if reason_str.is_empty() {
-        run_cli_json(&["policy-scout", "lockdown", "on", "--json"])
+        run_cli_json(oa(&["policy-scout", "lockdown", "on", "--json"])).await
     } else {
-        run_cli_json(&[
-            "policy-scout",
-            "lockdown",
-            "on",
-            "--reason",
-            &reason_str,
-            "--json",
-        ])
+        let mut args = oa(&["policy-scout", "lockdown", "on", "--reason"]);
+        args.push(reason_str);
+        args.push("--json".into());
+        run_cli_json(args).await
     }
 }
 
 #[tauri::command]
-fn deactivate_lockdown() -> CliJsonResponse {
-    run_cli_json(&["policy-scout", "lockdown", "off", "--json"])
+async fn deactivate_lockdown() -> CliJsonResponse {
+    run_cli_json(oa(&["policy-scout", "lockdown", "off", "--json"])).await
 }
 
 #[tauri::command]
 async fn restart_watch() -> CliJsonResponse {
-    // watch stop takes ~1.6s (waits for daemon death) — moved off IPC thread.
-    let _ = Command::new("policy-scout").args(["watch", "stop"]).output();
-    run_cli_json(&["policy-scout", "watch", "start", "--json"])
+    // watch stop takes ~1.6s; run it in its own blocking task so it doesn't
+    // block the IPC thread, then start fresh.
+    let _ = tauri::async_runtime::spawn_blocking(|| {
+        Command::new("policy-scout").args(["watch", "stop"]).output()
+    }).await;
+    run_cli_json(oa(&["policy-scout", "watch", "start", "--json"])).await
 }
 
 #[tauri::command]
-fn ps_watch_status() -> Result<WatchStatusResponse, String> {
-    let output = Command::new("policy-scout")
-        .args(["watch", "status", "--json"])
-        .output()
-        .map_err(|e| format!("subprocess failed to start: {}", e))?;
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    serde_json::from_str::<WatchStatusResponse>(&stdout)
-        .map_err(|e| format!("could not parse watch status JSON: {} — stdout: {}", e, stdout))
+async fn ps_watch_status() -> Result<WatchStatusResponse, String> {
+    tauri::async_runtime::spawn_blocking(|| {
+        let output = Command::new("policy-scout")
+            .args(["watch", "status", "--json"])
+            .output()
+            .map_err(|e| format!("subprocess failed to start: {}", e))?;
+        let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+        serde_json::from_str::<WatchStatusResponse>(&stdout)
+            .map_err(|e| format!("could not parse watch status JSON: {} — stdout: {}", e, stdout))
+    }).await.map_err(|e| e.to_string())?
 }
 
 #[tauri::command]
-fn ps_approvals_list() -> Result<ApprovalsListResponse, String> {
-    let output = Command::new("policy-scout")
-        .args(["approvals", "list", "--json"])
-        .output()
-        .map_err(|e| format!("subprocess failed to start: {}", e))?;
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    serde_json::from_str::<ApprovalsListResponse>(&stdout)
-        .map_err(|e| format!("could not parse approvals list JSON: {} — stdout: {}", e, stdout))
+async fn ps_approvals_list() -> Result<ApprovalsListResponse, String> {
+    tauri::async_runtime::spawn_blocking(|| {
+        let output = Command::new("policy-scout")
+            .args(["approvals", "list", "--json"])
+            .output()
+            .map_err(|e| format!("subprocess failed to start: {}", e))?;
+        let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
+        serde_json::from_str::<ApprovalsListResponse>(&stdout)
+            .map_err(|e| format!("could not parse approvals list JSON: {} — stdout: {}", e, stdout))
+    }).await.map_err(|e| e.to_string())?
 }
 
 #[tauri::command]
-fn ps_approve_once(approval_id: String) -> CliJsonResponse {
-    run_cli_json(&["policy-scout", "approvals", "approve", &approval_id, "--json"])
+async fn ps_approve_once(approval_id: String) -> CliJsonResponse {
+    let mut args = oa(&["policy-scout", "approvals", "approve"]);
+    args.push(approval_id);
+    args.push("--json".into());
+    run_cli_json(args).await
 }
 
 #[tauri::command]
-fn ps_deny(approval_id: String) -> CliJsonResponse {
-    run_cli_json(&["policy-scout", "approvals", "deny", &approval_id, "--json"])
+async fn ps_deny(approval_id: String) -> CliJsonResponse {
+    let mut args = oa(&["policy-scout", "approvals", "deny"]);
+    args.push(approval_id);
+    args.push("--json".into());
+    run_cli_json(args).await
 }
 
 // ── Entry point ───────────────────────────────────────────────────────────────

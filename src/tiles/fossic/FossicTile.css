@@ -1,0 +1,286 @@
+/* ── Fossic Tile ─────────────────────────────────────────────────────────── */
+
+.fossic-tile {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #0D1117;
+}
+
+/* Info bar */
+
+.fossic-tile__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-bottom: 1px solid rgba(28, 37, 48, 0.7);
+  flex-shrink: 0;
+}
+
+.fossic-tile__bar-count {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: #6B7A8A;
+}
+
+.fossic-tile__bar-badge {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 9px;
+  color: #6B7A8A;
+  padding: 2px 7px;
+  border: 1px solid #1C2530;
+  border-radius: 9999px;
+  margin-left: auto;
+}
+
+/* Visualization canvas */
+
+.fossic-tile__vis {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px 10px 8px;
+}
+
+/* Gold→pink center beam */
+
+.fossic-tile__beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    rgba(242, 168, 92, 0) 0%,
+    rgba(242, 168, 92, 0.22) 12%,
+    rgba(242, 168, 92, 0.18) 50%,
+    rgba(255, 91, 199, 0.18) 88%,
+    rgba(255, 91, 199, 0) 100%
+  );
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Flare areas */
+
+.fossic-tile__flare {
+  position: absolute;
+  top: 0;
+  bottom: 24px;
+  width: 78px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.fossic-tile__flare--left {
+  left: 2px;
+  align-items: flex-start;
+}
+
+.fossic-tile__flare--right {
+  right: 2px;
+  align-items: flex-end;
+}
+
+.fossic-tile__flare-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Right-side nodes: label first, then dot (mirrored layout) */
+.fossic-tile__flare-node--right {
+  flex-direction: row-reverse;
+}
+
+.fossic-tile__flare-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.fossic-tile__flare-label {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.fossic-tile__flare-sub {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: #6B7A8A;
+  padding-left: 15px;
+}
+
+.fossic-tile__flare-sub--right {
+  padding-left: 0;
+  padding-right: 15px;
+}
+
+/* Glow blobs (animated) */
+
+.fossic-tile__flare-glow--lattica {
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 168, 92, 0.55) 0%, rgba(242, 168, 92, 0) 70%);
+  animation: ft-flare-pulse 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.fossic-tile__flare-glow--bo {
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 91, 199, 0.5) 0%, rgba(255, 91, 199, 0) 70%);
+  animation: ft-flare-pulse 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ft-flare-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* Lane container */
+
+.fossic-tile__lanes {
+  position: absolute;
+  left: 90px;
+  right: 90px;
+  top: 10px;
+  bottom: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+/* Time axis */
+
+.fossic-tile__axis {
+  position: absolute;
+  left: 90px;
+  right: 90px;
+  bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: #6B7A8A;
+  border-top: 1px solid rgba(28, 37, 48, 0.7);
+  padding-top: 3px;
+  z-index: 1;
+}
+
+.fossic-tile__axis-now {
+  color: #4CC9FF;
+}
+
+/* ── Lane ────────────────────────────────────────────────────────────────── */
+
+.ft-lane {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+}
+
+.ft-lane__header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ft-lane__label {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.ft-lane__detail {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: #6B7A8A;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ft-lane__detail--degraded {
+  color: #FF5BC7;
+}
+
+.ft-lane__bundle {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 9px;
+  padding: 1px 5px;
+  border: 1px solid;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.06em;
+}
+
+.ft-lane__sub-pill {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 9px;
+  padding: 0 4px;
+  border: 1px solid;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ft-lane__count {
+  font-family: 'Geist Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  color: #6B7A8A;
+  margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Track */
+
+.ft-lane__track-row {
+  position: relative;
+}
+
+.ft-lane__track {
+  display: block;
+  width: 100%;
+}

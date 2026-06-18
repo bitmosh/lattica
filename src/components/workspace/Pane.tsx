@@ -6,6 +6,7 @@ import { CerebraSignalTile } from '../../tiles/cerebra-signal/CerebraSignalTile'
 import { PolicyScoutTile } from '../../tiles/policy-scout/PolicyScoutTile';
 import { AiStackTopologyTile } from '../../tiles/ai-stack/AiStackTopologyTile';
 import { LumaWeaveTile } from '../../tiles/lumaweave/LumaWeaveTile';
+import { FossicTile } from '../../tiles/fossic/FossicTile';
 
 interface Props {
   paneId: PaneId;
@@ -99,6 +100,10 @@ export function Pane({
         ) : tileKey === 'lumaweave' ? (
           <div className="la-pane-tile-slot">
             <LumaWeaveTile />
+          </div>
+        ) : tileKey === 'fossic' ? (
+          <div className="la-pane-tile-slot">
+            <FossicTile />
           </div>
         ) : (
           <div className="la-pane-tile-slot">

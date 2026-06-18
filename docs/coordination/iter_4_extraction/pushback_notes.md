@@ -86,3 +86,17 @@ TilePicker exposes `key: 'fossic'` and Pane.tsx has a fallthrough for unrecogniz
 
 **`defaultAnchor` now optional in TileSectionEntry**
 Phase 3 removed `defaultAnchor` from the required fields list in `tileSectionRegistry.validateShape` and made it optional in the `TileSectionEntry` type. Existing registrations that supply `defaultAnchor` remain valid. New registrations (LumaWeave) may omit it; the compositor assigns placement from category.
+
+### Phase 4 — Async Hardening + FossicTile
+
+**All PS Tauri commands migrated to spawn_blocking**
+Phase 3 left `activate_lockdown`, `deactivate_lockdown`, `ps_approve_once`, `ps_deny` as sync `fn` (safe for sub-100ms CLI calls). Phase 4 promotes them all to `async fn` via `run_cli_json(Vec<String>)` which uses `spawn_blocking` internally. `ps_watch_status` and `ps_approvals_list` each get their own `spawn_blocking` closures since they return `Result<T, String>` rather than `CliJsonResponse`. `fossic_query_remote_store` also gets `spawn_blocking` to keep the blocking Store I/O off the IPC thread. Consistent async surface — all commands are now `async fn`.
+
+**`oa()` helper introduced for owned args**
+`run_cli_json` now takes `Vec<String>` (owned) to satisfy `spawn_blocking`'s `'static` bound. `oa(&["cmd", "arg"])` converts `&[&str]` → `Vec<String>` at callsites. For commands with runtime strings (approval_id, reason), args are built as `mut vec` with `.push()`.
+
+**FossicTile: live event fabric visualizer**
+`src/tiles/fossic/FossicTile.tsx` + `.css` added. Shows 6 named lanes (lattica, cerebra, lumaweave, policy, fossic, aistack) with a 90-second sliding event window, tick marks per event, and per-lane relay status chips. Subscribes to `"**"` on the local hub store via `fossic_subscribe`. Lane routing is prefix-based (`lattica/` → lattica lane, etc.). Pruning runs every 15 s; max 300 events per lane. Registered as `fossic-stream-view` in tileSectionRegistry (defaultVisible: false) and routed via Pane.tsx `tileKey === 'fossic'` branch.
+
+**fossic-stream-view registered but defaultVisible: false**
+The tile is functional on the local hub store but all non-lattica lanes are pre-relay until each module's relay sidecar ships. Defaulting to hidden avoids the tile appearing in new panes before users have active relay streams. Can be toggled from the tile picker.

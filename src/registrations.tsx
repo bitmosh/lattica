@@ -10,6 +10,7 @@ import { CerebraSignalTile } from "./tiles/cerebra-signal/CerebraSignalTile";
 import { AiStackTopologyTile } from "./tiles/ai-stack/AiStackTopologyTile";
 import { PolicyScoutTile } from "./tiles/policy-scout/PolicyScoutTile";
 import { LumaWeaveTile } from "./tiles/lumaweave/LumaWeaveTile";
+import { FossicTile } from "./tiles/fossic/FossicTile";
 import { DecisionIssuedRenderer } from "./renderers/policy-scout/DecisionIssuedRenderer";
 import { ApprovalRequestedRenderer } from "./renderers/policy-scout/ApprovalRequestedRenderer";
 import { LockdownActivatedRenderer } from "./renderers/policy-scout/LockdownActivatedRenderer";
@@ -159,6 +160,18 @@ tileSectionRegistry.register({
   defaultVisible: true,
   defaultExpanded: true,
   content: () => <LumaWeaveTile />,
+});
+
+tileSectionRegistry.register({
+  id: "fossic-stream-view",
+  label: "Fossic Stream View",
+  category: "right-panel",
+  defaultWidth: 560,
+  defaultHeight: 480,
+  collapsible: true,
+  defaultVisible: false,
+  defaultExpanded: true,
+  content: () => <FossicTile />,
 });
 
 registerPayloadRenderer({

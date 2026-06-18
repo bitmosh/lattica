@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
 import { LiveValueChip, type LvStateKind } from '../../components/livevalue/LiveValueChip';
 import './PolicyScoutTile.css';
 
@@ -43,6 +44,19 @@ interface ApprovalsListResponse {
   approvals: ApprovalItem[];
 }
 
+interface SerializedEvent {
+  id: string;
+  stream_id: string;
+  timestamp_us: number;
+  event_type: string;
+  payload: unknown;
+}
+
+interface FossicEventPayload {
+  subscription_id: string;
+  event: SerializedEvent;
+}
+
 type WatchState = 'running' | 'stopped' | 'stale' | 'unknown';
 
 // ── Constants + helpers ──────────────────────────────────────────────────────
@@ -65,6 +79,12 @@ const RISK_BAND_STYLE: Record<string, { bg: string; text: string }> = {
   none:     { bg: 'var(--la-surface, #1C2530)', text: 'inherit' },
 };
 
+const VERDICT_STYLE: Record<string, { bg: string; color: string }> = {
+  ALLOW:         { bg: 'rgba(94,186,125,0.15)',  color: '#5eba7d' },
+  SANDBOX_FIRST: { bg: 'rgba(201,123,0,0.15)',   color: '#c97b00' },
+  DENY:          { bg: 'rgba(180,108,255,0.15)', color: 'var(--project-accent-policy-scout, #B46CFF)' },
+};
+
 function relExpiry(iso: string): string {
   const diff = new Date(iso).getTime() - Date.now();
   const abs = Math.abs(diff);
@@ -82,29 +102,130 @@ function relExpiry(iso: string): string {
   return past ? `expired ${d}d ago` : `in ${d} d`;
 }
 
+function fmtAge(ms: number): string {
+  const d = Math.floor((Date.now() - ms) / 1000);
+  if (d < 1) return 'now';
+  if (d < 60) return `${d}s`;
+  if (d < 3600) return `${Math.floor(d / 60)}m`;
+  return `${Math.floor(d / 3600)}h`;
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function PolicyScoutTile() {
-  // Track A: CLI poll. Starts no-data-yet; transitions to live/source-unreachable.
+  // Track A: CLI poll
   const [trackAState, setTrackAState] = useState<LvStateKind>('no-data-yet');
+  // Track B: fossic subscribe
+  const [trackBState, setTrackBState] = useState<LvStateKind>('no-data-yet');
 
-  // Track B: fossic subscribe. Always pre-relay until policy-scout-relay.py ships.
-  const trackBState: LvStateKind = 'pre-relay';
-
-  // Posture state — updated by ps_watch_status poll and action results
+  // Posture state — fast-pathed by Track B on event arrival; Track A reconciles on 15s tick
   const [lockdown, setLockdown] = useState(false);
   const [lockdownReason, setLockdownReason] = useState('');
   const [watchState, setWatchState] = useState<WatchState>('unknown');
   const [watchRestarting, setWatchRestarting] = useState(false);
 
-  // Approvals state
+  // Approvals state (Track A)
   const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
   const [inFlightIds, setInFlightIds] = useState<string[]>([]);
+
+  // Track B event accumulation
+  const [psEvents, setPsEvents] = useState<SerializedEvent[]>([]);
 
   // UI
   const [showReasonInput, setShowReasonInput] = useState(false);
   const [pendingReason, setPendingReason] = useState('');
   const [actionError, setActionError] = useState<string | null>(null);
+
+  // Refs
+  const subIdRef = useRef<string | null>(null);
+  const bootTimeMs = useRef(Date.now());
+
+  // ── Track B subscription ──────────────────────────────────────────────────
+
+  useEffect(() => {
+    let unlisten: (() => void) | null = null;
+    let cancelled = false;
+    const boot = bootTimeMs.current;
+
+    async function setup() {
+      try {
+        const subId = await invoke<string>('fossic_subscribe', {
+          streamPattern: 'policy-scout/**',
+          branch: null,
+          includeSystem: false,
+          queueSize: null,
+        });
+        if (cancelled) {
+          invoke('fossic_unsubscribe', { subscriptionId: subId }).catch(() => {});
+          return;
+        }
+        subIdRef.current = subId;
+
+        unlisten = await listen<FossicEventPayload>('fossic:event', (msg) => {
+          if (msg.payload.subscription_id !== subId) return;
+          const ev = msg.payload.event;
+
+          // Fast-path posture updates — boot guard prevents replay from flipping state
+          const evMs = ev.timestamp_us / 1000;
+          if (evMs > boot) {
+            if (ev.event_type === 'LockdownActivated') {
+              const p = ev.payload as { reason?: string | null };
+              setLockdown(true);
+              setLockdownReason(p.reason ?? '');
+            } else if (ev.event_type === 'LockdownDeactivated') {
+              setLockdown(false);
+              setLockdownReason('');
+            }
+          }
+
+          setPsEvents(prev => [...prev, ev]);
+          setTrackBState('live');
+        });
+
+        // Backfill historical events from hub store
+        try {
+          const allStreams = await invoke<{ id: string }[]>('fossic_list_streams');
+          const psStreams = allStreams.filter(s => s.id.startsWith('policy-scout/'));
+          const batches = await Promise.all(
+            psStreams.map(s =>
+              invoke<SerializedEvent[]>('fossic_read_range', {
+                streamId: s.id,
+                branch: null,
+                fromVersion: null,
+                toVersion: null,
+                limit: 100,
+                eventTypeFilter: null,
+              })
+            )
+          );
+          const historical = batches.flat();
+          if (historical.length > 0) {
+            setPsEvents(prev => {
+              const liveIds = new Set(prev.map(e => e.id));
+              const fresh = historical.filter(e => !liveIds.has(e.id));
+              return [...fresh, ...prev].sort((a, b) => a.timestamp_us - b.timestamp_us);
+            });
+            setTrackBState('live');
+          }
+        } catch {
+          // backfill failure is non-fatal — live events still arrive
+        }
+      } catch {
+        setTrackBState('source-unreachable');
+      }
+    }
+
+    void setup();
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+      if (subIdRef.current) {
+        invoke('fossic_unsubscribe', { subscriptionId: subIdRef.current }).catch(() => {});
+        subIdRef.current = null;
+      }
+    };
+  }, []);
 
   // ── Track A poll ─────────────────────────────────────────────────────────
 
@@ -218,7 +339,12 @@ export function PolicyScoutTile() {
     }
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  // ── Derived ───────────────────────────────────────────────────────────────
+
+  const recentDecisions = [...psEvents]
+    .filter(e => e.event_type === 'DecisionIssued')
+    .reverse()
+    .slice(0, 20);
 
   const watchColor =
     watchState === 'running' ? '#5eba7d' :
@@ -229,6 +355,8 @@ export function PolicyScoutTile() {
     watchState === 'stale'   ? '⚠ Watch stale'   :
     watchState === 'stopped' ? '○ Watch stopped'  :
                                '○ Watch unknown';
+
+  // ── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div className="ps-tile" data-testid="policy-scout-tile">
@@ -341,25 +469,51 @@ export function PolicyScoutTile() {
           )}
         </div>
 
-        {/* Recent decisions */}
+        {/* Recent decisions (Track B) */}
         <div className="ps-tile__section">
           <div className="ps-tile__section-hd">
             <span className="ps-tile__section-label">RECENT DECISIONS</span>
             <span className="ps-tile__section-meta">
-              CLI history · fossic feed pre-relay
+              {trackBState === 'live'
+                ? `${recentDecisions.length} events`
+                : 'fossic feed · loading…'}
             </span>
           </div>
-          <div className="ps-tile__empty-note">
-            no decisions — waiting for Track B fossic feed
-          </div>
-        </div>
-
-        {/* Track B feed placeholder */}
-        <div className="ps-tile__prelay-row ps-tile__prelay-row--block">
-          <LiveValueChip state="pre-relay" label="Track B feed" />
-          <span className="ps-tile__prelay-note">
-            hidden until policy-scout-relay.py ships
-          </span>
+          {trackBState === 'source-unreachable' ? (
+            <div className="ps-tile__prelay-row">
+              <LiveValueChip state="source-unreachable" label="B·fossic" />
+              <span className="ps-tile__prelay-note">hub store unreachable</span>
+            </div>
+          ) : recentDecisions.length === 0 ? (
+            <div className="ps-tile__empty-note">
+              {trackBState === 'live' ? 'no decisions yet' : 'awaiting fossic feed…'}
+            </div>
+          ) : (
+            <div className="ps-tile__decisions-list">
+              {recentDecisions.map(ev => {
+                const p = ev.payload as { verdict?: string; cmd?: string; decided_at?: number };
+                const verdict = p.verdict ?? '?';
+                const vs = VERDICT_STYLE[verdict] ?? { bg: 'rgba(107,122,138,0.15)', color: '#6B7A8A' };
+                const ageMs = p.decided_at ?? ev.timestamp_us / 1000;
+                return (
+                  <div key={ev.id} className="ps-tile__decision-row">
+                    <span
+                      className="ps-tile__verdict-chip"
+                      style={{ background: vs.bg, color: vs.color }}
+                    >
+                      {verdict}
+                    </span>
+                    <span className="ps-tile__decision-cmd" title={p.cmd ?? ''}>
+                      {(p.cmd ?? '').length > 44
+                        ? (p.cmd ?? '').slice(0, 43) + '…'
+                        : (p.cmd ?? '—')}
+                    </span>
+                    <span className="ps-tile__decision-age">{fmtAge(ageMs)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
       </div>

@@ -305,3 +305,50 @@
   background: rgba(180, 108, 255, 0.12);
   color: var(--project-accent-policy-scout, #B46CFF);
 }
+
+/* ── Decision rows (Track B) ──────────────────────────────────────────────── */
+
+.ps-tile__decisions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ps-tile__decision-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(74, 122, 155, 0.15);
+  background: rgba(20, 26, 31, 0.3);
+  min-width: 0;
+}
+
+.ps-tile__verdict-chip {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.ps-tile__decision-cmd {
+  font-size: 9.5px;
+  color: var(--la-text-primary, #E8ECF0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.ps-tile__decision-age {
+  font-size: 8.5px;
+  color: #6B7A8A;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

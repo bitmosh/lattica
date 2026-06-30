@@ -112,7 +112,12 @@ function fmtAge(ms: number): string {
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function PolicyScoutTile() {
+interface Props {
+  frozen?: boolean;
+  onQueuedCountChange?: (n: number) => void;
+}
+
+export function PolicyScoutTile({ frozen = false, onQueuedCountChange = () => {} }: Props) {
   // Track A: CLI poll
   const [trackAState, setTrackAState] = useState<LvStateKind>('no-data-yet');
   // Track B: fossic subscribe
@@ -139,6 +144,27 @@ export function PolicyScoutTile() {
   // Refs
   const subIdRef = useRef<string | null>(null);
   const bootTimeMs = useRef(Date.now());
+
+  // Freeze wiring
+  const frozenRef = useRef(frozen);
+  frozenRef.current = frozen;
+  const onQueuedCountChangeRef = useRef(onQueuedCountChange);
+  onQueuedCountChangeRef.current = onQueuedCountChange;
+  const localCountRef = useRef(0);
+  const latestPsEventsRef = useRef<SerializedEvent[]>([]);
+  latestPsEventsRef.current = psEvents;
+  const [frozenPsEvents, setFrozenPsEvents] = useState<SerializedEvent[] | null>(null);
+
+  useEffect(() => {
+    if (frozen) {
+      setFrozenPsEvents([...latestPsEventsRef.current]);
+      localCountRef.current = 0;
+    } else {
+      setFrozenPsEvents(null);
+      localCountRef.current = 0;
+      onQueuedCountChangeRef.current(0);
+    }
+  }, [frozen]);
 
   // ── Track B subscription ──────────────────────────────────────────────────
 
@@ -180,6 +206,10 @@ export function PolicyScoutTile() {
 
           setPsEvents(prev => [...prev, ev]);
           setTrackBState('live');
+          if (frozenRef.current) {
+            localCountRef.current++;
+            onQueuedCountChangeRef.current(localCountRef.current);
+          }
         });
 
         // Backfill historical events from hub store
@@ -341,7 +371,8 @@ export function PolicyScoutTile() {
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const recentDecisions = [...psEvents]
+  const displayPsEvents = frozenPsEvents ?? psEvents;
+  const recentDecisions = [...displayPsEvents]
     .filter(e => e.event_type === 'DecisionIssued')
     .reverse()
     .slice(0, 20);

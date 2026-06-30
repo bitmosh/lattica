@@ -229,11 +229,29 @@ function NodeCard({
 
 // ---- main tile ------------------------------------------------------------
 
-export function AiStackTopologyTile() {
+interface Props {
+  frozen?: boolean;
+  onQueuedCountChange?: (n: number) => void;
+}
+
+export function AiStackTopologyTile({ frozen = false }: Props) {
   const [snap, setSnap] = useState<TopologySnapshot | null>(null);
   const [polling, setPolling] = useState(false);
   const [pollError, setPollError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Freeze wiring — no fossic events, so queuedCount stays 0; just snapshot the topology display
+  const latestSnapRef = useRef<TopologySnapshot | null>(null);
+  latestSnapRef.current = snap;
+  const [frozenDisplayData, setFrozenDisplayData] = useState<{ snap: TopologySnapshot | null } | null>(null);
+
+  useEffect(() => {
+    if (frozen) {
+      setFrozenDisplayData({ snap: latestSnapRef.current });
+    } else {
+      setFrozenDisplayData(null);
+    }
+  }, [frozen]);
 
   // preferences — persisted in localStorage
   const [vramWarnPct, setVramWarnPct] = useState(() => loadPref("aistack.vramWarnPct", 90));
@@ -321,30 +339,32 @@ export function AiStackTopologyTile() {
     }
   };
 
-  // derived
-  const hasRunning = (snap?.runningModels.length ?? 0) > 0;
-  const usedPct = snap ? vramPct(snap.totalVramBytes, vramTotalMb) : 0;
+  // derived — displaySnap is the frozen snapshot when frozen, live snap otherwise
+  const displaySnap = frozenDisplayData !== null ? frozenDisplayData.snap : snap;
+
+  const hasRunning = (displaySnap?.runningModels.length ?? 0) > 0;
+  const usedPct = displaySnap ? vramPct(displaySnap.totalVramBytes, vramTotalMb) : 0;
   const vramExceeded = usedPct >= vramWarnPct;
   const stackStatus: NodeStatus =
-    !snap ? "unknown"
-    : snap.ollama === "down" && snap.litellm === "down" ? "down"
-    : snap.ollama === "down" || snap.litellm === "down" ? "unknown"
+    !displaySnap ? "unknown"
+    : displaySnap.ollama === "down" && displaySnap.litellm === "down" ? "down"
+    : displaySnap.ollama === "down" || displaySnap.litellm === "down" ? "unknown"
     : "up";
 
-  const topoAliases = snap?.aliases.filter((a) => TOPOLOGY_ALIASES.has(a)) ?? [];
-  const allAliases = snap?.aliases ?? [];
+  const topoAliases = displaySnap?.aliases.filter((a) => TOPOLOGY_ALIASES.has(a)) ?? [];
+  const allAliases = displaySnap?.aliases ?? [];
 
   // list-view rows — stable shape avoids anonymous object in render
   const listRows: Array<{ key: string; name: string; status: NodeStatus; detail: string }> = [
-    { key: "ollama", name: "OLLAMA", status: snap?.ollama ?? "unknown", detail: `:11434 · ${snap?.runningModels.length ?? 0} model${(snap?.runningModels.length ?? 0) !== 1 ? "s" : ""} running` },
-    { key: "litellm", name: "LITELLM", status: snap?.litellm ?? "unknown", detail: `:4000 · ${allAliases.length} alias${allAliases.length !== 1 ? "es" : ""}` },
-    { key: "openwebui", name: "OPEN-WEBUI", status: snap?.openwebui ?? "unknown", detail: ":3000" },
+    { key: "ollama", name: "OLLAMA", status: displaySnap?.ollama ?? "unknown", detail: `:11434 · ${displaySnap?.runningModels.length ?? 0} model${(displaySnap?.runningModels.length ?? 0) !== 1 ? "s" : ""} running` },
+    { key: "litellm", name: "LITELLM", status: displaySnap?.litellm ?? "unknown", detail: `:4000 · ${allAliases.length} alias${allAliases.length !== 1 ? "es" : ""}` },
+    { key: "openwebui", name: "OPEN-WEBUI", status: displaySnap?.openwebui ?? "unknown", detail: ":3000" },
     { key: "tts", name: "TTS", status: "unknown", detail: "no host port exposed" },
-    { key: "bo", name: "BO", status: snap?.cerebra ?? "unknown", detail: ":7432 · cerebra daemon" },
+    { key: "bo", name: "BO", status: displaySnap?.cerebra ?? "unknown", detail: ":7432 · cerebra daemon" },
   ];
 
-  const lastPolledTime = snap
-    ? new Date(snap.lastPolled).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  const lastPolledTime = displaySnap
+    ? new Date(displaySnap.lastPolled).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     : null;
 
   return (
@@ -356,10 +376,10 @@ export function AiStackTopologyTile() {
           <span className="aistack-tile__title">AI STACK</span>
           {hasRunning && (
             <span className="aistack-badge aistack-mono">
-              {snap!.runningModels.length} LOADED
+              {displaySnap!.runningModels.length} LOADED
             </span>
           )}
-          {!hasRunning && snap?.ollama === "up" && (
+          {!hasRunning && displaySnap?.ollama === "up" && (
             <span className="aistack-badge aistack-badge--idle aistack-mono">IDLE</span>
           )}
         </div>
@@ -387,7 +407,7 @@ export function AiStackTopologyTile() {
       )}
 
       {/* ── VRAM gauge ── */}
-      {snap && (
+      {displaySnap && (
         <div className="aistack-vram">
           <div className="aistack-vram__bar-row">
             <span className="aistack-label">VRAM</span>
@@ -405,7 +425,7 @@ export function AiStackTopologyTile() {
             </div>
             <span className="aistack-mono aistack-vram__label">
               <span className={vramExceeded ? "aistack-vram__pct--warn" : ""}>
-                {fmtGb(snap.totalVramBytes)} / {(vramTotalMb / 1024).toFixed(1)} GB
+                {fmtGb(displaySnap.totalVramBytes)} / {(vramTotalMb / 1024).toFixed(1)} GB
               </span>
               {" "}
               <span className={`aistack-vram__pct ${vramExceeded ? "aistack-vram__pct--warn" : ""}`}>
@@ -451,7 +471,7 @@ export function AiStackTopologyTile() {
             <NodeCard
               name="BO"
               port=":7432"
-              status={snap?.cerebra ?? "unknown"}
+              status={displaySnap?.cerebra ?? "unknown"}
               color={NODE_COLORS.bo}
             />
 
@@ -470,7 +490,7 @@ export function AiStackTopologyTile() {
                   </div>
                 );
               })}
-              {topoAliases.length === 0 && snap?.litellm === "up" && (
+              {topoAliases.length === 0 && displaySnap?.litellm === "up" && (
                 <div className="aistack-edge aistack-edge--dormant">
                   <span className="aistack-mono aistack-edge__label">awaiting aliases</span>
                 </div>
@@ -480,7 +500,7 @@ export function AiStackTopologyTile() {
             <NodeCard
               name="LITELLM"
               port=":4000"
-              status={snap?.litellm ?? "unknown"}
+              status={displaySnap?.litellm ?? "unknown"}
               color={NODE_COLORS.litellm}
             >
               {allAliases.length > 0 && (
@@ -500,7 +520,7 @@ export function AiStackTopologyTile() {
             <NodeCard
               name="OLLAMA"
               port=":11434"
-              status={snap?.ollama ?? "unknown"}
+              status={displaySnap?.ollama ?? "unknown"}
               color={NODE_COLORS.ollama}
             />
           </div>
@@ -508,7 +528,7 @@ export function AiStackTopologyTile() {
           {/* Running models — below main flow per iter-4 design */}
           {hasRunning ? (
             <ul className="aistack-running-models">
-              {snap!.runningModels.map((m) => (
+              {displaySnap!.runningModels.map((m) => (
                 <li key={m.name} className="aistack-running-models__row aistack-mono">
                   <span className="aistack-running-models__dot" />
                   <span className="aistack-running-models__name">{m.name}</span>
@@ -517,7 +537,7 @@ export function AiStackTopologyTile() {
               ))}
             </ul>
           ) : (
-            snap?.ollama === "up" && (
+            displaySnap?.ollama === "up" && (
               <div className="aistack-running-models--empty aistack-mono">no models in VRAM</div>
             )
           )}
@@ -527,7 +547,7 @@ export function AiStackTopologyTile() {
             <NodeCard
               name="OPEN-WEBUI"
               port=":3000"
-              status={snap?.openwebui ?? "unknown"}
+              status={displaySnap?.openwebui ?? "unknown"}
               color={NODE_COLORS.openwebui}
             />
             <NodeCard
@@ -554,7 +574,7 @@ export function AiStackTopologyTile() {
 
       {/* ── model actions ── */}
       <section className="aistack-actions">
-        {snap?.ollama === "up" && snap.localModels.length > 0 && (
+        {displaySnap?.ollama === "up" && displaySnap.localModels.length > 0 && (
           <div className="aistack-actions__load">
             <span className="aistack-label">LOAD</span>
             <select
@@ -566,7 +586,7 @@ export function AiStackTopologyTile() {
               disabled={loadingModel !== null}
             >
               <option value="" disabled>model…</option>
-              {snap.localModels.map((m) => (
+              {displaySnap.localModels.map((m) => (
                 <option key={m.name} value={m.name}>
                   {m.name}
                 </option>

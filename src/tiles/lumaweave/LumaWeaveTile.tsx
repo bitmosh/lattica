@@ -3,7 +3,12 @@
 import { LiveValueChip } from '../../components/livevalue/LiveValueChip';
 import './LumaWeaveTile.css';
 
-export function LumaWeaveTile() {
+interface Props {
+  frozen?: boolean;
+  onQueuedCountChange?: (n: number) => void;
+}
+
+export function LumaWeaveTile({ frozen: _frozen = false, onQueuedCountChange: _onQueuedCountChange = () => {} }: Props) {
   return (
     <div className="lw-tile" data-testid="lumaweave-tile">
       <div className="lw-tile__header">

@@ -192,11 +192,37 @@ function FossicLane({ lane, events, now, healthy }: LaneProps) {
 
 // ── Main tile ─────────────────────────────────────────────────────────────────
 
-export function FossicTile() {
+interface Props {
+  frozen?: boolean;
+  onQueuedCountChange?: (n: number) => void;
+}
+
+export function FossicTile({ frozen = false, onQueuedCountChange = () => {} }: Props) {
   const subIdRef = useRef<string | null>(null);
   const [buffers, setBuffers] = useState<Buffers>(emptyBuffers);
   const [now, setNow] = useState(() => Date.now());
   const [hubState, setHubState] = useState<LvStateKind>("no-data-yet");
+
+  // Freeze wiring
+  const frozenRef = useRef(frozen);
+  frozenRef.current = frozen;
+  const onQueuedCountChangeRef = useRef(onQueuedCountChange);
+  onQueuedCountChangeRef.current = onQueuedCountChange;
+  const localCountRef = useRef(0);
+  const latestBuffersRef = useRef<Buffers>(emptyBuffers());
+  latestBuffersRef.current = buffers;
+  const [frozenBuffers, setFrozenBuffers] = useState<Buffers | null>(null);
+
+  useEffect(() => {
+    if (frozen) {
+      setFrozenBuffers({ ...latestBuffersRef.current });
+      localCountRef.current = 0;
+    } else {
+      setFrozenBuffers(null);
+      localCountRef.current = 0;
+      onQueuedCountChangeRef.current(0);
+    }
+  }, [frozen]);
 
   // Hub readiness
   useEffect(() => {
@@ -205,9 +231,11 @@ export function FossicTile() {
       .catch(() => setHubState("source-unreachable"));
   }, []);
 
-  // 1 Hz clock drives event position animation
+  // 1 Hz clock drives event position animation — pauses when frozen
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1_000);
+    const id = setInterval(() => {
+      if (!frozenRef.current) setNow(Date.now());
+    }, 1_000);
     return () => clearInterval(id);
   }, []);
 
@@ -260,6 +288,10 @@ export function FossicTile() {
           ...prev,
           [lid]: [entry, ...prev[lid]].slice(0, MAX_EVENTS_PER_LANE),
         }));
+        if (frozenRef.current) {
+          localCountRef.current++;
+          onQueuedCountChangeRef.current(localCountRef.current);
+        }
       });
     }
 
@@ -275,6 +307,7 @@ export function FossicTile() {
     };
   }, []);
 
+  // laneHealth uses live buffers — health reflects reality even when display is frozen
   const laneHealth = useMemo(
     () => Object.fromEntries(
       LANES.map((l) => [l.id, buffers[l.id].some((e) => now - e.timestamp_ms < RELAY_WINDOW_MS)])
@@ -282,8 +315,10 @@ export function FossicTile() {
     [buffers, now],
   );
 
+  const displayBuffers = frozenBuffers ?? buffers;
+
   const totalVisible = LANES.reduce(
-    (s, l) => s + buffers[l.id].filter((e) => now - e.timestamp_ms < WINDOW_MS).length,
+    (s, l) => s + displayBuffers[l.id].filter((e) => now - e.timestamp_ms < WINDOW_MS).length,
     0,
   );
 
@@ -343,7 +378,7 @@ export function FossicTile() {
         {/* Lane tracks */}
         <div className="fossic-tile__lanes">
           {LANES.map((lane) => (
-            <FossicLane key={lane.id} lane={lane} events={buffers[lane.id]} now={now} healthy={laneHealth[lane.id]} />
+            <FossicLane key={lane.id} lane={lane} events={displayBuffers[lane.id]} now={now} healthy={laneHealth[lane.id]} />
           ))}
         </div>
 

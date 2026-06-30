@@ -377,7 +377,12 @@ function renderCard(e: SerializedEvent): ReactNode {
 
 // ─── main component ───────────────────────────────────────────────────────────
 
-export function CerebraSignalTile() {
+interface Props {
+  frozen?: boolean;
+  onQueuedCountChange?: (n: number) => void;
+}
+
+export function CerebraSignalTile({ frozen = false, onQueuedCountChange = () => {} }: Props) {
   const [events, setEvents] = useState<SerializedEvent[]>([]);
   const [daemonHealth, setDaemonHealth] = useState<DaemonHealth>("offline");
   const [daemonStatus, setDaemonStatus] = useState<DaemonStatus | null>(null);
@@ -387,6 +392,27 @@ export function CerebraSignalTile() {
   const subIdRef = useRef<string | null>(null);
   const controlSubIdRef = useRef<string | null>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+
+  // Freeze wiring
+  const frozenRef = useRef(frozen);
+  frozenRef.current = frozen;
+  const onQueuedCountChangeRef = useRef(onQueuedCountChange);
+  onQueuedCountChangeRef.current = onQueuedCountChange;
+  const localCountRef = useRef(0);
+  const latestEventsRef = useRef<SerializedEvent[]>([]);
+  latestEventsRef.current = events;
+  const [frozenEvents, setFrozenEvents] = useState<SerializedEvent[] | null>(null);
+
+  useEffect(() => {
+    if (frozen) {
+      setFrozenEvents([...latestEventsRef.current]);
+      localCountRef.current = 0;
+    } else {
+      setFrozenEvents(null);
+      localCountRef.current = 0;
+      onQueuedCountChangeRef.current(0);
+    }
+  }, [frozen]);
 
   // 30s daemon health poll; immediate on mount
   useEffect(() => {
@@ -438,6 +464,10 @@ export function CerebraSignalTile() {
           e.payload.subscription_id === controlSubId
         ) {
           setEvents((prev) => [...prev, e.payload.event]);
+          if (frozenRef.current) {
+            localCountRef.current++;
+            onQueuedCountChangeRef.current(localCountRef.current);
+          }
         }
       });
 
@@ -499,8 +529,10 @@ export function CerebraSignalTile() {
 
   // ─── derived state ──────────────────────────────────────────────────────────
 
+  const displayEvents = frozenEvents ?? events;
+
   const fiveMinsAgo = Date.now() - 5 * 60 * 1000;
-  const recentFossicEvents: FossicEvent[] = events
+  const recentFossicEvents: FossicEvent[] = displayEvents
     .filter((e) => e.timestamp_us / 1000 > fiveMinsAgo)
     .map((e) => ({
       event_type: e.event_type,
@@ -515,15 +547,15 @@ export function CerebraSignalTile() {
     daemonStatus,
   });
 
-  const sessionInfo = extractSessionInfo(events, daemonStatus);
-  const latestSignals = extractLatestSignals(events);
-  const lastSignalStepId = extractLastSignalStepId(events);
-  const compositeScore = extractCompositeScore(events);
-  const lastClutch = extractLastClutch(events);
-  const cycleGroups = buildCycleGroups(events);
-  const sparkline = buildSparkline(events);
+  const sessionInfo = extractSessionInfo(displayEvents, daemonStatus);
+  const latestSignals = extractLatestSignals(displayEvents);
+  const lastSignalStepId = extractLastSignalStepId(displayEvents);
+  const compositeScore = extractCompositeScore(displayEvents);
+  const lastClutch = extractLastClutch(displayEvents);
+  const cycleGroups = buildCycleGroups(displayEvents);
+  const sparkline = buildSparkline(displayEvents);
 
-  const isPreRelay = !events.some((e) =>
+  const isPreRelay = !displayEvents.some((e) =>
     e.stream_id.startsWith("cerebra/agent-trace/"),
   );
 
@@ -730,7 +762,7 @@ export function CerebraSignalTile() {
             ))}
         </div>
         <div className="cst-footer__meta">
-          <span className="cst-footer__count">← {events.length}</span>
+          <span className="cst-footer__count">← {displayEvents.length}</span>
           <span className="cst-footer__now">now</span>
         </div>
       </div>

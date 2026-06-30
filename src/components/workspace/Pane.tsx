@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import './Pane.css';
 import { TilePicker, TileKey, PaneId, TILE_INFO } from './TilePicker';
 import { FreezeOverlay } from './FreezeOverlay';
@@ -32,6 +33,11 @@ export function Pane({
   onThaw,
 }: Props) {
   const info = tileKey ? TILE_INFO[tileKey] : null;
+  const [queuedCount, setQueuedCount] = useState(0);
+
+  useEffect(() => {
+    if (!frozen) setQueuedCount(0);
+  }, [frozen]);
   const anchorRight = paneId !== 'left';
 
   return (
@@ -87,23 +93,23 @@ export function Pane({
           <EmptyPane onOpenPicker={onOpenPicker} />
         ) : tileKey === 'cerebra' ? (
           <div className="la-pane-tile-slot">
-            <CerebraSignalTile />
+            <CerebraSignalTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
           </div>
         ) : tileKey === 'policy' ? (
           <div className="la-pane-tile-slot">
-            <PolicyScoutTile />
+            <PolicyScoutTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
           </div>
         ) : tileKey === 'aistack' ? (
           <div className="la-pane-tile-slot">
-            <AiStackTopologyTile />
+            <AiStackTopologyTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
           </div>
         ) : tileKey === 'lumaweave' ? (
           <div className="la-pane-tile-slot">
-            <LumaWeaveTile />
+            <LumaWeaveTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
           </div>
         ) : tileKey === 'fossic' ? (
           <div className="la-pane-tile-slot">
-            <FossicTile />
+            <FossicTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
           </div>
         ) : (
           <div className="la-pane-tile-slot">
@@ -112,7 +118,7 @@ export function Pane({
         )}
       </div>
 
-      {frozen && <FreezeOverlay queuedCount={0} onThaw={onThaw} />}
+      {frozen && <FreezeOverlay queuedCount={queuedCount} onThaw={onThaw} />}
 
       {pickerOpen && (
         <TilePicker

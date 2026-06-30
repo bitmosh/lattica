@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { LiveValueChip, type LvStateKind } from "../../components/livevalue/LiveValueChip";
@@ -41,6 +41,7 @@ interface LaneConfig {
 
 const WINDOW_MS = 90_000;
 const RATE_WINDOW_MS = 10_000;
+const RELAY_WINDOW_MS = 60_000;
 const MAX_EVENTS_PER_LANE = 300;
 
 const LANES: LaneConfig[] = [
@@ -122,11 +123,13 @@ interface LaneProps {
   lane: LaneConfig;
   events: LaneEvent[];
   now: number;
+  healthy: boolean;
 }
 
-function FossicLane({ lane, events, now }: LaneProps) {
+function FossicLane({ lane, events, now, healthy }: LaneProps) {
   const visible = events.filter((e) => now - e.timestamp_ms < WINDOW_MS);
   const rate = events.filter((e) => now - e.timestamp_ms < RATE_WINDOW_MS).length / (RATE_WINDOW_MS / 1000);
+  const relayStatus: LvStateKind = lane.degraded ? "pre-relay" : healthy ? "live" : "no-data-yet";
 
   return (
     <div className="ft-lane">
@@ -150,18 +153,18 @@ function FossicLane({ lane, events, now }: LaneProps) {
             key={s.name}
             className="ft-lane__sub-pill"
             style={{
-              color: s.healthy ? "#6B7A8A" : "#FF5BC7",
-              borderColor: s.healthy ? "#1C2530" : "rgba(255,91,199,0.35)",
+              color: healthy ? "#6B7A8A" : "#FF5BC7",
+              borderColor: healthy ? "#1C2530" : "rgba(255,91,199,0.35)",
             }}
           >
-            {s.healthy ? "●" : "⚠"} {s.name}
+            {healthy ? "●" : "⚠"} {s.name}
           </span>
         ))}
         <span className="ft-lane__count">
           {visible.length} ev{rate > 0 && ` · ${rate.toFixed(1)}/s`}
         </span>
-        {lane.relayStatus !== "live" && (
-          <LiveValueChip state={lane.relayStatus} label={`${lane.id}-relay`} />
+        {relayStatus !== "live" && (
+          <LiveValueChip state={relayStatus} label={`${lane.id}-relay`} />
         )}
       </div>
 
@@ -272,6 +275,13 @@ export function FossicTile() {
     };
   }, []);
 
+  const laneHealth = useMemo(
+    () => Object.fromEntries(
+      LANES.map((l) => [l.id, buffers[l.id].some((e) => now - e.timestamp_ms < RELAY_WINDOW_MS)])
+    ),
+    [buffers, now],
+  );
+
   const totalVisible = LANES.reduce(
     (s, l) => s + buffers[l.id].filter((e) => now - e.timestamp_ms < WINDOW_MS).length,
     0,
@@ -333,7 +343,7 @@ export function FossicTile() {
         {/* Lane tracks */}
         <div className="fossic-tile__lanes">
           {LANES.map((lane) => (
-            <FossicLane key={lane.id} lane={lane} events={buffers[lane.id]} now={now} />
+            <FossicLane key={lane.id} lane={lane} events={buffers[lane.id]} now={now} healthy={laneHealth[lane.id]} />
           ))}
         </div>
 

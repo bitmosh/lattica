@@ -315,7 +315,7 @@ pub fn run() {
             store.append(Append {
                 stream_id: "lattica/canary".to_string(),
                 event_type: "startup_ping".to_string(),
-                payload: serde_json::json!({ "version": "0.2.0" }),
+                payload: serde_json::json!({ "version": env!("CARGO_PKG_VERSION") }),
                 ..Append::default()
             })?;
 

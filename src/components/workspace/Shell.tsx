@@ -1,23 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode, type JSX } from 'react';
-import { invoke } from '@tauri-apps/api/core';
-import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import { routeToScope } from '../../lib/routing';
+import { useEffect, useState, type ReactNode, type JSX } from 'react';
+import { routeToScope, WINDOW_MS, RATE_WINDOW_MS } from '../../lib/routing';
+import { useFossicSubscription } from '../../hooks/useFossicSubscription';
+import { SCOPE_PROJECTS } from '../../lib/scopes';
 import './Shell.css';
 
 interface Props {
   children: ReactNode;
-}
-
-interface SerializedEvent {
-  id: string;
-  stream_id: string;
-  timestamp_us: number;
-  event_type: string;
-}
-
-interface FossicEventPayload {
-  subscription_id: string;
-  event: SerializedEvent;
 }
 
 interface LaneEvent {
@@ -27,17 +15,6 @@ interface LaneEvent {
 
 type Buffers = Record<string, LaneEvent[]>;
 
-const SCOPE_PROJECTS: Array<{ key: string; label: string; color: string; bg: string }> = [
-  { key: 'lattica',   label: 'lattica',   color: '#F2A85C', bg: 'rgba(242,168,92,0.07)' },
-  { key: 'cerebra',   label: 'cerebra',   color: '#22E0C4', bg: 'rgba(34,224,196,0.07)' },
-  { key: 'lumaweave', label: 'lumaweave', color: '#A6F35A', bg: 'rgba(166,243,90,0.07)' },
-  { key: 'policy',    label: 'policy',    color: '#B46CFF', bg: 'rgba(180,108,255,0.07)' },
-  { key: 'fossic',    label: 'fossic',    color: '#4CC9FF', bg: 'rgba(76,201,255,0.07)' },
-  { key: 'aistack',   label: 'ai-stack',  color: '#FF5BC7', bg: 'rgba(255,91,199,0.07)' },
-];
-
-const WINDOW_MS = 90_000;
-const RATE_WINDOW_MS = 10_000;
 const MAX_EVENTS = 200;
 
 function emptyBuffers(): Buffers {
@@ -203,7 +180,6 @@ export function Shell({ children }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [buffers, setBuffers] = useState<Buffers>(emptyBuffers);
   const [now, setNow] = useState(() => Date.now());
-  const subIdRef = useRef<string | null>(null);
 
   // 1 Hz clock drives tick position animation
   useEffect(() => {
@@ -228,48 +204,15 @@ export function Shell({ children }: Props) {
     return () => clearInterval(id);
   }, []);
 
-  // Subscribe to all hub streams
-  useEffect(() => {
-    let unlisten: UnlistenFn | null = null;
-    let cancelled = false;
-
-    async function setup() {
-      const subId = await invoke<string>('fossic_subscribe', {
-        streamPattern: '**',
-        branch: null,
-        includeSystem: false,
-        queueSize: null,
-      });
-      if (cancelled) {
-        invoke('fossic_unsubscribe', { subscriptionId: subId }).catch(() => {});
-        return;
-      }
-      subIdRef.current = subId;
-
-      unlisten = await listen<FossicEventPayload>('fossic:event', e => {
-        if (e.payload.subscription_id !== subId) return;
-        const ev = e.payload.event;
-        const key = routeToScope(ev.stream_id);
-        if (!key) return;
-        const entry: LaneEvent = { id: ev.id, timestamp_ms: ev.timestamp_us / 1_000 };
-        setBuffers(prev => ({
-          ...prev,
-          [key]: [entry, ...prev[key]].slice(0, MAX_EVENTS),
-        }));
-      });
-    }
-
-    setup().catch(e => console.error('[Shell] subscribe:', e));
-
-    return () => {
-      cancelled = true;
-      unlisten?.();
-      if (subIdRef.current) {
-        invoke('fossic_unsubscribe', { subscriptionId: subIdRef.current }).catch(() => {});
-        subIdRef.current = null;
-      }
-    };
-  }, []);
+  useFossicSubscription('**', ev => {
+    const key = routeToScope(ev.stream_id);
+    if (!key) return;
+    const entry: LaneEvent = { id: ev.id, timestamp_ms: ev.timestamp_us / 1_000 };
+    setBuffers(prev => ({
+      ...prev,
+      [key]: [entry, ...prev[key]].slice(0, MAX_EVENTS),
+    }));
+  });
 
   const rate = SCOPE_PROJECTS.reduce(
     (s, p) => s + buffers[p.key].filter(e => now - e.timestamp_ms < RATE_WINDOW_MS).length,

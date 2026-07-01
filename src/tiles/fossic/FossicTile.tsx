@@ -1,20 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { useFossicSubscription } from "../../hooks/useFossicSubscription";
 import { LiveValueChip, type LvStateKind } from "../../components/livevalue/LiveValueChip";
 import "./FossicTile.css";
-
-interface SerializedEvent {
-  id: string;
-  stream_id: string;
-  timestamp_us: number;
-  event_type: string;
-}
-
-interface FossicEventPayload {
-  subscription_id: string;
-  event: SerializedEvent;
-}
 
 interface StoreStatus {
   ok: boolean;
@@ -198,7 +186,6 @@ interface Props {
 }
 
 export function FossicTile({ frozen = false, onQueuedCountChange = () => {} }: Props) {
-  const subIdRef = useRef<string | null>(null);
   const [buffers, setBuffers] = useState<Buffers>(emptyBuffers);
   const [now, setNow] = useState(() => Date.now());
   const [hubState, setHubState] = useState<LvStateKind>("no-data-yet");
@@ -256,56 +243,23 @@ export function FossicTile({ frozen = false, onQueuedCountChange = () => {} }: P
     return () => clearInterval(id);
   }, []);
 
-  // Subscribe to all streams on the hub store
-  useEffect(() => {
-    let unlisten: UnlistenFn | null = null;
-    let cancelled = false;
-
-    async function setup() {
-      const subId = await invoke<string>("fossic_subscribe", {
-        streamPattern: "**",
-        branch: null,
-        includeSystem: false,
-        queueSize: null,
-      });
-      if (cancelled) {
-        invoke("fossic_unsubscribe", { subscriptionId: subId }).catch(() => {});
-        return;
-      }
-      subIdRef.current = subId;
-
-      unlisten = await listen<FossicEventPayload>("fossic:event", (e) => {
-        if (e.payload.subscription_id !== subId) return;
-        const ev = e.payload.event;
-        const lid = routeToLane(ev.stream_id);
-        if (!lid) return;
-        const entry: LaneEvent = {
-          id: ev.id,
-          timestamp_ms: ev.timestamp_us / 1_000,
-          event_type: ev.event_type,
-        };
-        setBuffers((prev) => ({
-          ...prev,
-          [lid]: [entry, ...prev[lid]].slice(0, MAX_EVENTS_PER_LANE),
-        }));
-        if (frozenRef.current) {
-          localCountRef.current++;
-          onQueuedCountChangeRef.current(localCountRef.current);
-        }
-      });
-    }
-
-    setup().catch((e) => console.error("[FossicTile] subscribe:", e));
-
-    return () => {
-      cancelled = true;
-      unlisten?.();
-      if (subIdRef.current) {
-        invoke("fossic_unsubscribe", { subscriptionId: subIdRef.current }).catch(() => {});
-        subIdRef.current = null;
-      }
+  useFossicSubscription("**", (ev) => {
+    const lid = routeToLane(ev.stream_id);
+    if (!lid) return;
+    const entry: LaneEvent = {
+      id: ev.id,
+      timestamp_ms: ev.timestamp_us / 1_000,
+      event_type: ev.event_type,
     };
-  }, []);
+    setBuffers((prev) => ({
+      ...prev,
+      [lid]: [entry, ...prev[lid]].slice(0, MAX_EVENTS_PER_LANE),
+    }));
+    if (frozenRef.current) {
+      localCountRef.current++;
+      onQueuedCountChangeRef.current(localCountRef.current);
+    }
+  });
 
   // laneHealth uses live buffers — health reflects reality even when display is frozen
   const laneHealth = useMemo(

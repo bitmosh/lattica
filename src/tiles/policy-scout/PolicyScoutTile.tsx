@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
+import type { SerializedEvent } from '../../types/fossic';
+import { useFossicSubscription } from '../../hooks/useFossicSubscription';
 import { LiveValueChip, type LvStateKind } from '../../components/livevalue/LiveValueChip';
 import './PolicyScoutTile.css';
 
@@ -42,19 +43,6 @@ interface ApprovalItem {
 
 interface ApprovalsListResponse {
   approvals: ApprovalItem[];
-}
-
-interface SerializedEvent {
-  id: string;
-  stream_id: string;
-  timestamp_us: number;
-  event_type: string;
-  payload: unknown;
-}
-
-interface FossicEventPayload {
-  subscription_id: string;
-  event: SerializedEvent;
 }
 
 type WatchState = 'running' | 'stopped' | 'stale' | 'unknown';
@@ -142,7 +130,6 @@ export function PolicyScoutTile({ frozen = false, onQueuedCountChange = () => {}
   const [actionError, setActionError] = useState<string | null>(null);
 
   // Refs
-  const subIdRef = useRef<string | null>(null);
   const bootTimeMs = useRef(Date.now());
 
   // Freeze wiring
@@ -168,93 +155,63 @@ export function PolicyScoutTile({ frozen = false, onQueuedCountChange = () => {}
 
   // ── Track B subscription ──────────────────────────────────────────────────
 
-  useEffect(() => {
-    let unlisten: (() => void) | null = null;
-    let cancelled = false;
-    const boot = bootTimeMs.current;
-
-    async function setup() {
-      try {
-        const subId = await invoke<string>('fossic_subscribe', {
-          streamPattern: 'policy-scout/**',
-          branch: null,
-          includeSystem: false,
-          queueSize: null,
-        });
-        if (cancelled) {
-          invoke('fossic_unsubscribe', { subscriptionId: subId }).catch(() => {});
-          return;
+  useFossicSubscription(
+    'policy-scout/**',
+    (ev) => {
+      // Fast-path posture updates — boot guard prevents replay from flipping state
+      const evMs = ev.timestamp_us / 1000;
+      if (evMs > bootTimeMs.current) {
+        if (ev.event_type === 'LockdownActivated') {
+          const p = ev.payload as { reason?: string | null };
+          setLockdown(true);
+          setLockdownReason(p.reason ?? '');
+        } else if (ev.event_type === 'LockdownDeactivated') {
+          setLockdown(false);
+          setLockdownReason('');
         }
-        subIdRef.current = subId;
+      }
+      setPsEvents(prev => [...prev, ev]);
+      setTrackBState('live');
+      if (frozenRef.current) {
+        localCountRef.current++;
+        onQueuedCountChangeRef.current(localCountRef.current);
+      }
+    },
+    { onError: () => setTrackBState('source-unreachable') },
+  );
 
-        unlisten = await listen<FossicEventPayload>('fossic:event', (msg) => {
-          if (msg.payload.subscription_id !== subId) return;
-          const ev = msg.payload.event;
-
-          // Fast-path posture updates — boot guard prevents replay from flipping state
-          const evMs = ev.timestamp_us / 1000;
-          if (evMs > boot) {
-            if (ev.event_type === 'LockdownActivated') {
-              const p = ev.payload as { reason?: string | null };
-              setLockdown(true);
-              setLockdownReason(p.reason ?? '');
-            } else if (ev.event_type === 'LockdownDeactivated') {
-              setLockdown(false);
-              setLockdownReason('');
-            }
-          }
-
-          setPsEvents(prev => [...prev, ev]);
+  // Backfill historical events from hub store
+  useEffect(() => {
+    async function backfill() {
+      try {
+        const allStreams = await invoke<{ id: string }[]>('fossic_list_streams');
+        const psStreams = allStreams.filter(s => s.id.startsWith('policy-scout/'));
+        const batches = await Promise.all(
+          psStreams.map(s =>
+            invoke<SerializedEvent[]>('fossic_read_range', {
+              streamId: s.id,
+              branch: null,
+              fromVersion: null,
+              toVersion: null,
+              limit: 100,
+              eventTypeFilter: null,
+            })
+          )
+        );
+        const historical = batches.flat();
+        if (historical.length > 0) {
+          setPsEvents(prev => {
+            const liveIds = new Set(prev.map(e => e.id));
+            const fresh = historical.filter(e => !liveIds.has(e.id));
+            return [...fresh, ...prev].sort((a, b) => a.timestamp_us - b.timestamp_us);
+          });
           setTrackBState('live');
-          if (frozenRef.current) {
-            localCountRef.current++;
-            onQueuedCountChangeRef.current(localCountRef.current);
-          }
-        });
-
-        // Backfill historical events from hub store
-        try {
-          const allStreams = await invoke<{ id: string }[]>('fossic_list_streams');
-          const psStreams = allStreams.filter(s => s.id.startsWith('policy-scout/'));
-          const batches = await Promise.all(
-            psStreams.map(s =>
-              invoke<SerializedEvent[]>('fossic_read_range', {
-                streamId: s.id,
-                branch: null,
-                fromVersion: null,
-                toVersion: null,
-                limit: 100,
-                eventTypeFilter: null,
-              })
-            )
-          );
-          const historical = batches.flat();
-          if (historical.length > 0) {
-            setPsEvents(prev => {
-              const liveIds = new Set(prev.map(e => e.id));
-              const fresh = historical.filter(e => !liveIds.has(e.id));
-              return [...fresh, ...prev].sort((a, b) => a.timestamp_us - b.timestamp_us);
-            });
-            setTrackBState('live');
-          }
-        } catch {
-          // backfill failure is non-fatal — live events still arrive
         }
       } catch {
-        setTrackBState('source-unreachable');
+        // backfill failure is non-fatal — live events still arrive
       }
     }
-
-    void setup();
-
-    return () => {
-      cancelled = true;
-      unlisten?.();
-      if (subIdRef.current) {
-        invoke('fossic_unsubscribe', { subscriptionId: subIdRef.current }).catch(() => {});
-        subIdRef.current = null;
-      }
-    };
+    void backfill();
   }, []);
 
   // ── Track A poll ─────────────────────────────────────────────────────────

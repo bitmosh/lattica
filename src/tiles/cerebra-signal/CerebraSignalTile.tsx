@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
+import type { SerializedEvent } from "../../types/fossic";
+import { useFossicSubscription } from "../../hooks/useFossicSubscription";
 import { LiveValueChip, type LvStateKind } from "../../components/livevalue/LiveValueChip";
 import { SignalPanel } from "./SignalPanel";
 import {
@@ -12,26 +13,6 @@ import {
 } from "./daemon";
 import { deriveAgentState, type FossicEvent } from "./state";
 import "./CerebraSignalTile.css";
-
-interface SerializedEvent {
-  id: string;
-  stream_id: string;
-  branch: string;
-  version: number;
-  timestamp_us: number;
-  causation_id: string | null;
-  correlation_id: string | null;
-  event_type: string;
-  type_version: number;
-  payload: unknown;
-  external_id: string | null;
-  indexed_tags: unknown;
-}
-
-interface FossicEventPayload {
-  subscription_id: string;
-  event: SerializedEvent;
-}
 
 // ─── cycle color helpers ────────────────────────────────────────────────────
 
@@ -389,8 +370,6 @@ export function CerebraSignalTile({ frozen = false, onQueuedCountChange = () => 
   const [posture, setPosture] = useState<"auto" | "hold">("auto");
   const [checkpointFlash, setCheckpointFlash] = useState(false);
   const [atTop, setAtTop] = useState(true);
-  const subIdRef = useRef<string | null>(null);
-  const controlSubIdRef = useRef<string | null>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
   // Freeze wiring
@@ -437,42 +416,21 @@ export function CerebraSignalTile({ frozen = false, onQueuedCountChange = () => 
     };
   }, []);
 
-  // Subscribe to cerebra/agent-trace/* and cerebra/control (explicit — not covered by wildcard)
+  const handleCerebraEvent = useCallback((ev: SerializedEvent) => {
+    setEvents((prev) => [...prev, ev]);
+    if (frozenRef.current) {
+      localCountRef.current++;
+      onQueuedCountChangeRef.current(localCountRef.current);
+    }
+  }, []);
+
+  useFossicSubscription("cerebra/agent-trace/*", handleCerebraEvent);
+  useFossicSubscription("cerebra/control", handleCerebraEvent);
+
+  // Backfill historical events — fossic_subscribe is PostCommit (live tail only);
+  // events already in the hub before this session opened are invisible without this.
   useEffect(() => {
-    let unlisten: (() => void) | null = null;
-
-    async function setup() {
-      const subId = await invoke<string>("fossic_subscribe", {
-        streamPattern: "cerebra/agent-trace/*",
-        branch: null,
-        includeSystem: false,
-        queueSize: null,
-      });
-      subIdRef.current = subId;
-
-      const controlSubId = await invoke<string>("fossic_subscribe", {
-        streamPattern: "cerebra/control",
-        branch: null,
-        includeSystem: false,
-        queueSize: null,
-      });
-      controlSubIdRef.current = controlSubId;
-
-      unlisten = await listen<FossicEventPayload>("fossic:event", (e) => {
-        if (
-          e.payload.subscription_id === subId ||
-          e.payload.subscription_id === controlSubId
-        ) {
-          setEvents((prev) => [...prev, e.payload.event]);
-          if (frozenRef.current) {
-            localCountRef.current++;
-            onQueuedCountChangeRef.current(localCountRef.current);
-          }
-        }
-      });
-
-      // Backfill historical events — fossic_subscribe is PostCommit (live tail only);
-      // events already in the hub before this session opened are invisible without this.
+    async function backfill() {
       try {
         const allStreams = await invoke<{ id: string; declared_at: number }[]>(
           "fossic_list_streams",
@@ -498,33 +456,14 @@ export function CerebraSignalTile({ frozen = false, onQueuedCountChange = () => 
           setEvents((prev) => {
             const liveIds = new Set(prev.map((e) => e.id));
             const fresh = historical.filter((e) => !liveIds.has(e.id));
-            return [...fresh, ...prev].sort(
-              (a, b) => a.timestamp_us - b.timestamp_us,
-            );
+            return [...fresh, ...prev].sort((a, b) => a.timestamp_us - b.timestamp_us);
           });
         }
       } catch (err) {
         console.error("[CerebraSignalTile] history backfill:", err);
       }
     }
-
-    setup().catch((e: unknown) =>
-      console.error("[CerebraSignalTile] fossic subscribe:", e),
-    );
-
-    return () => {
-      unlisten?.();
-      if (subIdRef.current) {
-        invoke("fossic_unsubscribe", {
-          subscriptionId: subIdRef.current,
-        }).catch(() => {});
-      }
-      if (controlSubIdRef.current) {
-        invoke("fossic_unsubscribe", {
-          subscriptionId: controlSubIdRef.current,
-        }).catch(() => {});
-      }
-    };
+    void backfill();
   }, []);
 
   // ─── derived state ──────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { routeToScope } from '../lib/routing';
+import { routeToScope, SCOPE_KEYS, LANE_PREFIX } from '../lib/routing';
+import { SCOPE_PROJECTS } from '../lib/scopes';
 
 describe('routeToScope', () => {
   it('routes cerebra streams', () => {
@@ -43,5 +44,18 @@ describe('routeToScope', () => {
   it('matches a stream that is exactly the prefix (no trailing content)', () => {
     // "lattica/" is a valid stream root — matches lattica
     expect(routeToScope('lattica/')).toBe('lattica');
+  });
+});
+
+describe('SCOPE_PROJECTS / LANE_PREFIX alignment', () => {
+  it('SCOPE_PROJECTS keys match LANE_PREFIX keys exactly', () => {
+    const scopeProjKeys = SCOPE_PROJECTS.map(p => p.key).sort();
+    const lanePrefixKeys = Object.keys(LANE_PREFIX).sort();
+    expect(scopeProjKeys).toEqual(lanePrefixKeys);
+  });
+
+  it('SCOPE_KEYS derived constant matches SCOPE_PROJECTS keys', () => {
+    expect(new Set(SCOPE_KEYS)).toEqual(new Set(SCOPE_PROJECTS.map(p => p.key)));
+    expect(SCOPE_KEYS).toHaveLength(SCOPE_PROJECTS.length);
   });
 });

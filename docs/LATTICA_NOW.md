@@ -27,9 +27,9 @@ significantly further than documented as of 2026-06-14 — five tiles are live,
 the fossic subscription pattern is in use by four components, and Shell has
 live event-stream monitoring.
 
-Phase 0 exit criteria (from `docs/PHASES.md`) are not yet fully met: Playwright
-test suite is absent and LumaWeaveTile has no live data source. All other tiles
-are live.
+Phase 0 exit criteria (from `docs/PHASES.md`) are not yet fully met:
+LumaWeaveTile has no live data source. All other tiles are live. A three-tier
+test suite (Rust unit, Vitest TS unit, Playwright E2E) is now in place.
 
 ## What exists right now
 
@@ -112,14 +112,8 @@ are live.
 
 ## What does NOT exist yet
 
-- Playwright test suite (zero coverage — T11)
 - Mode B child webview (Linux positioning issue still open)
 - LumaWeaveTile live data source (Phase 2+ — Reflective Twin Architecture)
-- Pane layout persistence across restarts (M6)
-- `useFossicSubscription` hook — subscription setup/teardown copy-pasted
-  into Shell, CerebraSignalTile, PolicyScoutTile, FossicTile (T13)
-- Shared fossic types file — `SerializedEvent` / `FossicEventPayload` defined
-  4× (T12)
 - Platform drawer content (M9 — permanent stub)
 
 ## Known bugs (tracking in repo_fix_2026-06-29.md)

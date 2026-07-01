@@ -239,6 +239,13 @@ struct AiTopologySnapshot {
 #[derive(serde::Deserialize)] struct LiteLlmResp    { data: Option<Vec<LiteLlmModel>>       }
 #[derive(serde::Deserialize)] struct LiteLlmModel   { id: String                            }
 
+fn validate_model_name(model: &str) -> Result<(), String> {
+    if model.is_empty() || model.len() > 200 {
+        return Err("invalid model name".into());
+    }
+    Ok(())
+}
+
 fn ai_client(timeout_secs: u64) -> Result<reqwest::Client, String> {
     reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(timeout_secs))
@@ -297,7 +304,7 @@ async fn poll_ai_stack() -> Result<AiTopologySnapshot, String> {
 
 #[tauri::command]
 async fn ollama_load_model(model: String) -> Result<(), String> {
-    if model.is_empty() || model.len() > 200 { return Err("invalid model name".into()); }
+    validate_model_name(&model)?;
     let body = serde_json::json!({ "model": model, "prompt": "", "keep_alive": "10m" });
     let r = ai_client(30)?.post("http://localhost:11434/api/generate").json(&body).send().await.map_err(|e| e.to_string())?;
     if !r.status().is_success() { return Err(format!("Ollama load failed: {}", r.status())); }
@@ -306,7 +313,7 @@ async fn ollama_load_model(model: String) -> Result<(), String> {
 
 #[tauri::command]
 async fn ollama_unload_model(model: String) -> Result<(), String> {
-    if model.is_empty() || model.len() > 200 { return Err("invalid model name".into()); }
+    validate_model_name(&model)?;
     let body = serde_json::json!({ "model": model, "prompt": "", "keep_alive": 0 });
     let r = ai_client(10)?.post("http://localhost:11434/api/generate").json(&body).send().await.map_err(|e| e.to_string())?;
     if !r.status().is_success() { return Err(format!("Ollama unload failed: {}", r.status())); }
@@ -367,4 +374,61 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // validate_reason
+
+    #[test]
+    fn reason_empty_is_ok() {
+        assert!(validate_reason("").is_ok());
+    }
+
+    #[test]
+    fn reason_normal_is_ok() {
+        assert!(validate_reason("routine maintenance window").is_ok());
+    }
+
+    #[test]
+    fn reason_exactly_500_chars_is_ok() {
+        assert!(validate_reason(&"x".repeat(500)).is_ok());
+    }
+
+    #[test]
+    fn reason_501_chars_is_err() {
+        assert!(validate_reason(&"x".repeat(501)).is_err());
+    }
+
+    #[test]
+    fn reason_nul_byte_is_err() {
+        let r = validate_reason("bad\0value");
+        assert!(r.is_err());
+    }
+
+    // validate_model_name
+
+    #[test]
+    fn model_name_valid_is_ok() {
+        assert!(validate_model_name("qwen2.5:7b").is_ok());
+    }
+
+    #[test]
+    fn model_name_empty_is_err() {
+        assert!(validate_model_name("").is_err());
+    }
+
+    #[test]
+    fn model_name_exactly_200_chars_is_ok() {
+        assert!(validate_model_name(&"a".repeat(200)).is_ok());
+    }
+
+    #[test]
+    fn model_name_201_chars_is_err() {
+        assert!(validate_model_name(&"a".repeat(201)).is_err());
+    }
 }

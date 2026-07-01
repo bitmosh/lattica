@@ -1,26 +1,10 @@
 import { useState } from 'react';
 import './PaneWorkspace.css';
 import { Pane } from './Pane';
-import { TileKey, PaneId } from './TilePicker';
+import type { TileKey, PaneId } from './TilePicker';
+import { type TileMap, loadTiles, saveTiles } from '../../lib/tileStorage';
 
-type TileMap = Record<PaneId, TileKey>;
 type FrozenMap = Record<PaneId, boolean>;
-
-const TILES_KEY = 'lattica.pane.tiles';
-const DEFAULT_TILES: TileMap = { left: 'cerebra', topRight: 'policy', bottomRight: 'fossic' };
-
-function loadTiles(): TileMap {
-  try {
-    const raw = localStorage.getItem(TILES_KEY);
-    return raw ? (JSON.parse(raw) as TileMap) : DEFAULT_TILES;
-  } catch {
-    return DEFAULT_TILES;
-  }
-}
-
-function saveTiles(t: TileMap): void {
-  try { localStorage.setItem(TILES_KEY, JSON.stringify(t)); } catch { /* quota */ }
-}
 
 export function PaneWorkspace() {
   const [tiles, setTiles] = useState<TileMap>(loadTiles);

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode, type JSX } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import { routeToScope } from '../../lib/routing';
 import './Shell.css';
 
 interface Props {
@@ -35,25 +36,9 @@ const SCOPE_PROJECTS: Array<{ key: string; label: string; color: string; bg: str
   { key: 'aistack',   label: 'ai-stack',  color: '#FF5BC7', bg: 'rgba(255,91,199,0.07)' },
 ];
 
-const LANE_PREFIX: Record<string, string> = {
-  lattica:   'lattica/',
-  cerebra:   'cerebra/',
-  lumaweave: 'lumaweave/',
-  policy:    'policy-scout/',
-  fossic:    'fossic/',
-  aistack:   'ai-stack/',
-};
-
 const WINDOW_MS = 90_000;
 const RATE_WINDOW_MS = 10_000;
 const MAX_EVENTS = 200;
-
-function routeToScope(stream_id: string): string | null {
-  for (const [key, prefix] of Object.entries(LANE_PREFIX)) {
-    if (stream_id.startsWith(prefix)) return key;
-  }
-  return null;
-}
 
 function emptyBuffers(): Buffers {
   return Object.fromEntries(SCOPE_PROJECTS.map(p => [p.key, []]));

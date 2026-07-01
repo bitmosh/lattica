@@ -327,7 +327,11 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             let home = app.path().home_dir()?;
-            let store_path = home.join(".lattica/fossic/store.db");
+            // LATTICA_FOSSIC_STORE overrides the default for federation consumers
+            // (Cerebra, LumaWeave, Policy Scout) that open the store directly.
+            let store_path = std::env::var_os("LATTICA_FOSSIC_STORE")
+                .map(std::path::PathBuf::from)
+                .unwrap_or_else(|| home.join(".lattica/fossic/store.db"));
 
             if let Some(parent) = store_path.parent() {
                 std::fs::create_dir_all(parent)?;

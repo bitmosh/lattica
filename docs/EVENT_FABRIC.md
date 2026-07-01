@@ -130,6 +130,13 @@ CREATE INDEX IF NOT EXISTS idx_events_correlation
 
 **WAL mode is mandatory.** The ES toolkit opens every store with `PRAGMA journal_mode = WAL;`. WAL allows concurrent readers while a writer is active, which is required when the time-travel viewer is reading while the main application is appending.
 
+**Store location — `LATTICA_FOSSIC_STORE`.** All federation consumers that open the hub store directly (Cerebra, LumaWeave, Policy Scout) must resolve the path using the same rule:
+
+1. If the env var `LATTICA_FOSSIC_STORE` is set, use its value as the absolute path.
+2. Otherwise default to `~/.lattica/fossic/store.db`.
+
+The Lattica Tauri backend (`src-tauri/src/lib.rs`) follows this rule and is the store's owner — it creates the file and parent directory on startup. Consumers should never create the file themselves; they open it read-only or rely on WAL's concurrent-write semantics. Absence of the file on a consumer's first open should be treated as "hub not yet started", not a fatal error.
+
 **No foreign keys from events to branches.** This is intentional. The branch lookup is done by the read path in Rust, not by the database engine. Enforcing the constraint at the DB layer would complicate branch deletion semantics and add unnecessary overhead on every append.
 
 ### Content-addressed event IDs

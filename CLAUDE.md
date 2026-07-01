@@ -21,11 +21,8 @@ lattica/
   lattica/eval-core/    — standalone eval package, stdlib only, zero runtime deps (ADR-003)
   packages/gwells/      — n-body physics engine (TypeScript, extraction target)
   packages/es-toolkit/  — event sourcing library (Rust core, PyO3, napi-rs)
-  cerebra/              — memory/knowledge layer (Python 3.12+)
+  cerebra/              — memory/knowledge layer + Bo live agent (Python 3.12+)
   policy-scout/         — governance daemon (Python 3.12+)
-  discord-bot/          — Bo comms interface (Python 3.11+)
-  rhyzome/              — code repair agent (Python 3.12)
-  bons-ai/              — multi-agent cognitive system (Python 3.12)
   ai-stack/             — inference layer (Docker-composed)
   docs/
     LATTICA_NOW.md      — live state (version, roadmap, known bugs)
@@ -47,9 +44,6 @@ Each module with its own complexity has a `CLAUDE.md` in its subdirectory. Read 
 | Cerebra | Python 3.12+ | Memory/knowledge layer, SQLite + embeddings |
 | Policy Scout | Python 3.12+ | Governance daemon, shell/package/file/HITL gates |
 | ai-stack | Docker | Ollama + LiteLLM + Open WebUI, GPU inference |
-| discord-bot (Bo) | Python 3.11+ | Comms interface, routes to local Qwen |
-| Rhyzome | Python 3.12 | Code repair agent, AST-based semantic gates |
-| bons.ai / AI-lab | Python 3.12 | Multi-agent loop, generator/evaluator/mutator |
 | gwells | TypeScript | n-body physics engine, npm extraction target |
 | eval-core | TypeScript | Shared eval infrastructure, zero runtime deps |
 | es-toolkit | Rust/Python/TS | Event sourcing — the event fabric substrate |

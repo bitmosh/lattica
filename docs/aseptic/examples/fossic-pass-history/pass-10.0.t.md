@@ -66,9 +66,9 @@ None. Docs-only pass.
 
 ## Editorial decisions
 
-**Section numbering:** Consumer Extension Registry placed as §2 (after intro, before any consumer sections) per pass prompt — it serves as a discoverability aid. All prior sections shifted by one (§2→§3, §3→§4, etc.). Cerebra landed as §7 (after bons.ai §6, before OTel §8).
+**Section numbering:** Consumer Extension Registry placed as §2 (after intro, before any consumer sections) per pass prompt — it serves as a discoverability aid. All prior sections shifted by one (§2→§3, §3→§4, etc.). Cerebra landed as §7 (before OTel §8).
 
-**Rhyzome and bons.ai registry rows:** Both sections existed at §4 and §5 (now §5 and §6). Used real section links — no "(vocabulary pending)" placeholders needed.
+**Registry rows §5 and §6:** Both sections existed at §4 and §5 (now §5 and §6). Used real section links — no "(vocabulary pending)" placeholders needed.
 
 **OTel mapping treatment:** Extended existing §8 (was §6) by renaming the standard 5-row table to §8.1 and adding new §8.2 for Cerebra's 22 events. Added ancillary notes: span hierarchy (session > cycle > step), re-injection span links, cardinality exclusion for `checklist_details`, and `gen_ai.cerebra.*` namespace convention.
 

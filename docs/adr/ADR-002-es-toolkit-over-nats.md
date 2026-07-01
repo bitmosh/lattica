@@ -7,7 +7,7 @@
 
 ## Context and Problem Statement
 
-Lattica unifies multiple independent modules — LumaWeave, Cerebra, Policy Scout, Rhyzome, bons.ai, Bo — into a single platform runtime. For the "Reflective Twin Architecture" to function, modules must be able to observe each other's activity in real time. Graph A (canonical snapshot) and Graph B (live state) must be kept synchronized through a diff layer that carries semantic meaning: not "line 42 changed" but "Agent investigating file X," "Policy violation detected on tool call Y," "Repair strategy Z selected and failed."
+Lattica unifies multiple independent modules — LumaWeave, Cerebra (including Bo as a live agent), Policy Scout, ai-stack — into a single platform runtime. For the "Reflective Twin Architecture" to function, modules must be able to observe each other's activity in real time. Graph A (canonical snapshot) and Graph B (live state) must be kept synchronized through a diff layer that carries semantic meaning: not "line 42 changed" but "Agent investigating file X," "Policy violation detected on tool call Y," "Repair strategy Z selected and failed."
 
 A conventional pub/sub event bus satisfies the delivery requirement but nothing more. The reflective twin vision requires the diff layer to be a first-class artifact — queryable, replayable, branchable, and persistent. The system must be able to answer questions like: "What was the state of the knowledge graph at 14:32:07 before the repair agent modified it?" and "If we had taken branch B instead of branch A at that decision point, what would the graph look like now?" Delivery alone cannot answer those questions.
 
@@ -61,7 +61,7 @@ The time-travel viewer (Phase 6, scrubbable HTML canvas UI embedded in LumaWeave
 - **Deterministic agent trace replay.** Failed or anomalous agent runs can be replayed exactly by feeding stored tool outputs back through the same reducer. No live re-execution needed.
 - **No broker daemon.** Each module embeds the ES toolkit and writes to its own SQLite file. No server process to start, no port to allocate, no failure mode from a crashed broker.
 - **Single SQLite file per module.** Operationally simple: the event log for any module is one file on disk, readable with standard SQLite tooling, copyable, backupable, inspectable.
-- **Cross-language without protocol overhead.** Rust core is the single canonical implementation. PyO3 gives Python modules (Cerebra, Policy Scout, Rhyzome, bons.ai, Bo) direct bindings with no serialization round-trip. napi-rs gives the TypeScript frontend and Node tooling direct bindings. The Tauri backend uses the crate directly. Every language sees the same types.
+- **Cross-language without protocol overhead.** Rust core is the single canonical implementation. PyO3 gives Python modules (Cerebra, Policy Scout) direct bindings with no serialization round-trip. napi-rs gives the TypeScript frontend and Node tooling direct bindings. The Tauri backend uses the crate directly. Every language sees the same types.
 - **Portfolio artifact.** lattica-es is a self-contained publishable library. The implementation cost is not sunk — it is recoverable as open-source.
 - **Constraint design alignment.** Append-only immutability enforces the invariant structurally. The diff layer cannot silently drop or rewrite events. This is a structural guarantee, not a monitoring policy.
 
@@ -111,7 +111,7 @@ The ES toolkit is implemented as a Rust crate (lattica-es) with cross-language b
 
 **Rust core is the single canonical implementation.** The SQLite schema, the blake3 content-addressed ID derivation, the branching model, the snapshot logic, and the reactive subscription machinery are written once in Rust and exposed to all languages through bindings. There is no risk of subtle behavioral divergence between a "Python version" and a "TypeScript version" of the same reducer contract.
 
-**PyO3 for Python modules.** Cerebra, Policy Scout, Rhyzome, bons.ai, and Bo are all Python 3.12+. PyO3 gives them synchronous and async bindings to the Rust core with no serialization overhead for in-process calls. The Python API surface is idiomatic Python — type hints, context managers, async generators for reactive subscriptions — but the implementation runs at Rust speed against the same SQLite file.
+**PyO3 for Python modules.** Cerebra and Policy Scout are Python 3.12+. PyO3 gives them synchronous and async bindings to the Rust core with no serialization overhead for in-process calls. The Python API surface is idiomatic Python — type hints, context managers, async generators for reactive subscriptions — but the implementation runs at Rust speed against the same SQLite file.
 
 **napi-rs for TypeScript.** LumaWeave's frontend and the Lattica UI layer are TypeScript/React. napi-rs compiles the Rust core to a native Node addon. The TypeScript API surface is idiomatic TypeScript — async iterators for subscriptions, branded types for stream IDs and event versions, full type inference on reducers. The time-travel viewer and the cross-module event timeline panel in Lattica consume the ES toolkit through this binding.
 
@@ -136,7 +136,7 @@ What the ES toolkit provides instead is **cross-language read adapters** that su
 
 From the perspective of the cross-module event timeline in Lattica and the time-travel viewer, all events — whether they originated in lattica-es streams, Cerebra's inspector_events, or Policy Scout's audit.db — appear in a unified vocabulary with consistent types and IDs. The migration cost is zero because there is no migration: the source stores remain authoritative for their own modules, and the adapters provide a read view.
 
-New modules built in Phase 6 and later (Rhyzome event emission, bons.ai three-agent cycle events, Bo conversation events) will write directly to lattica-es streams from the start, using the native PyO3 bindings. They have no legacy event store to bridge.
+New modules built in Phase 6 and later will write directly to lattica-es streams from the start, using the native PyO3 or napi-rs bindings. They have no legacy event store to bridge.
 
 ---
 

@@ -41,12 +41,12 @@ Minus: `docs/LATTICA_NOW.md` is referenced as the authoritative live state docum
 
 Risks are identified at every phase, which is good. Most are real and accurately characterized. But a few are undersold or unresolved:
 
-- SQLite writer contention is flagged as a "known unknown" at Phase 6 but has no mitigation plan. Five Python processes + LumaWeave frontend all writing to `~/.lattica/events.db` under SQLite WAL means writes serialize. Under active development (Rhyzome running, bons.ai cycling, Cerebra ingesting, Bo responding) this could produce visible jank. The fallback (per-module files + read-aggregator) would break the unified timeline, which is a core feature.
+- SQLite writer contention is flagged as a "known unknown" at Phase 6 but has no mitigation plan. Five Python processes + LumaWeave frontend all writing to `~/.lattica/events.db` under SQLite WAL means writes serialize. Under active development (Policy Scout auditing, Cerebra ingesting, Bo responding) this could produce visible jank. The fallback (per-module files + read-aggregator) would break the unified timeline, which is a core feature.
 - The Cerebra cold start is a user-visible problem for all of Phases 3–6. ADR-005 explicitly says "don't build interactive features that require sub-second responses before Phase 7." That's a significant design constraint to carry for 4–5 phases.
 
 ### Solo Feasibility — C+
 
-This is where the grade drops. The scope is 2–3 years at solo pace if everything goes well. Phases 0–5 are achievable in a focused 6–9 months. Phase 6 alone (Rust crate + PyO3 + napi-rs + time-travel viewer + bridge adapters + OTel export + module event emission changes across 4 codebases) is easily a 3–4 month phase for one person. Phase 8 requires stable Phase 6, requires changing 2 external codebases (Rhyzome, bons.ai), and produces the most architecturally novel work (live agent visualization). Phases 9–11 pile on after that.
+This is where the grade drops. The scope is 2–3 years at solo pace if everything goes well. Phases 0–5 are achievable in a focused 6–9 months. Phase 6 alone (Rust crate + PyO3 + napi-rs + time-travel viewer + bridge adapters + OTel export + module event emission changes across 4 codebases) is easily a 3–4 month phase for one person. Phase 8 requires stable Phase 6, requires integrating live agent emission across active modules (Cerebra, Policy Scout), and produces the most architecturally novel work (live agent visualization). Phases 9–11 pile on after that.
 
 Phase 12 is clearly labeled SPECULATIVE, which is honest. But Phases 8–11 are labeled LOW to MEDIUM confidence while being genuinely large.
 

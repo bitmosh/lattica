@@ -85,7 +85,7 @@ tileSectionRegistry type changes in a way that breaks the tile slot.
 Phase 2 (primary delivery), Phase 4 (multi-stream glob UI enhancement).
 
 **Cross-project impact:**
-Cerebra, policy-scout, bo, rhyzome all have similar subscription needs.
+Cerebra, policy-scout, bo all have similar subscription needs.
 The tile will be generic (glob pattern input); no project-specific forks
 needed. Addressed collectively in R-C-001, R-PS-001.
 

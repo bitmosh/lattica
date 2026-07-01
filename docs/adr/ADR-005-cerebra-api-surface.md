@@ -16,7 +16,7 @@ Cerebra is Lattica's memory and knowledge layer: Python 3.12+, SQLite WAL + FTS5
 Three consumers need programmatic Cerebra access in the near term:
 
 1. **LumaWeave / Lattica (Phase 4–5):** The Cerebra SQLite → LumaWeave graph adapter needs to query retrieval results and working memory slot state to render them as graph nodes and subgraph overlays.
-2. **discord-bot / Bo (Phase 9):** `gather_context()` is the existing seam for a Cerebra swap. Once Phase 5 (working memory + session daemon) and Phase 7 (UDS daemon) both land, Bo should send requests to the daemon rather than subprocess-invoking the CLI.
+2. **Bo live agent in Cerebra (Phase 9):** `gather_context()` is the existing seam for a Cerebra memory integration. Once Phase 5 (working memory + session daemon) and Phase 7 (UDS daemon) both land, Bo's context gathering routes through Cerebra's daemon rather than a subprocess CLI.
 3. **Lattica status panel (Phase 3):** `cerebra metrics --format json` drives a Prometheus textfile poller and a Cerebra status panel in the Lattica UI.
 
 The critical constraint is **first-query latency.** Model cold load (`mxbai-embed-large-v1`) takes approximately 10 seconds. Every subprocess invocation pays this cost again. That latency is acceptable for an early prototype; it is not acceptable for interactive use, for the Bo context pipeline, or for any future sub-second retrieval requirement.
@@ -206,9 +206,9 @@ For the Lattica status panel (Phase 3), `cerebra metrics --format prometheus` is
 4. The CLI (`cerebra context`, etc.) is updated to detect the socket and proxy to the daemon. CLI output is byte-for-byte identical to the current direct-execution output.
 5. The Phase 4–5 SQLite polling path remains as the final fallback (daemon down, CLI unavailable) — it is never removed, only deprioritized.
 
-### Phase 9: Bo memory swap
+### Phase 9: Bo memory integration
 
-`gather_context()` in the discord-bot is replaced with a direct HTTP request to the UDS daemon's `/context` endpoint. The request is made via the daemon socket, not via subprocess. This path is only wired after both Phase 5 (session concept stable) and Phase 7 (daemon exists) are confirmed green.
+Bo's `gather_context()` seam is replaced with a direct call to Cerebra's UDS daemon `/context` endpoint. The request is made via the daemon socket, not via subprocess. This path is only wired after both Phase 5 (session concept stable) and Phase 7 (daemon exists) are confirmed green.
 
 ---
 

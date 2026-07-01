@@ -126,7 +126,7 @@ No staging, no edits, no commits.
 - `~/Projects/fossic/docs/implement/AGENT_TRACE_VOCABULARY.md` — EXISTS, **919 lines**
 - Last commit note in Lattica git log for the Lattica copy: `28c8e50 chore(aseptic): adopt Aseptic methodology as Lattica's working copy` — meaning this file was copied into Lattica at repo inception, not updated since
 
-**The divergence:** Fossic's canonical is 919 lines and includes a Consumer Extension Registry table at the top (listing Cerebra, rhyzome, bons.ai as registered consumers). The Lattica copy (381 lines) predates this addition — it has the earlier scope line ("rhyzome and bons.ai extensions" only) and lacks the registry table entirely. The Lattica copy is approximately the v1 draft; fossic's is the current document.
+**The divergence:** Fossic's canonical is 919 lines and includes a Consumer Extension Registry table at the top (listing Cerebra and Policy Scout as registered consumers). The Lattica copy (381 lines) predates this addition — it has an earlier scope line and lacks the Consumer Extension Registry table entirely. The Lattica copy is approximately the v1 draft; fossic's is the current document.
 
 **Why the deletion + move happened:** The accidental Claudes likely recognized the file was out of place in `docs/implement/` (a directory for Lattica's own implementation docs, not adjacent project info). Moving it to `docs/adjacent-project-info/` (which already contains `cerebra_extract.md`, `aistack_extract.md`, etc.) is logically correct for a reference copy.
 

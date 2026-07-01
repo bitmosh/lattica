@@ -587,7 +587,7 @@ The alternative models that could have been proposed (micro-frontends with modul
 
 **Info quality:** Very complete
 
-**One-sentence shape:** Discord bot with a 3-attempt inference retry pipeline; no fossic integration today; operational visibility requires either a heartbeat file (Phase 1 interim) or fossic lifecycle events (Phase 2).
+**One-sentence shape:** Bo is a live agent in Cerebra (formerly a standalone Discord bot) with a 3-attempt inference retry pipeline; fossic integration handles lifecycle events and conversation trace (Phase 2).
 
 **Top 3 requirements:**
 - R-BO-001: Bot operational status tile — interim: heartbeat file; Phase 2: fossic `BotStarted`/`BotStopped` lifecycle events
@@ -2751,7 +2751,7 @@ Current architecture and latency budget:
 
 **Governance decisions are recorded as fossic events for audit regardless.** The sync call returns a decision; the fossic emit is a side effect that happens in parallel (or just after) at the write path. No blocking on the fossic write.
 
-**Practical answer for Rhyzome/bons.ai gating in Phase 8:** They call
+**Practical answer for agent gating in Phase 8:** Active agents (Cerebra, Policy Scout) call
 Policy Scout synchronously (via MCP tool call or direct CLI invocation),
 get a permit/deny, proceed. The governance event lands in fossic for
 the audit chain. The agent doesn't subscribe to policy-scout streams;

@@ -589,7 +589,7 @@ Push notifications use Tauri's native `emit` mechanism. The `fossic_subscribe` c
 
 Fossic uses Model 1 for snapshot ownership: reducers are consumer code, and snapshots are language-bound. A snapshot row carries `reducer_name`, `reducer_version`, and `state_schema_version` so that a snapshot can only be read by a reducer registration that matches all three.
 
-**Pattern-based registration** is the v1 API. Consumers register one reducer against a glob-style stream pattern; the reducer applies to every stream matching the pattern. This is the right model when consumers have many similar streams (Cerebra's per-lattice-node streams, rhyzome's per-repair-session streams, bons.ai's per-idea streams).
+**Pattern-based registration** is the v1 API. Consumers register one reducer against a glob-style stream pattern; the reducer applies to every stream matching the pattern. This is the right model when consumers have many similar streams (Cerebra's per-lattice-node streams, Policy Scout's per-audit-session streams).
 
 ```python
 store.register_reducer(
@@ -627,7 +627,7 @@ store.append(Append(stream_id="cerbra/lattice/abc123", ...))
 
 Stream ID conventions are documented but not enforced by the type:
 
-- **Format:** `{module}/{resource-type}/{resource-id}[/{sub-type}]`. Examples: `cerebra/lattice/lineage_abc`, `rhyzome/repair/session_42`, `bonsai/idea/idea_xyz`, `lumaweave/graph`, `policy-scout/audit`, `bo/conversation/channel_42`.
+- **Format:** `{module}/{resource-type}/{resource-id}[/{sub-type}]`. Examples: `cerebra/lattice/lineage_abc`, `cerebra/vault-01/retrieval`, `lumaweave/graph`, `policy-scout/audit`, `bo/conversation/channel_42`.
 - **Max length:** 256 characters.
 - **Allowed characters:** alphanumeric, `-`, `_`, `/`. No whitespace, no quote characters, no path separators other than `/`.
 - **Max path segments:** 4.
@@ -704,8 +704,8 @@ A branch is a pointer record: `(stream_id, branch_id, parent_id, parent_version)
 
 ```python
 store.create_branch(CreateBranch(
-    stream_id="rhyzome/repair/session_42",
-    branch_id="repair-class_bug/rethink_state_design-1",
+    stream_id="cerebra/vault-01/retrieval",
+    branch_id="session-42/strategy-b-1",
     parent_id="main",
     parent_version=23,
     description="Strategy B counterfactual after A failed",
@@ -727,9 +727,9 @@ Branch IDs are TEXT, validated as `{format: same as stream-id segments, max 128 
 
 | Value | Meaning |
 |---|---|
-| `ephemeral` (default) | Branch is a candidate. Eligible for cold archival / discard per retention policy. Most rhyzome strategy branches are ephemeral. |
+| `ephemeral` (default) | Branch is a candidate. Eligible for cold archival / discard per retention policy. Most Cerebra counterfactual branches are ephemeral. |
 | `promoted` | Branch succeeded or is otherwise canonical. Kept forever. |
-| `dead_end` | Branch failed in a way worth remembering. Kept forever, but visualization and default queries can de-emphasize. bons.ai culled-idea streams use this. |
+| `dead_end` | Branch failed in a way worth remembering. Kept forever, but visualization and default queries can de-emphasize. Policy Scout culled-audit branches use this. |
 
 Transitions:
 
@@ -745,16 +745,16 @@ Lifecycle is one-way: ephemeral → (promoted | dead_end). No transitions back. 
 Reading a branch resolves the ancestor chain:
 
 ```
-read_range(stream="rhyzome/repair/session_42", branch="repair-42/strategy-b-1",
+read_range(stream="cerebra/vault-01/retrieval", branch="session-42/strategy-b-1",
            from=0, to=latest)
-  → events 0..=23 from main + events 24.. from repair-42/strategy-b-1
+  → events 0..=23 from main + events 24.. from session-42/strategy-b-1
 ```
 
 Chain resolution is cached in an in-process LRU keyed on `(stream_id, branch_id)`. Cache invalidates when a new branch is created on any ancestor.
 
 ### Branch and storage
 
-Two branches of the same stream can be appended to concurrently (different `branch` values, different version sequences). They contend only at the SQLite WAL writer lock, which the bench showed is not an issue at realistic throughput. bons.ai's parallel-cycles-on-same-parent concern is addressed by this: parallel cycles map to parallel branches.
+Two branches of the same stream can be appended to concurrently (different `branch` values, different version sequences). They contend only at the SQLite WAL writer lock, which the bench showed is not an issue at realistic throughput. Cerebra's parallel-retrievals-on-same-vault concern is addressed by this: parallel sessions map to parallel branches.
 
 ---
 
@@ -861,7 +861,7 @@ Use cases: LumaWeave subgraph highlighting (one user action triggers events acro
 
 `store.walk_causation(start_event_id, direction, max_depth)` walks the `causation_id` graph forward (children: events whose causation_id is the start), backward (ancestors), or both. Implemented as a SQLite recursive CTE.
 
-Use cases: bons.ai lineage walk ("show me the full ancestor chain of idea X"), incident forensics ("what did this initial event lead to").
+Use cases: Cerebra lineage walk ("show me the full ancestor chain of retrieval session X"), incident forensics ("what did this initial event lead to").
 
 ### 10.3 Aggregation over indexed_tags
 
@@ -869,15 +869,15 @@ Use cases: bons.ai lineage walk ("show me the full ancestor chain of idea X"), i
 
 ```python
 result = store.aggregate(AggregateQuery(
-    stream_pattern="bonsai/idea/*",
-    where={"indexed_tags.generation": 5},
-    group_by="indexed_tags.arm_id",
+    stream_pattern="cerebra/vault-*/retrieval",
+    where={"indexed_tags.strategy": "semantic_vector"},
+    group_by="indexed_tags.vault_id",
     aggregations={
         "count": "count(*)",
-        "mean_reward": "avg(indexed_tags.reward)",
+        "mean_salience": "avg(indexed_tags.salience_score)",
     },
 ))
-# → {"arm_X": {"count": 12, "mean_reward": 0.73}, "arm_Y": {...}}
+# → {"vault_01": {"count": 12, "mean_salience": 0.73}, "vault_02": {...}}
 ```
 
 Consumers populate `indexed_tags` at append time with the few fields they need for aggregation. Cost: one indexed JSON column. Benefit: efficient projection queries without msgpack decoding.
@@ -893,7 +893,7 @@ pub trait SimilaritySearchProvider: Send + Sync + 'static {
 }
 ```
 
-Consumers (bons.ai's cross-stream semantic-similarity-on-idea-text use case) can register their own provider against a vector index (ChromaDB, sqlite-vec, etc.). The trait shape is the v1 contract; implementations are out of v1 scope.
+Consumers (Cerebra's cross-stream semantic-similarity-on-knowledge-text use case) can register their own provider against a vector index (ChromaDB, sqlite-vec, etc.). The trait shape is the v1 contract; implementations are out of v1 scope.
 
 When a `SimilaritySearchProvider` is registered, fossic calls `index(event)` for every appended event (in PostCommit mode; never blocks the writer). Consumers call `store.similarity_query(...)` to retrieve hits.
 
@@ -905,9 +905,9 @@ See `AGENT_TRACE_VOCABULARY.md` for the full event type list and per-tool determ
 
 Standard event types: `llm_call`, `llm_response`, `tool_call`, `tool_result`, `reasoning_step`.
 
-Rhyzome extension: `strategy_selected`, `ast_gate_evaluated`, `strategy_exhausted`.
+Cerebra extension: `bandit_arm_selected`, `bandit_arm_updated`, `bandit_decision`, `memory_retrieved`, `embedding_stored`.
 
-Bons.ai extension: `bandit_arm_selected`, `bandit_arm_updated`, `bandit_decision`, `stagnation_detected`, `adaptation_applied`, `memory_retrieved`, `embedding_stored`.
+Policy Scout extension: `policy_decision`, `signal_evaluated`, `gate_triggered`.
 
 Per-tool determinism: `deterministic` defaults to `false` (safer default — re-execute on replay is visible latency; serve-stale is invisible corruption). Tools opt in to `true` via the `register_tool` API on the trace adapter.
 
@@ -994,7 +994,7 @@ The following are API surfaces shaped now to avoid breaking changes later. v1 sh
 
 **`CheckpointMode::Manual { interval_ms }`** — v1 accepts the enum variant but `Store::open` returns `Err(NotImplemented)` if Manual is requested. The implementation (background checkpoint thread with `wal_autocheckpoint=0` and explicit timer) lands in v1.1 if any consumer hits the burst-checkpoint stall in production.
 
-**`SimilaritySearchProvider`** — declared trait, no default impl. v1 calls `index()` for every event if a provider is registered. `store.similarity_query(...)` returns `Err(NoProviderRegistered)` otherwise. bons.ai's anticipated v2 work registers an implementation.
+**`SimilaritySearchProvider`** — declared trait, no default impl. v1 calls `index()` for every event if a provider is registered. `store.similarity_query(...)` returns `Err(NoProviderRegistered)` otherwise. Cerebra's anticipated v2 work registers an implementation against its vector index.
 
 **`fossic-http-gateway`** — a companion crate (not part of v1) that exposes the fossic API over a localhost HTTP server. Designed for containerized consumers (LiteLLM) that can't easily embed PyO3. v1.1 candidate; the v1 Rust API is shaped to be wrappable without changes.
 
@@ -1029,21 +1029,21 @@ A reverse-index of which v1 features each consumer profile drove:
 |---|---|
 | Single-file SQLite | All; bench confirms |
 | `external_id` column | Cerebra (`evt_<uuid>`), Policy Scout (`request_id`) |
-| `indexed_tags` column | bons.ai (population aggregation queries) |
+| `indexed_tags` column | Cerebra (population aggregation queries) |
 | Payload transform hook | Policy Scout (`redact_dict`) |
 | Pre-built wheels | All Python consumers |
 | Sync-first Python | Cerebra (hard requirement), Policy Scout |
-| Branch lifecycle states | Rhyzome (ephemeral/promoted), bons.ai (dead_end) |
-| `alternatives` on branch creation | Rhyzome (StrategyRouter ranked list), bons.ai (BanditDecision candidates) |
-| Pattern-based reducer registration | Cerebra (thousands of lattice nodes), rhyzome (per-repair-session) |
+| Branch lifecycle states | Cerebra (ephemeral/promoted), Policy Scout (dead_end) |
+| `alternatives` on branch creation | Cerebra (StrategyRouter ranked list) |
+| Pattern-based reducer registration | Cerebra (thousands of lattice nodes), Policy Scout (per-audit-session) |
 | Crypto-shredding (per-stream DEK) | Cerebra (session/source deletion) |
-| Causation walk + correlation lookup | bons.ai (lineage), LumaWeave (subgraph highlight) |
-| `SimilaritySearchProvider` extension | bons.ai (semantic NN on idea text) |
+| Causation walk + correlation lookup | Cerebra (lineage), LumaWeave (subgraph highlight) |
+| `SimilaritySearchProvider` extension | Cerebra (semantic NN on knowledge text) |
 | Upcaster protocol | Cerebra (`schema_version` first-class field) |
 | Tauri IPC command set | LumaWeave (webview consumer) |
 | `tokio::runtime::Handle` option | LumaWeave (Tauri runtime sharing) |
-| `deterministic: false` default | Rhyzome (push: visible cost is correct failure mode) |
-| Per-tool determinism registry | bons.ai (per-role table), rhyzome (per-tool table) |
+| `deterministic: false` default | Cerebra/Bo (push: visible cost is correct failure mode) |
+| Per-tool determinism registry | Cerebra (per-role table), Policy Scout (per-tool table) |
 | Subscription mode split | LumaWeave (real-time Graph B), Cerebra (backpressure-tolerant) |
 
 ---

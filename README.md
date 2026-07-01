@@ -13,8 +13,9 @@ advocate-coordination scaffolding for inter-project requirements gathering.
 
 Lattica extends LumaWeave (a graph-based architecture-visualization workbench)
 into a full platform: multiple project modules — Cerebra, Policy Scout, fossic,
-Bo, rhyzome, bons.ai, ai-stack — are surfaced as tiles in a unified Tauri shell.
-The substrate connecting them is fossic, a local-first event sourcing library.
+ai-stack — are surfaced as tiles in a unified Tauri shell. Bo, a live agent
+bootstrapped into Cerebra, provides the comms layer from within. The substrate
+connecting them is fossic, a local-first event sourcing library.
 
 The governing philosophy is **constraint design**: don't detect mistakes, make
 them structurally impossible. Every architectural decision asks which invariants
@@ -43,11 +44,8 @@ lattica/
   src-tauri/            — Rust backend
   packages/gwells/      — n-body physics engine (TypeScript)
   packages/fossic/      — event sourcing library (external dep, not a monorepo pkg)
-  cerebra/              — memory/knowledge layer (Python)
+  cerebra/              — memory/knowledge layer + Bo live agent (Python)
   policy-scout/         — governance daemon (Python)
-  discord-bot/          — Bo comms interface (Python)
-  rhyzome/              — code repair agent (Python)
-  bons-ai/              — multi-agent cognitive system (Python)
   ai-stack/             — inference layer (Docker-composed)
   docs/                 — platform docs, ADRs, aseptic methodology, requirements
 ```

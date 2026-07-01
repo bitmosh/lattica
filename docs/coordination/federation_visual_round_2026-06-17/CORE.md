@@ -111,8 +111,7 @@ chips in causation arcs, and any other per-project visual differentiation.
 --project-accent-policy-scout:  #cf0a5c;   /* crimson */
 ```
 
-bons.ai and rhyzome are benched and have no tokens. If they un-bench, add one
-line each.
+No additional project color tokens are needed.
 
 ---
 

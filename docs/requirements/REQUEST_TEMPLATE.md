@@ -81,7 +81,7 @@ priority: must-have
 
 **Specific need:**
 Lattica must provide a tile that subscribes to fossic stream patterns via
-glob (`cerebra/agent-trace/*`, `rhyzome/repair/*`, etc.) and renders events
+glob (`cerebra/agent-trace/*`, `policy-scout/audit/*`, etc.) and renders events
 as they arrive, with event type, version, stream ID, and payload summary visible.
 
 **Why it matters:**
@@ -95,7 +95,7 @@ Phase 2–4 integration.
 - Payload summary must be legible without knowing the specific event type schema
 
 **Adjacent project awareness:**
-All other consumer projects (Cerebra, policy-scout, bo, rhyzome) have
+All other consumer projects (Cerebra, policy-scout, bo) have
 similar needs — a shared subscription tile may satisfy multiple projects
 if it supports glob patterns.
 

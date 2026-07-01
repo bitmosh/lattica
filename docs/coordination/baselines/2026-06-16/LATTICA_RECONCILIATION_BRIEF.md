@@ -1,5 +1,7 @@
 # Lattica Reconciliation Brief
 
+> **Historical snapshot — 2026-06-16.** References to rhyzome, bons.ai, and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
+
 **Filed by:** lattica-claude (recompile pass v0.3.5s)
 **Audience:** Lattica Claude (self-briefing), developer, web-claude
 **Purpose:** Bring Lattica up to speed on what landed during reconciliation rounds. Reconciliation involved Cerebra, LumaWeave, Policy Scout, ai-stack/Bo, and Fossic Claudes iterating against each other's files across three cross-read rounds; Lattica was running v0.3.5u + v0.3.5t in parallel and is outside that loop. This brief is the bridging document.

@@ -663,7 +663,7 @@ requirement — do not rely on hue alone.
 |---|---|---|
 | Ollama | up/down, models loaded in VRAM, VRAM gauge | at-a-glance |
 | LiteLLM | up/down, N aliases live | at-a-glance |
-| Bo (Discord bot) | running/offline, last-seen timestamp | at-a-glance |
+| Bo (Cerebra live agent) | running/offline, last-seen timestamp | at-a-glance |
 | openedai-speech | up/down only | medium |
 | Open-WebUI | up/down only | medium |
 

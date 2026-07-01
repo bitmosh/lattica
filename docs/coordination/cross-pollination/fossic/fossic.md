@@ -2,6 +2,8 @@
 
 All cross-pollination passes, chronological.
 
+> **Note:** Rhyzome, bons.ai, and discord-bot are deprecated and removed from the platform. References to those modules in passes below are historical records of communications sent at the time; they no longer represent active consumers.
+
 ---
 
 ## fossic
@@ -71,10 +73,10 @@ confirmed no breaking change.
 
 ---
 
-## lumaweave, ai-stack, rhyzome, bons.ai
+## lumaweave, ai-stack
 
-No impact. lumaweave uses Node binding (unchanged). ai-stack is indirect. rhyzome and
-bons.ai are benched.
+No impact. lumaweave uses Node binding (unchanged). ai-stack is indirect. (rhyzome and
+bons.ai were benched at time of writing; now deprecated.)
 
 ---
 
@@ -135,13 +137,11 @@ No action required. Awareness only.
 
 ---
 
-## Rhyzome / bons.ai
+## Rhyzome / bons.ai *(deprecated — historical record only)*
 
 **Severity: FYI**
 
-AGENT_TRACE_VOCABULARY.md section numbers shifted — rhyzome vocabulary is now §5 (was §4); bons.ai vocabulary is now §6 (was §5). Update any internal docs that reference specific section numbers.
-
-No behavioral changes. Awareness only for cross-references.
+AGENT_TRACE_VOCABULARY.md section numbers shifted — rhyzome vocabulary was §5 (was §4); bons.ai vocabulary was §6 (was §5). These modules are now deprecated; no action needed.
 
 ---
 
@@ -202,7 +202,7 @@ summary: Add event_type_filter to ReadQuery across all four layers
 
 ---
 
-## Bo / discord-bot / ai-stack
+## Bo / ai-stack
 
 **Severity: FYI**
 
@@ -210,23 +210,19 @@ summary: Add event_type_filter to ReadQuery across all four layers
 
 ---
 
-## Rhyzome
+## Rhyzome *(deprecated — historical record only)*
 
 **Severity: FYI**
 
-- Rhyzome uses `read_range` for stream introspection. `event_type_filter` is available
-  if Rhyzome needs to read only repair-related event types from a mixed stream. No
-  action required now.
+- Rhyzome used `read_range` for stream introspection. Module is now deprecated.
 
 ---
 
-## bons.ai
+## bons.ai *(deprecated — historical record only)*
 
 **Severity: FYI**
 
-- The `event_type_filter` field makes ReadQuery parity with AggregateQuery. When bons.ai
-  reads from idea or session streams that carry mixed event types (e.g. `IdeaCreated`,
-  `IdeaScored`, `IdeaDiscarded`), filtering can now be done server-side.
+- The `event_type_filter` field added ReadQuery parity with AggregateQuery. Module is now deprecated.
 
 ---
 
@@ -236,7 +232,7 @@ summary: Add event_type_filter to ReadQuery across all four layers
 pass: 10
 version: v0.10.0
 date: "(retroactive estimate, not verified)"
-impacts: [cerebra, bons.ai]
+impacts: [cerebra]
 ---
 
 # Cross-Pollination — Pass 10 (v0.10.0)
@@ -289,26 +285,19 @@ snapshots, latency grows linearly with event count.
 
 ---
 
-## bons.ai
+## bons.ai *(deprecated — historical record only)*
 
 **Severity:** FYI
 
-**What changed:** Same DynReducer protocol update as cerebra. bons.ai is currently benched
-but should be aware that when it resumes, reducer classes need the three class-level
-attributes.
-
-**Advocate-agent message:**
-> fossic v0.10.0: DynReducer protocol now requires `name`, `version`, `state_schema_version`
-> class attributes on reducer objects. Impact for bons.ai: FYI while benched. When
-> bons.ai resumes and uses fossic reducers, add these attributes to your reducer classes
-> before calling register_reducer.
+**What changed:** Same DynReducer protocol update as cerebra. bons.ai was benched at
+time of writing; module is now deprecated.
 
 ---
 
-## policy-scout, bo, lumaweave, ai-stack, rhyzome
+## policy-scout, bo, lumaweave, ai-stack
 
 No impact. policy-scout and bo don't use reducers. lumaweave uses the Node binding
-(no Python reducer path). ai-stack is indirect. rhyzome is benched.
+(no Python reducer path). ai-stack is indirect. (rhyzome was benched at time of writing; now deprecated.)
 
 ---
 
@@ -365,7 +354,7 @@ summary: Spec clarification — purge semantics, branch conventions, BranchInfo 
 
 ---
 
-## Bo / discord-bot / ai-stack
+## Bo / ai-stack
 
 **Severity: FYI**
 
@@ -374,13 +363,12 @@ summary: Spec clarification — purge semantics, branch conventions, BranchInfo 
 
 ---
 
-## Rhyzome
+## Rhyzome *(deprecated — historical record only)*
 
 **Severity: FYI**
 
-- `BranchInfo` field names now documented canonically in §8: `.id`, `.lifecycle`
-  (not `.branch_id`, `.status`). Rhyzome uses branches heavily — confirm all branch
-  code uses the correct field names before implementing new branch features.
+- `BranchInfo` field names documented canonically in §8: `.id`, `.lifecycle`
+  (not `.branch_id`, `.status`). Module is now deprecated.
 
 ---
 
@@ -421,9 +409,9 @@ changes — this is additive.
 
 ---
 
-## cerebra, policy-scout, bo, ai-stack, rhyzome, bons.ai
+## cerebra, policy-scout, bo, ai-stack
 
-No impact. Python binding unchanged. This pass touched only `fossic-node/index.js`.
+No impact. Python binding unchanged. This pass touched only `fossic-node/index.js`. (rhyzome and bons.ai were listed here at time of writing; now deprecated.)
 
 ---
 

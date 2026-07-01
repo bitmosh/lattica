@@ -49,8 +49,6 @@ requirements/
   policy-scout/ ...
   bo/ ...
   ai-stack/ ...
-  rhyzome/ ...            — benched project; file requirements when un-benched
-  bonsai/ ...             — benched project ("bons.ai" in docs; "bonsai" here)
   group-rounds/
     round-01.md           — (pending; created when 3+ deposits arrive)
 ```
@@ -69,10 +67,6 @@ Deposits received:
 - [x] policy-scout — `policy-scout/requirements.md` filed 2026-06-13
 - [x] cerebra — `cerebra/requirements.md` filed 2026-06-13
 
-Benched (not required for round 1):
-- [ ] rhyzome
-- [ ] bonsai
-
 Round 1 synthesis quorum met. All active projects deposited. Lattica Claude
 may proceed to `group-rounds/round-01.md`.
 
@@ -89,5 +83,3 @@ may proceed to `group-rounds/round-01.md`.
 - **Stability rule:** A `decisions.md` entry is locked when Lattica Claude marks it
   `status: locked`. Locked entries do not change without opening a new requirements
   round. Advocates may rely on locked decisions.
-- **Benched projects** (rhyzome, bonsai): subdirectories are scaffolded but
-  requirements.md is not required until the project is un-benched.

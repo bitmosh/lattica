@@ -49,9 +49,9 @@ The file is `fossic/cce-test-vectors.json` (187 lines). It contains `encode_valu
 
 The implementation status: there is no `fossic/otel.py`, no `src/otel.rs`, and no OTel-related import in any source file. The `agent-trace` feature flag in `Cargo.toml` exists but currently resolves to an empty feature — it's a placeholder for future OTel-adjacent code.
 
-**What's needed before Phase 6 cycle runtime:** agreement on the stream naming convention for agent-trace streams. The spec says the exporter subscribes to streams matching `*/agent-trace/*` by default, plus consumer-configured patterns. Cerebra's cycle runtime would write to `cerebra/agent-trace/cycles` (or similar). The exporter spec uses `stream_patterns=["*/agent-trace/*", "rhyzome/repair/*", "bonsai/idea/*"]` as the example config. **The pattern is a proposal; it hasn't been committed to in code.** Before Cerebra's Phase 6 emissions start, this needs to be locked: either adopt the `*/agent-trace/*` convention or choose a different convention. The span structure itself (llm_call/llm_response/tool_call/tool_result/reasoning_step) is locked — those payload shapes are in the vocabulary doc and the CCE test vectors.
+**What's needed before Phase 6 cycle runtime:** agreement on the stream naming convention for agent-trace streams. The spec says the exporter subscribes to streams matching `*/agent-trace/*` by default, plus consumer-configured patterns. Cerebra's cycle runtime would write to `cerebra/agent-trace/cycles` (or similar). The exporter spec uses `stream_patterns=["*/agent-trace/*", "cerebra/*", "policy-scout/*"]` as the example config. **The pattern is a proposal; it hasn't been committed to in code.** Before Cerebra's Phase 6 emissions start, this needs to be locked: either adopt the `*/agent-trace/*` convention or choose a different convention. The span structure itself (llm_call/llm_response/tool_call/tool_result/reasoning_step) is locked — those payload shapes are in the vocabulary doc and the CCE test vectors.
 
-**Cycle-vs-event span structure:** the vocabulary doc doesn't have a `cycle_started` / `cycle_completed` event type. bons.ai has `bandit_arm_selected`, `bandit_decision`, etc. — those map to INTERNAL spans. A "cycle" span (a scope that wraps a full cognitive cycle) is implicit: the cycle's `correlation_id` ties all events within it, which becomes the OTel trace. Explicit `CycleStarted`/`CycleEnded` bookend events would make the span boundary unambiguous. Worth adding to the vocabulary before Phase 6 starts emitting.
+**Cycle-vs-event span structure:** the vocabulary doc doesn't have a `cycle_started` / `cycle_completed` event type. A "cycle" span (a scope that wraps a full cognitive cycle) is implicit: the cycle's `correlation_id` ties all events within it, which becomes the OTel trace. Explicit `CycleStarted`/`CycleEnded` bookend events would make the span boundary unambiguous. Worth adding to the vocabulary before Phase 6 starts emitting.
 
 ---
 
@@ -578,7 +578,7 @@ The Rust backend uses `tokio` (already in `Cargo.toml` with `rt` and
   rendering them.
 
 - **Agent trace replay for the time-travel viewer.** When a Claude Code
-  session or Rhyzome repair run completes, LumaWeave should be able to
+  session or code repair run completes, LumaWeave should be able to
   scrub backward through the event log and re-render the graph state at
   any point. This requires ordered replay from a checkpoint, not just
   tail-the-latest.
@@ -903,7 +903,7 @@ TypeScript wrappers: `src/lib/tauri-invoke.ts`. New commands go here. The `__lwT
 
 ### gwells physics engine
 
-`src/physics/` — N-body simulation. Extensible via `physicsDialectRegistry` (T2) and `seedFunctionRegistry` (T1). Recent hardening: structural resolver for well assignment (current branch). This is the shared physics engine for Platform-level graphs (Policy Scout DAGs, Cerebra retrieval overlays, Rhyzome repair strategy DAGs).
+`src/physics/` — N-body simulation. Extensible via `physicsDialectRegistry` (T2) and `seedFunctionRegistry` (T1). Recent hardening: structural resolver for well assignment (current branch). This is the shared physics engine for Platform-level graphs (Policy Scout DAGs, Cerebra retrieval overlays).
 
 ### Playwright suite
 
@@ -1334,14 +1334,16 @@ ES_CONSUMER_PROFILES.md.
 
 ---
 
-## discord_bot_extract
+## bo_cerebra_agent
 
-# ES Consumer Profile — discord-bot (Bo)
+> **Note:** Bo is no longer a standalone discord-bot module. Bo is a live, bootstrapped agent inside Cerebra — part of Cerebra's cognitive system, not a separate project. The profile below is historical (captured when Bo was still a standalone discord-bot); it remains useful as a record of Bo's ES requirements, which now apply to Cerebra's live agent layer.
 
-You are the discord-bot advocate. We're building **ES**, a local-first
+# ES Consumer Profile — Bo (Cerebra live agent, formerly discord-bot)
+
+You are the Bo advocate. We're building **ES**, a local-first
 event sourcing library: Rust core, PyO3/napi-rs bindings, SQLite-backed,
 content-addressed events, branchable history, pure synchronous reducers.
-It's being extracted from Lattica's Phase 6 plans because discord-bot and
+It's being extracted from Lattica's Phase 6 plans because Bo and
 several other projects also want event sourcing capabilities.
 
 Before we lock the v1 API, we need your project's actual shape. Please
@@ -1449,11 +1451,11 @@ files/lines where helpful.
 
 ---
 
-## Bo (discord-bot)
+## Bo (Cerebra live agent)
 
 **Summary for ES_CONSUMER_PROFILES.md:**
 
-Bo is a Python 3.12 asyncio Discord bot (~610 lines, single file) that routes @mentions to a local Qwen 3.5 LLM via LiteLLM/Ollama. It is single-user, local-first, low-volume (2–10 events/burst, effectively 0 at idle), and has no existing event store — context today is live-fetched from Discord's API on every message. The primary integration point is `gather_context()` (`bot.py:252`), already designed as a plug-in seam for persistent memory. ES would replace live Discord fetches with local event replay and add a durable reasoning-trace log. Requirements are minimal: append-event, fetch-recent-N, SQLite on a workstation. Does not need branching, OTel, or snapshots. Payloads max ~16KB. One friction point: synchronous ES reducers will need `run_in_executor()` wrappers in an asyncio context.
+Bo is a live agent embedded in Cerebra's runtime. Historically implemented as a Python 3.12 asyncio Discord bot (~610 lines, single file) that routes @mentions to a local Qwen 3.5 LLM via LiteLLM/Ollama. It is single-user, local-first, low-volume (2–10 events/burst, effectively 0 at idle), and has no existing event store — context today is live-fetched from Discord's API on every message. The primary integration point is `gather_context()` (`bot.py:252`), already designed as a plug-in seam for persistent memory. ES would replace live Discord fetches with local event replay and add a durable reasoning-trace log. Requirements are minimal: append-event, fetch-recent-N, SQLite on a workstation. Does not need branching, OTel, or snapshots. Payloads max ~16KB. One friction point: synchronous ES reducers will need `run_in_executor()` wrappers in an asyncio context.
 
 ---
 

@@ -40,7 +40,7 @@ summary: Spec clarification — purge semantics, branch conventions, BranchInfo 
 ### Created
 
 - `docs/aseptic/blast-radius/pass-10.v.md` — this file.
-- `docs/aseptic/cross-pollination/pass-10.v.md` — adjacent-project impact notes (Cerebra FYI, Policy Scout FYI, LumaWeave NEEDS-AWARENESS on Rust vs binding tilde, Rhyzome FYI on BranchInfo fields).
+- `docs/aseptic/cross-pollination/pass-10.v.md` — adjacent-project impact notes (Cerebra FYI, Policy Scout FYI, LumaWeave NEEDS-AWARENESS on Rust vs binding tilde).
 
 ---
 

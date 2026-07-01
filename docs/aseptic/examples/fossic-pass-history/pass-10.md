@@ -19,7 +19,7 @@ summary: DynReducer snapshot caching in Python binding; Rust BoxedReducer expose
 - `tests/similarity.rs` — similarity stub tests (verifies trait compiles; no impl yet)
 - `benchmarks/aggregate_volume_bench.py` — aggregate volume benchmark validating snapshot caching latency
 - `docs/aseptic/blast-radius/pass-10.md` — this file (retroactive blast-radius artifact)
-- `docs/aseptic/cross-pollination/pass-10.md` — cerebra and bons.ai notifications
+- `docs/aseptic/cross-pollination/pass-10.md` — cerebra notifications
 
 > **Note (retroactive commit walkthrough):** Source code modifications for this pass
 > (`src/reducers.rs` DynReducer exposure, `fossic-py/src/store.rs` Rust snapshot wiring,

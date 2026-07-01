@@ -1,5 +1,7 @@
 # Node + JS/TS Version Audit — Cross-Project Reconciliation
 
+> **Historical research snapshot — 2026-06-14.** Rhyzome and discord-bot are referenced below as active projects; both are now deprecated and removed from the platform.
+
 **Date:** 2026-06-14
 **Audited by:** Lattica Claude (read-only, no files modified)
 **Active Node runtime:** v22.22.3 (system default, no project pins it)

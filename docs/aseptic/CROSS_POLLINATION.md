@@ -32,10 +32,7 @@ blast-radius file under "Living report updates").
 | lumaweave | TypeScript | Will be absorbed as the graph module (ADR-001) | Sigma.js/Graphology layer, gwells physics, source-adapter registry |
 | cerebra | Python | Lattica surfaces Cerebra events and provides memory-management UI | event subscriptions; future Cerebra-as-tile |
 | policy-scout | Python | Lattica surfaces audit events and may host policy-edit UI | event subscriptions; PreToolUse hook integration |
-| bo (discord-bot) | Python | Lattica surfaces conversation events | event subscriptions |
 | ai-stack | Docker/Python | Lattica surfaces VRAM/inference metrics | Prometheus metrics consumer; not an event consumer |
-| rhyzome | Python | Lattica surfaces repair strategy DAGs | event subscriptions (when rhyzome is un-benched) |
-| bons.ai | Python | Lattica surfaces idea-graph evolution | event subscriptions (when bons.ai is un-benched) |
 
 ---
 

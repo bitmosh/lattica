@@ -9,13 +9,13 @@
 
 ## Context
 
-Policy Scout currently governs shell commands: it sits between an actor's request and execution, classifies the command, evaluates policy, and emits a decision. That capability is stable and tested. As Lattica evolves toward a reflective twin architecture — with Rhyzome repairing files, bons.ai mutating agent strategies, and Cerebra writing to its own knowledge store — the question of which of those actions Policy Scout should govern becomes load-bearing.
+Policy Scout currently governs shell commands: it sits between an actor's request and execution, classifies the command, evaluates policy, and emits a decision. That capability is stable and tested. As Lattica evolves toward a reflective twin architecture — with Cerebra writing to its own knowledge store and future agent modules executing file mutations — the question of which of those actions Policy Scout should govern becomes load-bearing.
 
 The scope question has two dangerous failure modes:
 
-1. **Too narrow:** Policy Scout only gates shell commands. A Rhyzome repair that writes a modified source file, or a bons.ai mutation that pushes a new generation into ChromaDB, both escape governance entirely. The harness has blind spots in precisely the areas that matter most as autonomous agents become more capable.
+1. **Too narrow:** Policy Scout only gates shell commands. An agent repair that writes a modified source file, or a mutation that pushes new data into a vector store, escapes governance entirely. The harness has blind spots in precisely the areas that matter most as autonomous agents become more capable.
 
-2. **Too broad:** Policy Scout gates every LLM call — every Cerebra classification, every Bo inference request, every bons.ai mutation-score computation. This adds latency to inference-intensive loops, produces a firehose of audit events for purely in-process decisions, and conflates "content policy" (Cerebra's domain) with "action policy" (Policy Scout's domain). It also creates a circular dependency: Policy Scout might use an LLM to explain a decision, which would then gate itself.
+2. **Too broad:** Policy Scout gates every LLM call — every Cerebra classification, every Bo inference request, every Cerebra cognitive cycle computation. This adds latency to inference-intensive loops, produces a firehose of audit events for purely in-process decisions, and conflates "content policy" (Cerebra's domain) with "action policy" (Policy Scout's domain). It also creates a circular dependency: Policy Scout might use an LLM to explain a decision, which would then gate itself.
 
 Phase 2 of the Lattica platform wires Policy Scout as a daemon module. At that point, the scope question must be answered — not left to convention — because the PreToolUse hook, the MCP `policy_scout_check` tool, and the HITL gate in Lattica's agent dispatch all need a clear definition of what they are and are not responsible for gating.
 
@@ -33,7 +33,7 @@ Phase 2 of the Lattica platform wires Policy Scout as a daemon module. At that p
 
 - **Lattica agent dispatch must compose Policy Scout as a pre-execution gate.** For this to work cleanly, the gate must be stateless with respect to what it's blocking: you hand it an action, it returns a decision. This works cleanly for shell commands and file mutations. It doesn't work for "is this classification reasonable?" — that question requires domain context Policy Scout doesn't have.
 
-- **Audit volume.** In a running Lattica session, Cerebra may classify dozens of memory fragments per minute; bons.ai may run hundreds of mutation-score computations per hour. Gating these would produce an audit store that is too noisy to be useful for its primary purpose: auditing consequential actions.
+- **Audit volume.** In a running Lattica session, Cerebra may classify dozens of memory fragments per minute. Gating these would produce an audit store that is too noisy to be useful for its primary purpose: auditing consequential actions.
 
 ---
 
@@ -41,9 +41,9 @@ Phase 2 of the Lattica platform wires Policy Scout as a daemon module. At that p
 
 **Option (a): Shell/system commands only (current state)**
 
-Policy Scout gates what it already gates: commands submitted through `policy-scout check` or the PreToolUse hook. Package installs are a subset of shell commands and already covered. File mutations triggered by agent tools (Rhyzome writes, bons.ai checkpoint writes) are not covered unless the agent routes through a shell command.
+Policy Scout gates what it already gates: commands submitted through `policy-scout check` or the PreToolUse hook. Package installs are a subset of shell commands and already covered. File mutations triggered by agent tools are not covered unless the agent routes through a shell command.
 
-*Rejected:* Leaves the largest gap exactly where it matters most. Rhyzome repairing a source file is a consequential action. bons.ai writing a new generation to ChromaDB is a mutation with audit value. Both escape governance under option (a).
+*Rejected:* Leaves the largest gap exactly where it matters most. An agent repairing a source file is a consequential action. Writing new generations to a vector store is a mutation with audit value. Both escape governance under option (a).
 
 **Option (b): Shell + package installs + file mutations**
 
@@ -53,7 +53,7 @@ Extends option (a) to include explicit file mutation gates, not only shell-comma
 
 **Option (c): All of above + LLM call interception**
 
-Every Cerebra classification request, every Bo inference call, every bons.ai strategy evaluation passes through Policy Scout. Policy Scout can inspect prompt content and optionally block or flag before inference.
+Every Cerebra classification request, every inference call, every agent evaluation passes through Policy Scout. Policy Scout can inspect prompt content and optionally block or flag before inference.
 
 *Rejected:* This is a content policy function, not an action policy function. It conflates two distinct governance problems. It creates tight coupling between Policy Scout and every module's inference path. It introduces latency into inference loops that are already latency-sensitive. And it duplicates the function of a separate, better-suited mechanism (prompt injection detection, which is a distinct planned feature for Policy Scout that applies only to agent-submitted content, not to all LLM calls in the system).
 
@@ -79,13 +79,13 @@ Extends option (b) with an explicit HITL gate interface: any agent in Lattica th
 - Destructive file operations (delete, move, rename, chmod, chown)
 - Subprocess spawns by agents that result in any of the above
 - Agent-initiated system state mutations (port binding, daemon start/stop, credential file access)
-- Any action that Rhyzome, bons.ai, Lattica agent dispatch, or another module routes through `policy_scout_check` or the HITL gate API
+- Any action that Lattica agent dispatch or another module routes through `policy_scout_check` or the HITL gate API
 
 **OUT of scope (explicitly, not by omission):**
 
-- LLM inference calls: Cerebra classifications, Bo inference requests, bons.ai mutation scoring, any call to the ai-stack inference layer
+- LLM inference calls: Cerebra classifications, Bo inference requests, any call to the ai-stack inference layer
 - Cerebra's internal knowledge graph mutations (Cerebra is the cognitive runtime; it owns its own consistency guarantees)
-- bons.ai's in-memory mutation strategy decisions (evaluation and selection of strategies is cognition, not action)
+- In-memory cognition strategy decisions (evaluation and selection of strategies is cognition, not action)
 - Read-only operations: file reads, registry lookups, audit store queries, graph exports
 - Network requests to Policy Scout's own configured intel sources
 - The content of what an LLM says, as opposed to what an agent does as a result
@@ -114,7 +114,7 @@ This is the primary integration path for Claude Code. It requires no agent coope
 
 ### MCP `policy_scout_check` tool (non-Claude-Code agents)
 
-The MCP server exposes `policy_scout_check`, `policy_scout_sandbox`, `policy_scout_sweep`, and `policy_scout_get_report` as MCP tools. Agents that voluntarily participate (Rhyzome, bons.ai, future Lattica agent dispatch) call `policy_scout_check` before executing an action with side effects.
+The MCP server exposes `policy_scout_check`, `policy_scout_sandbox`, `policy_scout_sweep`, and `policy_scout_get_report` as MCP tools. Agents that voluntarily participate (future Lattica agent dispatch) call `policy_scout_check` before executing an action with side effects.
 
 The trust model (ADR-001 in Policy Scout's own ADR series) assigns trust server-side; agents cannot self-escalate. The check-before-run session enforcement logs `MCPUncheckedExecution` if an agent skips the check step.
 
@@ -122,7 +122,7 @@ The trust model (ADR-001 in Policy Scout's own ADR series) assigns trust server-
 
 Lattica's agent dispatch coordinates active agents across the platform. For Phase 2, agent dispatch wires Policy Scout as a mandatory pre-execution gate for all agent actions with side effects. The integration is:
 
-1. Agent dispatch receives an agent action request (e.g., Rhyzome proposes repairing a file).
+1. Agent dispatch receives an agent action request (e.g., Cerebra's Bo agent proposes writing a file).
 2. Dispatch calls `policy_scout_check` via the MCP tool (or directly via the Python API if in-process).
 3. If decision is `ALLOW` or `ALLOW_LOGGED`: dispatch proceeds immediately, audit event written.
 4. If decision is `REQUIRE_APPROVAL`: dispatch posts the pending gate to the Lattica dashboard and blocks.
@@ -199,7 +199,7 @@ Async gates (medium risk):
 
 - Every consequential agent action in Lattica — regardless of which module initiates it — passes through a single, inspectable gate. The audit trail is complete.
 - The scope boundary is mechanically enforceable: "side effect on files, packages, or system state" is a test you can run on any action description.
-- LLM inference paths remain unimpeded. Cerebra, bons.ai, and ai-stack are not bottlenecked by the governance layer.
+- LLM inference paths remain unimpeded. Cerebra and ai-stack are not bottlenecked by the governance layer.
 - The PreToolUse hook already covers Claude Code integration. Extending to the MCP tool and HITL gate covers the remaining integration surface without requiring Policy Scout to understand every agent's internal architecture.
 - eval-core (ADR-003) can be used to regression-test governance decisions — a decision suite that covers all decision categories with known outcomes, CI-gated.
 - The tighten-only YAML override system (Policy Scout ADR-002) means any module can declare stricter governance for its own domain without weakening the global harness.
@@ -212,9 +212,9 @@ Async gates (medium risk):
 
 - **Scope creep pressure.** As Lattica grows, there will be pressure to add "just this one" LLM call to Policy Scout's scope — for example, to gate Bo's inference requests before sending a message to a user. Resist this. The governing principle is the firewall. If a feature genuinely needs content-level governance, it belongs in a dedicated content safety module, not in Policy Scout.
 
-- **Latency in synchronous gates.** High-risk synchronous gates block agent execution indefinitely waiting for human approval. In an automated workflow (e.g., a Rhyzome repair job running unattended), this will stall. Mitigation: agents should declare their intended action scope in their session manifest, and Policy Scout should be configured with appropriate trust levels per agent. A Rhyzome session with `trusted_agent` trust may qualify for `ALLOW_LOGGED` on file mutations below a certain risk score, removing most synchronous blocking in practice.
+- **Latency in synchronous gates.** High-risk synchronous gates block agent execution indefinitely waiting for human approval. In an automated workflow running unattended, this will stall. Mitigation: agents should declare their intended action scope in their session manifest, and Policy Scout should be configured with appropriate trust levels per agent. A session with `trusted_agent` trust may qualify for `ALLOW_LOGGED` on file mutations below a certain risk score, removing most synchronous blocking in practice.
 
-- **Agent cooperation for non-hook paths.** The PreToolUse hook is mandatory for Claude Code agents. For other agents (Rhyzome, bons.ai), cooperation requires routing through the MCP tool or the dispatch chokepoint. If an agent bypasses dispatch and writes files directly, it evades the gate. Mitigation: Lattica agent dispatch is the structural enforcement point — agents that do not route through dispatch are not recognized as Lattica-coordinated agents and do not receive dispatch scheduling, memory access, or cross-module communication.
+- **Agent cooperation for non-hook paths.** The PreToolUse hook is mandatory for Claude Code agents. For other agents, cooperation requires routing through the MCP tool or the dispatch chokepoint. If an agent bypasses dispatch and writes files directly, it evades the gate. Mitigation: Lattica agent dispatch is the structural enforcement point — agents that do not route through dispatch are not recognized as Lattica-coordinated agents and do not receive dispatch scheduling, memory access, or cross-module communication.
 
 ---
 

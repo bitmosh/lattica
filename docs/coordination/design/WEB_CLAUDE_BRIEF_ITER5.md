@@ -19,7 +19,7 @@ The portfolio projects are:
 | **Cerebra** | Python 3.12 | Memory/knowledge agent — runs inference cycles, stores insights in SQLite |
 | **LumaWeave** | TypeScript/React | Graph visualization — renders code and docs as a typed node/edge network |
 | **Policy Scout** | Python 3.12 | Governance daemon — shell/package/file gate; approval workflows |
-| **ai-stack / Bo** | Docker + Python | Local inference stack: Ollama + LiteLLM + Open WebUI + Discord bot |
+| **ai-stack / Bo** | Docker + Python | Local inference stack: Ollama + LiteLLM + Open WebUI; Bo is a live agent in Cerebra |
 | **fossic** | Rust + Python + TS | Event sourcing library — the shared substrate for all event streams |
 
 Each project is a standalone application. Lattica **does not absorb or replace** any of them. It surfaces their event streams and controls through a tile-based UI.

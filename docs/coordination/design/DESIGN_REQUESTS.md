@@ -1158,8 +1158,8 @@ are reachable and what is currently active.
 - **openedai-speech (TTS)** — audio synthesis. Key state: up/down only; no rich
   runtime state at Phase 1. "Is TTS available."
 - **Open-WebUI** — web front-end. Key state: up/down only. "Is the chat UI reachable."
-- **Bo (Discord bot)** — Key state: running/stopped/offline (from heartbeat JSON),
-  last-seen timestamp. "Is the bot alive." Bo is visually subordinate to the ai-stack
+- **Bo (Cerebra live agent)** — Key state: running/stopped/offline (from Cerebra heartbeat),
+  last-seen timestamp. "Is the agent alive." Bo is visually subordinate to the ai-stack
   topology — a labeled status node, not a peer to Ollama in visual weight.
 
 **Edges in the topology:**
@@ -1257,8 +1257,8 @@ Bo down ≠ Ollama down ≠ both down. Each is a distinct situation.
 
 ## Section 7 — Current implementation (reference only — diverge encouraged)
 
-- `~/Projects/discord-bot/bot.py` — heartbeat JSON at `~/.lattica/bo-heartbeat.json`
-  (polling-based, Phase 1); fossic emitter implemented for `bot/lifecycle` and
+- Bo (Cerebra live agent) — heartbeat at `~/.lattica/bo-heartbeat.json`
+  (polling-based, Phase 1); fossic emitter in Cerebra for `bot/lifecycle` and
   `bot/conversation/<channel_id>` (Phase 2, live)
 - `~/Projects/ai-stack/docker-compose.yml` — service definitions; no fossic sidecar
   yet (ai-stack Phase 2 pending)

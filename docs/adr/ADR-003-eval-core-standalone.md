@@ -7,7 +7,7 @@
 
 ## Context and Problem Statement
 
-Multiple Lattica modules need evaluation infrastructure, and they need it to share a result schema. Policy Scout has the most mature eval system today: 44 test cases, CI-gated regression baseline, 7 assertion types, and a run harness that emits a structured `EvalSummary`. Cerebra has the richest *requirements*: SKU classification accuracy, retrieval quality scoring, abstention calibration, and LoRA training quality — none of which exist yet. discord-bot (Bo) and ai-stack have eval needs (tier routing correctness, alias resolution smoke tests) but currently have nothing at all.
+Multiple Lattica modules need evaluation infrastructure, and they need it to share a result schema. Policy Scout has the most mature eval system today: 44 test cases, CI-gated regression baseline, 7 assertion types, and a run harness that emits a structured `EvalSummary`. Cerebra has the richest *requirements*: SKU classification accuracy, retrieval quality scoring, abstention calibration, and LoRA training quality — none of which exist yet. ai-stack has eval needs (alias resolution smoke tests) but currently has nothing at all.
 
 The Lattica dashboard — starting in Phase 10 — needs to aggregate pass rates, regression trends, and cross-module correlations. That aggregation is only possible if every module writes to the same `EvalResult`/`EvalSummary` schema. If each module grows its own eval framework independently, the dashboard must either translate between four incompatible schemas or the cross-module correlation layer cannot be built at all.
 
@@ -17,7 +17,7 @@ A second problem is dependency direction. Policy Scout and Cerebra are peer modu
 
 ## Decision Drivers
 
-- **Unified schema requirement.** The Phase 10 Lattica evaluation dashboard requires a single `EvalSummary` schema across all modules. Cross-module correlation (e.g., detecting when Cerebra retrieval quality and bons.ai mutation pass rate drop together) is impossible without it.
+- **Unified schema requirement.** The Phase 10 Lattica evaluation dashboard requires a single `EvalSummary` schema across all modules. Cross-module correlation (e.g., detecting when Cerebra retrieval quality and Policy Scout pass rates drop together) is impossible without it.
 - **Dependency direction.** Neither Policy Scout nor Cerebra should own infrastructure the other imports. Shared infrastructure belongs in a neutral package.
 - **Minimal blast radius.** eval-core should be small enough that any module can adopt it without a significant investment. If the package requires pulling in a test framework, an HTTP client, or a data-science library, adoption friction rises and modules will avoid it.
 - **CI gateability.** The package must be importable in a fresh virtual environment with no internet access. Zero runtime dependencies (beyond stdlib and PyYAML, which is already a universal dep in the Python monorepo) is the requirement.
@@ -36,7 +36,7 @@ eval-core lives at `lattica/policy_scout/eval_core/` or is re-exported from `lat
 - Policy Scout's eval is the most mature; letting it set the interface is reasonable.
 
 **Cons:**
-- Cerebra, Rhyzome, bons.ai, and Bo would all take a runtime dependency on `lattica-policy-scout` to import eval infrastructure. A governance daemon is in every module's dependency tree.
+- Cerebra and ai-stack would all take a runtime dependency on `lattica-policy-scout` to import eval infrastructure. A governance daemon is in every module's dependency tree.
 - Any breaking change to Policy Scout's package (a schema migration, a rename, a dependency bump) could break CI for all other modules simultaneously.
 - When the Phase 10 dashboard aggregates eval results, it is importing from a governance tool — the abstraction is wrong at every call site.
 - The dependency graph is inverted: modules being *governed* by Policy Scout also *depend* on it.
@@ -54,7 +54,7 @@ eval-core lives inside Cerebra (`lattica/cerebra/eval_core/`), because Cerebra h
 - Cerebra is not a governance tool, so the semantic mismatch from Option 1 is avoided.
 
 **Cons:**
-- Policy Scout, Rhyzome, bons.ai, and Bo would take a dependency on `lattica-cerebra` — a memory/knowledge module — to import test infrastructure. This is equally semantically wrong, just in a different direction.
+- Policy Scout and ai-stack would take a dependency on `lattica-cerebra` — a memory/knowledge module — to import test infrastructure. This is equally semantically wrong, just in a different direction.
 - Cerebra has significant runtime dependencies (SQLite, embedding model, vector search). eval-core's zero-dependency requirement would need to be enforced as a sub-package isolation rule, which is fragile.
 - If Cerebra's API changes (as it will — multiple phases involve Cerebra schema evolution), every module's CI import path breaks.
 - Cerebra is one of the modules that *uses* eval-core. The owner of a shared primitive should not be one of its primary consumers.
@@ -245,7 +245,7 @@ The Lattica Phase 10 dashboard reads this database. eval-core owns the schema; t
 
 ## Positive Consequences
 
-- **Correct dependency direction.** No module's CI depends on a peer module. Policy Scout, Cerebra, Rhyzome, bons.ai, and Bo all take a dependency on a shared primitive that has no opinion about any of them.
+- **Correct dependency direction.** No module's CI depends on a peer module. Policy Scout, Cerebra, and ai-stack all take a dependency on a shared primitive that has no opinion about any of them.
 - **Phase 10 dashboard is possible.** A single `eval_results.db` schema means the dashboard can aggregate, trend, and correlate without translation layers.
 - **Cross-module regression gating is possible.** A monorepo root CI step can read `eval_results.db` and fail if any module regresses. This would not be possible if each module used its own schema.
 - **Policy Scout extraction is a phase gate check.** If Policy Scout's eval logic is not extractable without modification, that is a signal to clean up Policy Scout first. The extraction pressure improves the source codebase.
@@ -296,7 +296,7 @@ Retrieval quality cases populate `EvalResult.score` with the retrieval score fro
 
 LoRA training quality cases are run after each training epoch: `EvalCase.input` contains the dataset fingerprint and hyperparameters; `EvalCase.expected` contains the minimum acceptable validation loss. The evaluator reads the training run's output metrics.
 
-### discord-bot (Bo)
+### Bo (Cerebra live agent)
 
 Bo currently has no eval infrastructure. The integration establishes a baseline for tier routing correctness.
 
@@ -304,7 +304,7 @@ Bo currently has no eval infrastructure. The integration establishes a baseline 
 
 ```yaml
 suite_id: bo-tier-routing
-module: discord_bot
+module: cerebra_bo
 cases:
   - id: local-qwen-default
     description: "Default messages route to local Qwen via LiteLLM"

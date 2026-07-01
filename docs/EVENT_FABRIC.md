@@ -38,7 +38,7 @@ Git is the clearest analogy. Git does not just deliver file changes between mach
 
 The ES toolkit is Git for application state. The SQLite store is the object database. Events are commits. Branches are branches. Reducers are the equivalent of Git's tree-hashing — they derive the current state from the log, deterministically. Snapshots are equivalent to Git's pack files — an optimization that avoids replaying the entire log, but never required for correctness.
 
-The implication is that every interesting state transition in the platform is queryable, diffable, and counterfactually explorable in perpetuity. Rhyzome's repair sessions do not disappear when the agent stops. bons.ai's evolutionary cycles are not lost when the process exits. Policy Scout's audit decisions form a branching history, not a flat log. This is the property that justifies building the toolkit rather than adopting NATS.
+The implication is that every interesting state transition in the platform is queryable, diffable, and counterfactually explorable in perpetuity. Cerebra's retrieval and memory sessions do not disappear when the agent stops. Policy Scout's audit decisions form a branching history, not a flat log. This is the property that justifies building the toolkit rather than adopting NATS.
 
 ### Why the immutable log matters for the reflective twin specifically
 
@@ -55,7 +55,7 @@ The ES toolkit is written in Rust for a specific reason: it is the single implem
 This matters because:
 
 - **Correctness is centralized.** A bug in the snapshot logic, the blake3 ID computation, or the branch resolution is fixed once and immediately propagated to all consumers. There is no Python/TypeScript drift.
-- **PyO3 provides zero-overhead Python bindings.** The Python modules (Cerebra, Policy Scout, Rhyzome, bons.ai) call the Rust implementation through PyO3 with no intermediate serialization for in-process calls.
+- **PyO3 provides zero-overhead Python bindings.** The Python modules (Cerebra, Policy Scout) call the Rust implementation through PyO3 with no intermediate serialization for in-process calls.
 - **napi-rs provides Node.js bindings** for the LumaWeave/Lattica TypeScript frontend. The same Rust crate, different binding layer.
 - **The Tauri backend uses the crate directly.** The Rust-to-Rust path is the most efficient — no serialization at all, direct function calls. IPC from the Tauri backend to the frontend crosses the boundary once, not twice.
 - **SQLite via rusqlite is safe and well-tested.** The Rust ecosystem's SQLite story is mature. WAL mode, prepared statements, and connection pooling are all well-understood.
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS snapshots (
 -- The parent_version is the event version in the parent branch where this branch diverged.
 -- Events at or before parent_version are shared (read from parent), not duplicated.
 CREATE TABLE IF NOT EXISTS branches (
-    id              TEXT    NOT NULL PRIMARY KEY,  -- branch name/ID (e.g. "rhyzome/repair-42/strategy-b")
+    id              TEXT    NOT NULL PRIMARY KEY,  -- branch name/ID (e.g. "cerebra/vault-01/counterfactual-b")
     stream_id       TEXT    NOT NULL,
     parent_id       TEXT    NOT NULL,              -- parent branch ID ("main" for root branches)
     parent_version  INTEGER NOT NULL,              -- divergence point in parent
@@ -240,11 +240,11 @@ let handle = store.subscribe("lumaweave/graph", "main", Box::new(MySubscriber));
 
 // Creating a branch
 let branch = store.create_branch(BranchOptions {
-    stream_id: "rhyzome/repair",
-    branch_id: "repair-42/strategy-b",
+    stream_id: "cerebra/vault-01/retrieval",
+    branch_id: "vault-01/counterfactual-b",
     parent_id: "main",
     parent_version: 23,
-    description: Some("Counterfactual: strategy B from event 23"),
+    description: Some("Counterfactual: alternative retrieval strategy from event 23"),
 })?;
 ```
 
@@ -286,8 +286,8 @@ handle.unsubscribe()  # cleanup
 
 # Branch operations
 store.create_branch(
-    stream_id="rhyzome/repair",
-    branch_id="repair-42/strategy-b",
+    stream_id="cerebra/vault-01/retrieval",
+    branch_id="vault-01/counterfactual-b",
     parent_id="main",
     parent_version=23
 )
@@ -297,8 +297,6 @@ store.create_branch(
 
 - **Cerebra** — appends retrieval trace events in the `cerebra/{vault_id}/retrieval` stream. Reads its own event history for context reconstruction. The store lives at `~/.lattica/events.db` (shared with all modules).
 - **Policy Scout** — appends governance decision events in the `policy-scout/audit` stream. Uses the bridge adapter (Section 5) to mirror its existing `audit.db` JSONL into the shared store.
-- **Rhyzome** — appends repair session events in the `rhyzome/repair` stream. Uses the branch API to create counterfactual branches for strategy comparison.
-- **bons.ai** — appends evolution cycle events in the `bonsai/evolution` stream.
 
 ### napi-rs TypeScript bindings (`@lattica/es`)
 
@@ -338,15 +336,15 @@ handle.unsubscribe();
 
 // Time-travel query — read the state of a stream at a specific timestamp
 const historicalEvents = await store.readBefore({
-  streamId: 'rhyzome/repair',
+  streamId: 'cerebra/vault-01/retrieval',
   branch: 'main',
   beforeTimestamp: Date.now() - 3600 * 1000, // 1 hour ago
 });
 
 // Branch operations
 await store.createBranch({
-  streamId: 'rhyzome/repair',
-  branchId: 'repair-42/strategy-b',
+  streamId: 'cerebra/vault-01/retrieval',
+  branchId: 'vault-01/counterfactual-b',
   parentId: 'main',
   parentVersion: 23n, // BigInt for u64 compatibility
 });
@@ -448,32 +446,13 @@ Ollama model lifecycle.
 - `ModelPullStarted` — new model being downloaded
 - `ModelPullCompleted` — model available for inference
 
-**bot/conversation**
-Discord bot (Bo) conversation lifecycle.
+**cerebra/agent-trace**
+Bo live agent (inside Cerebra) conversation lifecycle events.
 - `MessageReceived` — Discord message received
-- `ContextGathered` — context window assembled (shows whether Cerebra was queried)
+- `ContextGathered` — context window assembled (shows whether Cerebra retrieval was used)
 - `TierSelected` — resilience tier chosen (primary/fallback/emergency)
 - `ResponseGenerated` — response produced and sent
 - `MemoryUpdated` — rolling conversation memory updated
-
-**rhyzome/repair**
-Code repair agent sessions.
-- `RepairSessionStarted` — session ID, target file(s), triggering error
-- `FileInspected` — file read and analyzed (includes AST summary)
-- `StrategySelected` — repair strategy chosen with rationale
-- `RepairAttempted` — patch applied to file(s)
-- `ValidationRun` — test suite or type-check run with results
-- `OutcomeRecorded` — final outcome (success/failure/partial) with diff
-- `RepairSessionCompleted` — session closed
-
-**bonsai/evolution**
-bons.ai idea evolution cycles.
-- `CycleStarted` — evolution cycle initiated with seed idea
-- `Mutated` — idea mutated by the mutator agent (includes parent ID, mutation type)
-- `Scored` — evaluation score assigned by the evaluator agent
-- `Promoted` — idea promoted to next generation
-- `Culled` — idea eliminated (score below threshold)
-- `CycleCompleted` — cycle closed with generation summary
 
 **lumaweave/graph**
 LumaWeave graph state.
@@ -616,7 +595,7 @@ The bridges are stateless except for their cursors, which are stored in the sour
 
 ### Motivation
 
-Every agent in Lattica — Rhyzome's code repair loop, bons.ai's generator/evaluator/mutator cycle, and any future Claude Code invocation routed through the platform — executes as a sequence of LLM calls, tool calls, and reasoning steps. Without structured event recording, these sessions are opaque: you see the input and the output, but not the chain of reasoning that produced the output.
+Every agent in Lattica — Cerebra's cognitive cycles, Bo's inference pipeline, and any Claude Code invocation routed through the platform — executes as a sequence of LLM calls, tool calls, and reasoning steps. Without structured event recording, these sessions are opaque: you see the input and the output, but not the chain of reasoning that produced the output.
 
 The agent trace adapter standardizes the event vocabulary for agent activity so that every agent session is fully replayable, counterfactually explorable, and exportable to OpenTelemetry.
 
@@ -708,50 +687,23 @@ interface ReasoningStepPayload {
 }
 ```
 
-### How Rhyzome uses the trace adapter
+### How Cerebra uses the trace adapter
 
-Rhyzome's repair loop is the first agent to integrate the trace adapter (Phase 8, but the adapter is designed in Phase 6). Each repair session maps to a single ES stream: `rhyzome/repair`. The session produces a sequence:
+Cerebra's cognitive cycle is the primary agent to integrate the trace adapter. Each retrieval session maps to a `cerebra/{vault_id}/retrieval` stream. The session produces a sequence:
 
 ```
-RepairSessionStarted
-  → llm_call (initial analysis)
-  → tool_call (ReadFile: target.ts)
-  → tool_result (file contents)
+QueryReceived
+  → llm_call (retrieval planning)
+  → tool_call (QueryKnowledgeGraph: target vault)
+  → tool_result (graph traversal results)
   → llm_response (with StrategySelected tool call)
-  → tool_call (StrategySelected: "ast-guided patch")
-  → tool_result (strategy confirmation)
-  → reasoning_step (rationale for chosen strategy)
-  → RepairAttempted
-  → tool_call (WriteFile: patched target.ts)
-  → tool_result (write confirmation)
-  → tool_call (RunTests: tsc, playwright)
-  → tool_result (test results)
-  → ValidationRun
-  → OutcomeRecorded
-  → RepairSessionCompleted
+  → reasoning_step (rationale for chosen retrieval strategy)
+  → TraversalStepCompleted
+  → SalienceScored
+  → ContextPacketBuilt
 ```
 
-The branch API enables counterfactual exploration: after `StrategySelected` at version 23, a branch `rhyzome/repair-42/strategy-b` can be created. The branch replays the same events up to version 23, then appends a different `StrategySelected` event. The `tool_result` events for file reads before the branch point are replayed from storage — Rhyzome does not re-read the files. The `tool_result` events for file writes and test runs after the branch point are re-executed (they are non-deterministic with respect to the external filesystem state). This gives a genuine counterfactual: the same file contents, analyzed with a different strategy.
-
-### How bons.ai uses the trace adapter
-
-The bons.ai evolution cycle maps naturally to the `bonsai/evolution` stream. Each mutation cycle produces:
-
-```
-CycleStarted
-  → (for each idea in the population)
-     → llm_call (generator: produce mutation)
-     → llm_response
-     → Mutated
-     → llm_call (evaluator: score mutation)
-     → llm_response
-     → Scored
-     → (bandit decision)
-     → Promoted | Culled
-  → CycleCompleted
-```
-
-The bandit algorithm's state is stored as a `reasoning_step` event at the end of each cycle. This means the entire evolutionary trajectory — not just the final population, but every mutation, every score, every selection decision — is replayable. A researcher can fork the evolution at any generation and ask "what would the population look like if we had used a different scoring rubric?"
+The branch API enables counterfactual exploration: at any decision point, a branch can be created that replays the same inputs but applies a different strategy. The `tool_result` events for knowledge graph reads before the branch point are replayed from storage. This enables comparing retrieval quality across different strategies against the same vault state.
 
 ### OpenTelemetry GenAI span export
 
@@ -764,7 +716,7 @@ The agent trace adapter includes an exporter that converts ES agent trace events
 | `tool_call`    | INTERNAL       | `gen_ai.tool.name`, `gen_ai.tool.call.id`                |
 | `tool_result`  | (end of span)  | `gen_ai.tool.result` (truncated to 1KB)                  |
 
-The exporter runs as a background task in the Rust core, reading from a subscription on `rhyzome/*` and `bonsai/*` streams and forwarding to the configured OTel collector endpoint (defaults to `localhost:4317` for the local Grafana stack from Phase 1). Export is optional — if no collector is configured, the exporter is a no-op.
+The exporter runs as a background task in the Rust core, reading from a subscription on `cerebra/*` and `policy-scout/*` streams and forwarding to the configured OTel collector endpoint (defaults to `localhost:4317` for the local Grafana stack from Phase 1). Export is optional — if no collector is configured, the exporter is a no-op.
 
 ---
 
@@ -797,7 +749,7 @@ The viewer supports a two-point selection mode: the user can anchor the scrubber
 - The state delta between versions N and M (the output of `reducer.apply_range(state_at_n, events[n+1..=m])`)
 - A visual summary of which fields in the state changed, by how much
 
-This is the primary tool for understanding "what changed between these two points in the system's history." For example: "what changed in the `cerebra/vault-01/retrieval` stream between the time the Rhyzome repair started and when it completed?"
+This is the primary tool for understanding "what changed between these two points in the system's history." For example: "what changed in the `cerebra/vault-01/retrieval` stream between the time a Cerebra retrieval session started and when it completed?"
 
 ### Filtering
 
@@ -884,17 +836,17 @@ fn read_branch(
 
 The chain resolution is cached in a `BTreeMap<(stream_id, branch_id), Vec<BranchSegment>>` within the `EventStore` handle. The cache is invalidated when a new branch is created on any ancestor of the cached branch. Cache misses are rare in practice (branches are created infrequently relative to reads).
 
-### Example: Rhyzome counterfactual
+### Example: Cerebra retrieval counterfactual
 
-Rhyzome repair session 42 is running on `rhyzome/repair`, branch `main`. At version 23, the agent chose strategy A (AST-guided patch). The patch failed validation. The developer wants to explore: "would strategy B (full-function rewrite) have succeeded?"
+A Cerebra retrieval session is running on `cerebra/vault-01/retrieval`, branch `main`. At version 23, the agent chose strategy A (semantic vector search). The results had low salience scores. The developer wants to explore: "would strategy B (keyword + rerank) have produced higher-salience results?"
 
-1. Create the branch: `store.create_branch({ stream_id: "rhyzome/repair", branch_id: "repair-42/strategy-b", parent_id: "main", parent_version: 23 })`
+1. Create the branch: `store.create_branch({ stream_id: "cerebra/vault-01/retrieval", branch_id: "session-42/strategy-b", parent_id: "main", parent_version: 23 })`
 2. The branch record is written to `branches`. No events are copied.
-3. Rhyzome's counterfactual runner reads the branch: it gets events 0..=23 from `main` (the same file reads and initial analysis) and appends new events starting at version 24 on `repair-42/strategy-b` (the different strategy selection, new patch attempt, new validation run).
-4. `tool_result` events for file reads before version 23 are deterministic — they replay from storage without re-reading the filesystem. The file as it was at analysis time is guaranteed to be the same in both the main branch and the counterfactual.
-5. `tool_result` events for file writes and test runs after version 23 are non-deterministic — they execute against the actual filesystem. This is correct: strategy B's patch should be evaluated against the real codebase, not a stored snapshot.
+3. Cerebra's counterfactual runner reads the branch: it gets events 0..=23 from `main` (the same query and vault state) and appends new events starting at version 24 on `session-42/strategy-b` (the different strategy selection, new traversal, new salience scoring).
+4. `tool_result` events for knowledge graph reads before version 23 are deterministic — they replay from storage without re-querying the vault. The vault state at analysis time is guaranteed to be the same in both the main branch and the counterfactual.
+5. `tool_result` events for writes and downstream scoring after version 23 are non-deterministic — they execute against the actual vault state. This is correct: strategy B's results should be evaluated against the real knowledge graph, not a stored snapshot.
 
-The result: two complete repair session histories, sharing events 0..=23 (50 KB of file read data, stored once), diverging at event 24. The time-travel viewer can display both branches side by side, with the divergence point visually marked.
+The result: two complete retrieval session histories, sharing events 0..=23 (the shared query context, stored once), diverging at event 24. The time-travel viewer can display both branches side by side, with the divergence point visually marked.
 
 ### LumaWeave branch visualization
 
@@ -992,11 +944,11 @@ Add:
 Add:
 - Standard event payload types for `llm_call`, `llm_response`, `tool_call`, `tool_result`, `reasoning_step`
 - `AgentTraceRecorder` — a Rust struct with methods for each event type, managing the causation chain automatically
-- Python wrapper `AgentTraceRecorder` for Rhyzome and bons.ai
+- Python wrapper `AgentTraceRecorder` for Cerebra and Policy Scout
 - OTel GenAI span exporter (Rust, tokio async, targets `localhost:4317`)
 - Deterministic replay runner (Rust, reads a session stream, replays non-deterministic tool calls, returns final state)
 
-**Exit criterion:** A synthetic Rhyzome repair session (20 events, 3 tool calls) is recorded, exported to OTel (verify spans appear in Grafana Tempo), and replayed deterministically (verify final state matches original). The replay must complete without invoking any actual tools — all tool results are served from storage.
+**Exit criterion:** A synthetic Cerebra retrieval session (20 events, 3 tool calls) is recorded, exported to OTel (verify spans appear in Grafana Tempo), and replayed deterministically (verify final state matches original). The replay must complete without invoking any actual tools — all tool results are served from storage.
 
 **Risks at step 6:** The OTel exporter adds a `tokio` async runtime dependency. The Rust core is currently synchronous (by design — reducers are synchronous). The exporter must run on a separate tokio runtime spawned in a background thread, not on the main store thread. This is a known-acceptable trade-off: the exporter is explicitly async-I/O (network calls), while the store is explicitly sync (SQLite calls). They must not share a runtime.
 
@@ -1011,7 +963,7 @@ Add:
 - Stream/type/time filters
 - Branch visualization (branch overlay with divergence diamonds)
 
-**Exit criterion:** Open the time-travel viewer in LumaWeave's panel system with a store containing 5,000 events across 4 streams. The scrubber moves smoothly at 60fps. Selecting two scrubber positions shows the correct state delta. The branch view correctly shows a branched session from the Rhyzome trace adapter integration test.
+**Exit criterion:** Open the time-travel viewer in LumaWeave's panel system with a store containing 5,000 events across 4 streams. The scrubber moves smoothly at 60fps. Selecting two scrubber positions shows the correct state delta. The branch view correctly shows a branched session from the Cerebra trace adapter integration test.
 
 **Risks at step 7:** Canvas rendering at 60fps for 5,000 events requires careful culling — only events in the visible time window should be rendered. The initial implementation will use a simple O(n) scan with a time-range index; if performance is inadequate, a segment tree index over the `events` table indexed by timestamp will be added. Profile before optimizing.
 
@@ -1022,7 +974,7 @@ Phase 6 is complete when:
 1. The `lattica-es` crate passes all unit tests including concurrent access, branch operations, and snapshot correctness.
 2. The Python bindings run the Cerebra and Policy Scout bridge adapters in production against real data from each module.
 3. The TypeScript bindings serve the time-travel viewer in LumaWeave in production.
-4. The agent trace adapter records a complete Rhyzome repair session (real repair, not synthetic) and exports valid OTel GenAI spans visible in Grafana Tempo.
+4. The agent trace adapter records a complete Cerebra retrieval session (real session, not synthetic) and exports valid OTel GenAI spans visible in Grafana Tempo.
 5. The time-travel viewer correctly shows the canonical/live diff for the LumaWeave graph state.
 6. The Cerebra and Policy Scout event stores are bridged and visible in the cross-module event timeline in Lattica.
 7. All existing LumaWeave Playwright tests pass (no regressions from the ES integration).

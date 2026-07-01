@@ -339,7 +339,7 @@ mod tests {
     fn no_overlap_different_literals() {
         assert!(!patterns_may_overlap(
             "cerebra/lattice/*",
-            "rhyzome/repair/*"
+            "policy-scout/audit/*"
         ));
     }
 }

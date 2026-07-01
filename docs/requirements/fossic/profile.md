@@ -13,8 +13,7 @@
 
 Fossic is a local-first event sourcing library. From Lattica's
 perspective, fossic is the substrate that makes cross-project
-observability possible — every consumer project (Cerebra, rhyzome,
-bons.ai, Policy Scout, LumaWeave, Bo) emits events to a shared
+observability possible — every consumer project (Cerebra, Policy Scout, LumaWeave, Bo) emits events to a shared
 fossic store. Lattica reads those events.
 
 This document lists what fossic-as-substrate needs from Lattica to
@@ -31,7 +30,7 @@ Lattica needs to render fossic events as they commit, across selected
 streams. Specifically:
 
 - Subscribe to fossic stream patterns via glob (`cerebra/agent-trace/*`,
-  `rhyzome/repair/*`, etc.)
+  `policy-scout/audit/*`, etc.)
 - Render events as they arrive with low latency (~50ms from commit
   to visible)
 - Filter by event type within selected streams
@@ -138,8 +137,8 @@ dead_end). Lattica should render these visually:
 - Dead-end: visible but marked terminated
 
 **Why it matters:** When projects use branching for counterfactual
-exploration (rhyzome's "what if strategy B?", bons.ai's mutation
-exploration), the lifecycle tells the story of what alternatives
+exploration (Cerebra's "what if retrieval strategy B?", Policy Scout's
+audit alternatives), the lifecycle tells the story of what alternatives
 were tried and which won.
 
 ---
@@ -169,7 +168,7 @@ plugin-style registration mechanism.
 
 **Adjacent project awareness:** Each consumer probably wants to
 contribute their own payload renderers. Cerebra would contribute
-renderers for cycle runtime events; rhyzome for repair events;
+renderers for cycle runtime events; Policy Scout for audit events;
 etc.
 
 ---
@@ -638,7 +637,7 @@ For clarity:
   a hub for external feeds. If you want Discord activity in Lattica,
   Bo emits to fossic and Lattica reads from there.
 - **Direct file system view** — fossic stores events about file
-  operations (rhyzome writes a file, that emits an event), but doesn't
+  operations (a module writes a file and emits an event), but doesn't
   expose the file system itself.
 - **Code execution** — fossic doesn't run anything; consumers do, and
   emit events about what they did.

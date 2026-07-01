@@ -166,7 +166,7 @@ in the portfolio would produce.
 Signal trajectory is Cerebra-specific. No other current consumer produces
 multi-signal per-step scores. However, the tile design could generalize
 to any event stream producing repeated instances of a (dimension_name,
-score) pair — bons.ai's arm reward stream follows a similar shape.
+score) pair — Policy Scout's signal scores follow a similar shape.
 
 **Outstanding questions:**
 Is the signal trajectory tile a Cerebra-contributed widget that Lattica
@@ -281,11 +281,8 @@ internal state observable without requiring Cerebra-side CLI introspection.
   can be used for a more accurate view than post-hoc reconstruction.
 
 **Adjacent project awareness:**
-Bons.ai uses a similar bandit architecture (`bandit_arm_selected`,
-`bandit_arm_updated` in §6 of AGENT_TRACE_VOCABULARY.md). The arm
-performance tile design could potentially be shared between Cerebra and
-bons.ai if the payload shapes are aligned. Worth a cross-project coordination
-round when bons.ai un-benches.
+Policy Scout may share a similar signal-scoring pattern. The arm
+performance tile design could generalize if payload shapes align.
 
 **Outstanding questions:**
 None at this stage — future priority, deferred until must-haves are settled.
@@ -325,11 +322,11 @@ either builds renderers into Lattica core (coupling) or users get generic JSON
   consistent color/spacing — no hardcoded values.
 
 **Adjacent project awareness:**
-Fossic R-F-006 raises the same need from the substrate level. Rhyzome and
-bons.ai (when un-benched) will also need renderer registration. This is
-a shared infrastructure requirement that affects all consumer projects.
-The registration design should be discussed as a group-round item, not
-resolved unilaterally for Cerebra.
+Fossic R-F-006 raises the same need from the substrate level. Policy Scout
+will also need renderer registration. This is a shared infrastructure
+requirement that affects all consumer projects. The registration design
+should be discussed as a group-round item, not resolved unilaterally for
+Cerebra.
 
 **Outstanding questions:**
 1. Is the renderer registry a Lattica-core concept (module loaded at startup

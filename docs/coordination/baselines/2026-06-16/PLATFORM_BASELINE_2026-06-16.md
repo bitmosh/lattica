@@ -1,5 +1,7 @@
 # Platform Baseline — 2026-06-16
 
+> **Historical snapshot — 2026-06-16.** References to rhyzome, bons.ai, and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
+
 **Filed by:** lattica-claude (compile pass v0.3.5t)
 **Compiled from:** project baselines at
 `docs/coordination/baselines/2026-06-16/<project>/current_state.md`

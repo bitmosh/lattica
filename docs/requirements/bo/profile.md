@@ -1,23 +1,32 @@
 # Requirements Profile — bo
 
+> **Historical record** — This profile was authored when Bo was implemented as
+> a standalone Python agent process. Bo has since been bootstrapped into
+> Cerebra as a live agent; it is now indistinguishable from Cerebra at runtime.
+> References to `bot.py` and standalone process details below are historical.
+> The functional requirements (operational tile, conversation pipeline,
+> fossic causation chain) remain valid.
+
 ---
 
 ## requirements
 
 # Bo — Lattica Requirements
 
-**Project:** bo (discord-bot)
+**Project:** bo (cerebra live agent)
 **Author:** Bo Claude (acting as bo advocate)
 **Date:** 2026-06-13
 **Status:** Initial requirements deposit
 
-Bo is a Discord bot (Phase 0) that routes @mention messages through a local
-LiteLLM stack to Ollama-served models, with a structured retry/synthesis
-pipeline, thinking-trace threading, and an explicit seam in `gather_context()`
-for future Cerebra memory integration. Bo's Lattica presence is an operational
-dashboard tile plus — when fossic integration lands — a conversation pipeline
-visualization that makes the retry chain and future Cerebra causation chain
-visible.
+Bo is Cerebra's live agent — a bootstrapped agent embedded directly in
+Cerebra's runtime, indistinguishable from Cerebra itself. It was initially
+implemented as a standalone Python agent process and was bootstrapped into
+Cerebra in mid-2026. Bo routes conversation inputs through a local LiteLLM
+stack to Ollama-served models, with a structured retry/synthesis pipeline,
+thinking-trace threading, and Cerebra memory integration via `gather_context()`.
+Bo's Lattica presence is an operational dashboard tile plus — when fossic
+integration lands — a conversation pipeline visualization that makes the retry
+chain and Cerebra causation chain visible.
 
 ---
 
@@ -339,7 +348,7 @@ to make in round synthesis. Flagged here so it doesn't get missed.
 
 # Bo — Capabilities Inventory
 
-**Project:** bo (discord-bot)
+**Project:** bo (cerebra live agent)
 **Author:** Bo Claude
 **Date:** 2026-06-13
 **Purpose:** What Bo offers that is relevant for display or utilization in Lattica.
@@ -496,7 +505,7 @@ causation — no additional refactoring needed to add a Cerebra query there.
 
 # Bo — Current State
 
-**Project:** bo (discord-bot)
+**Project:** bo (cerebra live agent)
 **Last updated:** 2026-06-13
 **Living doc:** yes — update when phase advances, configuration changes, or
 integration milestones land.
@@ -1074,7 +1083,7 @@ End of Lattica round-2 response to bo.
 
 # Bo — Lattica Responses
 
-**Project:** bo (discord-bot)
+**Project:** bo (cerebra live agent)
 **Last updated:** 2026-06-13
 **Round:** 1
 

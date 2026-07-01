@@ -9,11 +9,11 @@
 
 ## Context
 
-The Lattica platform consists of six active modules — LumaWeave (TypeScript/Rust), Cerebra (Python), Policy Scout (Python), the ES toolkit (Rust + Python + TypeScript bindings), the discord-bot Bo (Python), and Rhyzome (Python) — each currently living as an independent repository with no shared infrastructure.
+The Lattica platform consists of five active modules — LumaWeave (TypeScript/Rust), Cerebra (Python, including Bo as a live agent), Policy Scout (Python), ai-stack (Docker), and the ES toolkit (Rust + Python + TypeScript bindings) — each currently living as an independent repository with no shared infrastructure.
 
 Three forcing functions make this untenable beyond Phase 2:
 
-**eval-core.** Policy Scout already has a working evaluation harness. ADR-003 extracted it into a standalone `eval-core/` package (stdlib-only, zero runtime deps) so Cerebra, Rhyzome, and bons.ai can all use the same evaluation primitives. Without a monorepo, each project consumes eval-core via a `pip install -e /path/to/eval-core` path-install, or worse, a copy-paste. Path installs break in CI and on a second machine. Copy-paste means fixes in eval-core never propagate.
+**eval-core.** Policy Scout already has a working evaluation harness. ADR-003 extracted it into a standalone `eval-core/` package (stdlib-only, zero runtime deps) so Cerebra and ai-stack can all use the same evaluation primitives. Without a monorepo, each project consumes eval-core via a `pip install -e /path/to/eval-core` path-install, or worse, a copy-paste. Path installs break in CI and on a second machine. Copy-paste means fixes in eval-core never propagate.
 
 **ES toolkit.** The event sourcing toolkit (ADR-002) has three language targets: a Rust core crate, PyO3 Python bindings, and napi-rs TypeScript bindings. All three must stay at the same version — a Python consumer importing `lattica_es` version 0.3 must be calling the same Rust core that the TypeScript consumer links against version 0.3. Co-versioning three packages across three separate repos requires either a synchronization bot or discipline that will eventually fail.
 
@@ -29,7 +29,7 @@ The question is not whether to unify — it's when and how.
 - **Migration tax compounds.** Moving a project into a monorepo after it has CI pipelines, lockfiles, and GitHub Actions referencing absolute paths costs more per project the later you do it. Phase 0 is the cheapest moment.
 - **uv workspace support is still maturing.** uv workspaces (PEP 518 + pyproject.toml-based) are the correct Python tool for this, but uv's workspace feature set is newer than pip's. There is some risk of hitting edge cases with cross-member editable installs.
 - **Python projects have heterogeneous constraints.** Policy Scout runs on Python 3.12+ and has no ML dependencies. Cerebra requires torch-compatible numpy, CUDA-aligned scipy, and constrained BLAS versions for the RTX 4070 SUPER. These constraint sets are incompatible in a single shared virtualenv. Workspace members must be able to have distinct lock files.
-- **The monorepo must not force premature coupling.** Rhyzome, bons.ai, and Bo are still in active evolution. Adding them to the monorepo should not change their import paths, CI setup, or development workflow until they are ready. Workspace membership is progressive, not mandatory.
+- **The monorepo must not force premature coupling.** Adding a new module to the monorepo should not change its import paths, CI setup, or development workflow until it is ready. Workspace membership is progressive, not mandatory.
 - **Rust workspace is already a known pattern.** Cargo workspaces are mature, well-documented, and the ES toolkit crate and the Tauri backend crate naturally belong in one.
 
 ---
@@ -82,8 +82,6 @@ lattica/
   modules/                          # platform modules — added progressively
     policy-scout/                   # Python workspace member (joins in Phase 2)
     cerebra/                        # Python workspace member (joins in Phase 3)
-    discord-bot/                    # Python workspace member (joins in Phase 3+)
-    rhyzome/                        # Python workspace member (joins in Phase 8)
     ai-stack/                       # Docker Compose only — config files, no package
   docs/
     DESIGN.md
@@ -197,8 +195,6 @@ Each module that has CUDA-sensitive or ML-specific dependencies (Cerebra) manage
 
 ### D6 — What stays outside the monorepo
 
-**bons.ai / AI-lab.** Still experimental — three-agent loop, RL/bandit, ChromaDB. The architecture may change substantially before Phase 8. It joins the monorepo when its interfaces stabilize. Until then, it consumes eval-core via a path-install that is explicitly documented as temporary.
-
 **LumaShell.** Benched. Four UX patterns have been absorbed as design references (ADR-007). The repository is archived; it is not added to the monorepo.
 
 **blog.bumper.** Standalone npm package already published to a public registry under a different identity. It has its own release cycle and does not depend on any Lattica package. It stays separate.
@@ -225,8 +221,6 @@ Existing projects are standalone repositories. Phase 0 creates the `lattica/` mo
 | **Phase 1** | `modules/ai-stack/` | Docker Compose files only — no package, no pyproject.toml; just config |
 | **Phase 2** | `modules/policy-scout/` | `pyproject.toml` updated to `workspace = true` for eval-core; existing test suite runs unmodified |
 | **Phase 3** | `modules/cerebra/` | Same pattern; separate lock file for ML deps |
-| **Phase 3+** | `modules/discord-bot/` | Same pattern |
-| **Phase 8** | `modules/rhyzome/` | Same pattern; bons.ai deferred until interface stabilizes |
 
 Each module join is a standalone commit. No module is required to change its internal import paths on join — the workspace source directive handles resolution transparently.
 

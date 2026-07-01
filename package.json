@@ -1,7 +1,7 @@
 {
   "name": "lattica",
   "private": true,
-  "version": "0.3.6",
+  "version": "0.3.6e",
   "type": "module",
   "scripts": {
     "dev": "vite",

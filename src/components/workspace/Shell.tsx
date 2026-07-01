@@ -226,7 +226,7 @@ export function Shell({ children }: Props) {
         <div className="la-shell-brand">
           <span className="la-shell-brand-icon">L</span>
           <span className="la-shell-brand-name">Lattica</span>
-          <span className="la-shell-brand-version">v0.3.6</span>
+          <span className="la-shell-brand-version">v0.3.6e</span>
         </div>
 
         {/* Activity scope — 6-lane event visualization */}

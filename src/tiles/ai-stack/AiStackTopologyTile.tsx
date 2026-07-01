@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { LiveValueChip } from "../../components/livevalue/LiveValueChip";
 import "./AiStackTopologyTile.css";
 
@@ -30,10 +31,6 @@ interface TopologySnapshot {
 
 // ---- constants ------------------------------------------------------------
 
-const OLLAMA = "http://localhost:11434";
-const LITELLM = "http://localhost:4000";
-const OPENWEBUI = "http://localhost:3000";
-const CEREBRA = "http://localhost:7432";
 const POLL_MS = 10_000;
 
 // RTX 4070 Super — no Ollama API source for total VRAM; override via
@@ -73,100 +70,6 @@ function savePref<T>(key: string, value: T): void {
   }
 }
 
-// ---- fetch helpers --------------------------------------------------------
-
-async function fetchWithTimeout(url: string, ms: number, init?: RequestInit): Promise<Response> {
-  const ctrl = new AbortController();
-  const id = setTimeout(() => ctrl.abort(), ms);
-  return fetch(url, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(id));
-}
-
-async function pollTopology(): Promise<TopologySnapshot> {
-  const [psResult, tagsResult, modelsResult, webuiResult, cerebraResult] = await Promise.allSettled([
-    fetchWithTimeout(`${OLLAMA}/api/ps`, 4_000).then((r) => r.json()),
-    fetchWithTimeout(`${OLLAMA}/api/tags`, 4_000).then((r) => r.json()),
-    fetchWithTimeout(`${LITELLM}/v1/models`, 4_000).then((r) => r.json()),
-    fetchWithTimeout(OPENWEBUI, 4_000, { method: "HEAD" }),
-    fetchWithTimeout(`${CEREBRA}/status`, 4_000),
-  ]);
-
-  const ollama: NodeStatus = psResult.status === "fulfilled" ? "up" : "down";
-  const litellm: NodeStatus = modelsResult.status === "fulfilled" ? "up" : "down";
-  const openwebui: NodeStatus = webuiResult.status === "fulfilled" ? "up" : "down";
-  const cerebra: NodeStatus = cerebraResult.status === "fulfilled" ? "up" : "down";
-
-  const runningModels: RunningModel[] =
-    psResult.status === "fulfilled" &&
-    Array.isArray((psResult.value as Record<string, unknown>).models)
-      ? ((psResult.value as Record<string, unknown[]>).models as Record<string, unknown>[]).map(
-          (m) => ({
-            name: String(m["name"] ?? ""),
-            size_vram: Number(m["size_vram"] ?? 0),
-          }),
-        )
-      : [];
-
-  const localModels: LocalModel[] =
-    tagsResult.status === "fulfilled" &&
-    Array.isArray((tagsResult.value as Record<string, unknown>).models)
-      ? ((tagsResult.value as Record<string, unknown[]>).models as Record<string, unknown>[]).map(
-          (m) => ({
-            name: String(m["name"] ?? ""),
-            size: Number(m["size"] ?? 0),
-          }),
-        )
-      : [];
-
-  const aliases: string[] =
-    modelsResult.status === "fulfilled" &&
-    Array.isArray((modelsResult.value as Record<string, unknown>).data)
-      ? ((modelsResult.value as Record<string, unknown[]>).data as Record<string, unknown>[]).map(
-          (m) => String(m["id"] ?? ""),
-        )
-      : [];
-
-  const totalVramBytes = runningModels.reduce((sum, m) => sum + m.size_vram, 0);
-
-  return {
-    ollama,
-    litellm,
-    openwebui,
-    cerebra,
-    runningModels,
-    localModels,
-    totalVramBytes,
-    aliases,
-    lastPolled: Date.now(),
-  };
-}
-
-// ---- Ollama model actions -------------------------------------------------
-
-async function ollamaLoad(model: string): Promise<void> {
-  const r = await fetchWithTimeout(
-    `${OLLAMA}/api/generate`,
-    30_000,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model, prompt: "", keep_alive: "10m" }),
-    },
-  );
-  if (!r.ok) throw new Error(`Ollama load failed: ${r.status}`);
-}
-
-async function ollamaUnload(model: string): Promise<void> {
-  const r = await fetchWithTimeout(
-    `${OLLAMA}/api/generate`,
-    10_000,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model, prompt: "", keep_alive: 0 }),
-    },
-  );
-  if (!r.ok) throw new Error(`Ollama unload failed: ${r.status}`);
-}
 
 // ---- formatters -----------------------------------------------------------
 
@@ -274,7 +177,7 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
   const runPoll = useCallback(async () => {
     setPolling(true);
     try {
-      const result = await pollTopology();
+      const result = await invoke<TopologySnapshot>("poll_ai_stack");
       setSnap(result);
       setPollError(null);
     } catch (e: unknown) {
@@ -312,7 +215,7 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
     setLoadingModel(modelName);
     setActionError(null);
     try {
-      await ollamaLoad(modelName);
+      await invoke<void>("ollama_load_model", { model: modelName });
       await runPoll();
     } catch (e: unknown) {
       setActionError(e instanceof Error ? e.message : String(e));
@@ -326,10 +229,13 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
     setUnloadingAll(true);
     setActionError(null);
     try {
-      const results = await Promise.allSettled(snap.runningModels.map((m) => ollamaUnload(m.name)));
+      const results = await Promise.allSettled(
+        snap.runningModels.map((m) => invoke<void>("ollama_unload_model", { model: m.name })),
+      );
       const failed = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
       if (failed.length > 0) {
-        throw new Error((failed[0].reason as Error).message ?? "unload failed");
+        const reason = failed[0].reason;
+        throw new Error(typeof reason === "string" ? reason : ((reason as Error).message ?? "unload failed"));
       }
       await runPoll();
     } catch (e: unknown) {

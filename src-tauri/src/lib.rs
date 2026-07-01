@@ -206,6 +206,113 @@ async fn ps_deny(approval_id: String) -> CliJsonResponse {
     run_cli_json(args).await
 }
 
+// ── AI Stack topology polling ─────────────────────────────────────────────────
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "lowercase")]
+enum AiNodeStatus { Up, Down }
+
+#[derive(serde::Serialize)]
+struct AiRunningModel { name: String, size_vram: u64 }
+
+#[derive(serde::Serialize)]
+struct AiLocalModel { name: String, size: u64 }
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AiTopologySnapshot {
+    ollama: AiNodeStatus,
+    litellm: AiNodeStatus,
+    openwebui: AiNodeStatus,
+    cerebra: AiNodeStatus,
+    running_models: Vec<AiRunningModel>,
+    local_models: Vec<AiLocalModel>,
+    total_vram_bytes: u64,
+    aliases: Vec<String>,
+    last_polled: u64,
+}
+
+#[derive(serde::Deserialize)] struct OllamaPsResp   { models: Option<Vec<OllamaPsModel>>   }
+#[derive(serde::Deserialize)] struct OllamaPsModel  { name: String, size_vram: Option<u64>  }
+#[derive(serde::Deserialize)] struct OllamaTagsResp { models: Option<Vec<OllamaTagsModel>> }
+#[derive(serde::Deserialize)] struct OllamaTagsModel{ name: String, size: Option<u64>       }
+#[derive(serde::Deserialize)] struct LiteLlmResp    { data: Option<Vec<LiteLlmModel>>       }
+#[derive(serde::Deserialize)] struct LiteLlmModel   { id: String                            }
+
+fn ai_client(timeout_secs: u64) -> Result<reqwest::Client, String> {
+    reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(timeout_secs))
+        .build()
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn poll_ai_stack() -> Result<AiTopologySnapshot, String> {
+    let c = ai_client(4)?;
+    let (ps, tags, models, webui, cerebra) = tokio::join!(
+        c.get("http://localhost:11434/api/ps").send(),
+        c.get("http://localhost:11434/api/tags").send(),
+        c.get("http://localhost:4000/v1/models").send(),
+        c.head("http://localhost:3000").send(),
+        c.get("http://localhost:7432/status").send(),
+    );
+
+    let ps_json: Option<OllamaPsResp> = match ps {
+        Ok(r) if r.status().is_success() => r.json().await.ok(),
+        _ => None,
+    };
+    let tags_json: Option<OllamaTagsResp> = match tags {
+        Ok(r) if r.status().is_success() => r.json().await.ok(),
+        _ => None,
+    };
+    let models_json: Option<LiteLlmResp> = match models {
+        Ok(r) if r.status().is_success() => r.json().await.ok(),
+        _ => None,
+    };
+
+    let running_models: Vec<AiRunningModel> = ps_json.as_ref()
+        .and_then(|r| r.models.as_ref())
+        .map(|ms| ms.iter().map(|m| AiRunningModel { name: m.name.clone(), size_vram: m.size_vram.unwrap_or(0) }).collect())
+        .unwrap_or_default();
+    let local_models: Vec<AiLocalModel> = tags_json.as_ref()
+        .and_then(|r| r.models.as_ref())
+        .map(|ms| ms.iter().map(|m| AiLocalModel { name: m.name.clone(), size: m.size.unwrap_or(0) }).collect())
+        .unwrap_or_default();
+    let aliases: Vec<String> = models_json.as_ref()
+        .and_then(|r| r.data.as_ref())
+        .map(|data| data.iter().map(|m| m.id.clone()).collect())
+        .unwrap_or_default();
+    let total_vram_bytes: u64 = running_models.iter().map(|m| m.size_vram).sum();
+    let last_polled = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() as u64;
+
+    Ok(AiTopologySnapshot {
+        ollama:    if ps_json.is_some()     { AiNodeStatus::Up } else { AiNodeStatus::Down },
+        litellm:   if models_json.is_some() { AiNodeStatus::Up } else { AiNodeStatus::Down },
+        openwebui: if webui.is_ok()         { AiNodeStatus::Up } else { AiNodeStatus::Down },
+        cerebra:   if cerebra.is_ok()       { AiNodeStatus::Up } else { AiNodeStatus::Down },
+        running_models, local_models, aliases, total_vram_bytes, last_polled,
+    })
+}
+
+#[tauri::command]
+async fn ollama_load_model(model: String) -> Result<(), String> {
+    if model.is_empty() || model.len() > 200 { return Err("invalid model name".into()); }
+    let body = serde_json::json!({ "model": model, "prompt": "", "keep_alive": "10m" });
+    let r = ai_client(30)?.post("http://localhost:11434/api/generate").json(&body).send().await.map_err(|e| e.to_string())?;
+    if !r.status().is_success() { return Err(format!("Ollama load failed: {}", r.status())); }
+    Ok(())
+}
+
+#[tauri::command]
+async fn ollama_unload_model(model: String) -> Result<(), String> {
+    if model.is_empty() || model.len() > 200 { return Err("invalid model name".into()); }
+    let body = serde_json::json!({ "model": model, "prompt": "", "keep_alive": 0 });
+    let r = ai_client(10)?.post("http://localhost:11434/api/generate").json(&body).send().await.map_err(|e| e.to_string())?;
+    if !r.status().is_success() { return Err(format!("Ollama unload failed: {}", r.status())); }
+    Ok(())
+}
+
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -254,6 +361,9 @@ pub fn run() {
             ps_approvals_list,
             ps_approve_once,
             ps_deny,
+            poll_ai_stack,
+            ollama_load_model,
+            ollama_unload_model,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactElement } from 'react';
 import './Pane.css';
 import { TilePicker, TileKey, PaneId, TILE_INFO } from './TilePicker';
 import { FreezeOverlay } from './FreezeOverlay';
@@ -8,6 +8,17 @@ import { PolicyScoutTile } from '../../tiles/policy-scout/PolicyScoutTile';
 import { AiStackTopologyTile } from '../../tiles/ai-stack/AiStackTopologyTile';
 import { LumaWeaveTile } from '../../tiles/lumaweave/LumaWeaveTile';
 import { FossicTile } from '../../tiles/fossic/FossicTile';
+
+type TileRendererProps = { frozen: boolean; onQueuedCountChange: (n: number) => void };
+type TileRenderer = (props: TileRendererProps) => ReactElement;
+
+const TILE_RENDERERS: Record<Exclude<TileKey, null>, TileRenderer> = {
+  cerebra:   p => <CerebraSignalTile {...p} />,
+  policy:    p => <PolicyScoutTile {...p} />,
+  fossic:    p => <FossicTile {...p} />,
+  lumaweave: p => <LumaWeaveTile {...p} />,
+  aistack:   p => <AiStackTopologyTile {...p} />,
+};
 
 interface Props {
   paneId: PaneId;
@@ -91,29 +102,9 @@ export function Pane({
       <div className="la-pane-content">
         {tileKey === null ? (
           <EmptyPane onOpenPicker={onOpenPicker} />
-        ) : tileKey === 'cerebra' ? (
-          <div className="la-pane-tile-slot">
-            <CerebraSignalTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
-          </div>
-        ) : tileKey === 'policy' ? (
-          <div className="la-pane-tile-slot">
-            <PolicyScoutTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
-          </div>
-        ) : tileKey === 'aistack' ? (
-          <div className="la-pane-tile-slot">
-            <AiStackTopologyTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
-          </div>
-        ) : tileKey === 'lumaweave' ? (
-          <div className="la-pane-tile-slot">
-            <LumaWeaveTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
-          </div>
-        ) : tileKey === 'fossic' ? (
-          <div className="la-pane-tile-slot">
-            <FossicTile frozen={frozen} onQueuedCountChange={setQueuedCount} />
-          </div>
         ) : (
           <div className="la-pane-tile-slot">
-            <EmptyPane onOpenPicker={onOpenPicker} />
+            {TILE_RENDERERS[tileKey]({ frozen, onQueuedCountChange: setQueuedCount })}
           </div>
         )}
       </div>

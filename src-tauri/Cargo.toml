@@ -1,8 +1,8 @@
 [package]
 name = "lattica"
-version = "0.3.6"
+version = "0.3.8"
 description = "Lattica platform OS"
-authors = []
+authors = ["Ryan Johnson"]
 edition = "2021"
 
 [lib]

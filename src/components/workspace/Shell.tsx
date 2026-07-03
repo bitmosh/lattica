@@ -99,7 +99,7 @@ function PlatformDrawer({ buffers, now }: PlatformDrawerProps) {
   const modules = [
     {
       key: 'lattica', label: 'lattica', color: '#F2A85C',
-      subInfo: 'v0.3.7 · host shell',
+      subInfo: 'v0.3.8 · host shell',
       badge: 'running', badgeColor: '#A6F35A', pulsing: false, degraded: false,
     },
     {
@@ -226,7 +226,7 @@ export function Shell({ children }: Props) {
         <div className="la-shell-brand">
           <span className="la-shell-brand-icon">L</span>
           <span className="la-shell-brand-name">Lattica</span>
-          <span className="la-shell-brand-version">v0.3.7e</span>
+          <span className="la-shell-brand-version">v0.3.8</span>
         </div>
 
         {/* Activity scope — 6-lane event visualization */}

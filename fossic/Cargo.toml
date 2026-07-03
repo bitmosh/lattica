@@ -15,8 +15,9 @@ tempfile          = "3"
 
 [package]
 name = "fossic"
-version = "1.8.1"
+version = "1.8.2"
 edition = "2021"
+authors = ["Ryan Johnson <https://github.com/bitmosh>"]
 description = "Local-first event sourcing library with content-addressed event identity"
 license = "MIT OR Apache-2.0"
 
@@ -29,16 +30,16 @@ tauri = []
 test-helpers = []
 
 [dependencies]
-blake3                = "1"
-rusqlite              = { version = "0.31", features = ["bundled"] }
-serde                 = { workspace = true }
-serde_json            = { workspace = true }
-rmp-serde             = { workspace = true }
+blake3             = "1"
+rusqlite           = { version = "0.31", features = ["bundled"] }
+serde              = { workspace = true }
+serde_json         = { workspace = true }
+rmp-serde          = { workspace = true }
 unicode-normalization = "0.1"
-thiserror             = "2"
-crossbeam-channel     = { workspace = true }
-notify                = "6"
-parking_lot           = { workspace = true }
+thiserror          = "2"
+crossbeam-channel  = { workspace = true }
+notify             = "6"
+parking_lot        = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }

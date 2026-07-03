@@ -12,7 +12,7 @@ The long-horizon vision is a **Reflective Twin Architecture**: Graph A (canonica
 
 ## Monorepo structure
 
-Lattica is a monorepo from Phase 0 (ADR-006): pnpm workspaces for TypeScript/Rust packages, uv workspaces for Python packages.
+Lattica is a monorepo from Phase 0 (ADR-006): npm for TypeScript/Rust packages, uv workspaces for Python packages.
 
 ```
 lattica/

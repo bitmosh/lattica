@@ -1,4 +1,4 @@
-# Node / npm / pnpm
+# Node / npm
 node_modules/
 dist/
 .pnpm-store/
@@ -70,3 +70,15 @@ htmlcov/
 # Misc
 *.bak
 *.tmp
+
+# Enforced package manager: npm only
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
+
+# Test runner artifacts
+test-results/
+playwright-report/
+
+# Pass review working dir
+.review/

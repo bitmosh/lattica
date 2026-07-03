@@ -3571,8 +3571,8 @@ summary: "Lattica repo bootstrap — git init, Aseptic adoption, requirements sc
 - `docs/requirements/bo/decisions.md`
 - `docs/requirements/ai-stack/responses.md`
 - `docs/requirements/ai-stack/decisions.md`
-- ~~`docs/requirements/rhyzome/`~~ — deleted 2026-06-30 (rhyzome deprecated)
-- ~~`docs/requirements/bonsai/`~~ — deleted 2026-06-30 (bons.ai deprecated)
+- ~~`docs/requirements/[redacted]/`~~ — deleted 2026-06-30 ([redacted] deprecated)
+- ~~`docs/requirements/bonsai/`~~ — deleted 2026-06-30 ([redacted] deprecated)
 - `docs/requirements/group-rounds/.gitkeep`
 
 **Existing files committed as-is (all prior docs committed in one of the above commits):**

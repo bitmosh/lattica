@@ -1,6 +1,6 @@
 # Node + JS/TS Version Audit — Cross-Project Reconciliation
 
-> **Historical research snapshot — 2026-06-14.** Rhyzome and discord-bot are referenced below as active projects; both are now deprecated and removed from the platform.
+> **Historical research snapshot — 2026-06-14.** [redacted] and discord-bot are referenced below as active projects; both are now deprecated and removed from the platform.
 
 **Date:** 2026-06-14
 **Audited by:** Lattica Claude (read-only, no files modified)
@@ -33,11 +33,11 @@ stable since Node 18. LumaWeave proves this is safe in practice. No BLOCKING mis
 | **fossic** | unpinned (Rust crate; see fossic-node below) | — | — | — | — | — | Rust-primary; Cargo.toml only |
 | **fossic-node** | `>=18` (engines) | — | — | `5.9.3` ¹ | — | — | napi-rs binding; @types/node `25.9.3` ¹; vitest `3.2.6` ¹ |
 | **bitmosh-website** | unpinned | `19.2.4` ¹ | — | `5.7.3` ¹ | `4.2.0` ¹ | — | Next.js `16.2.6`, PostCSS Tailwind integration, @types/node `22.19.11` ¹, Radix UI, pnpm |
-| **rhyzome** | unpinned | — | `8.0.10` ¹ | — | `4.2.4` ¹ | — | CSS-tooling-only; no React, no TS; daisyUI 5.5.19; @vitejs/plugin-react `6.0.1` ¹ in lockfile but unused |
+| **[redacted]** | unpinned | — | `8.0.10` ¹ | — | `4.2.4` ¹ | — | CSS-tooling-only; no React, no TS; daisyUI 5.5.19; @vitejs/plugin-react `6.0.1` ¹ in lockfile but unused |
 | **cerebra** | — | — | — | — | — | — | Python-primary, no Node deps; `pyproject.toml` only |
 | **policy-scout** | — | — | — | — | — | — | Python-primary, no Node deps; `pyproject.toml` only |
 | **discord-bot** | — | — | — | — | — | — | Python-primary; `requirements.txt` only (discord.py, openai) |
-| **ai-lab / ai-stack** | — | — | — | — | — | — | Python/Docker-primary; no `package.json` found |
+| **[redacted] / ai-stack** | — | — | — | — | — | — | Python/Docker-primary; no `package.json` found |
 | **blog.bumper** | — | — | — | — | — | — | Not present at `~/Projects/blog.bumper/`; may be inside `fossic/` or `bitmosh-website/` — not found |
 
 > ¹ Resolved version from lockfile (`package-lock.json` or `pnpm-lock.yaml`)
@@ -50,7 +50,7 @@ stable since Node 18. LumaWeave proves this is safe in practice. No BLOCKING mis
 | lumaweave | 4.2.4 | `@tailwindcss/vite` plugin (CSS-first, no `tailwind.config.*`) |
 | lattica | 4.2.4 | `@tailwindcss/vite` plugin (CSS-first, matching LumaWeave) |
 | bitmosh-website | 4.2.0 | `@tailwindcss/postcss` plugin (CSS-first via PostCSS) |
-| rhyzome | 4.2.4 | `@tailwindcss/vite` plugin (CSS-only, no React) |
+| [redacted] | 4.2.4 | `@tailwindcss/vite` plugin (CSS-only, no React) |
 
 All projects on Tailwind **v4**. No Tailwind v3 project found. No `tailwind.config.js` / `tailwind.config.ts` in any project (v4 CSS-first confirmed everywhere).
 
@@ -82,11 +82,11 @@ All projects on Tailwind **v4**. No Tailwind v3 project found. No `tailwind.conf
 
 ---
 
-### M-003 — rhyzome Vite 8.0.10 vs Lattica/LumaWeave Vite 7.3.2
+### M-003 — [redacted] Vite 8.0.10 vs Lattica/LumaWeave Vite 7.3.2
 
-**Mismatch:** `rhyzome` has resolved Vite `8.0.10`. LumaWeave and Lattica use Vite `^7.0.4`.
+**Mismatch:** `[redacted]` has resolved Vite `8.0.10`. LumaWeave and Lattica use Vite `^7.0.4`.
 
-**Risk:** None. Rhyzome is an isolated CSS tooling project (no React, no Tauri, no shared source with Lattica). The Vite version difference has zero impact on Lattica's build.
+**Risk:** None. [redacted] is an isolated CSS tooling project (no React, no Tauri, no shared source with Lattica). The Vite version difference has zero impact on Lattica's build.
 
 **Severity:** COSMETIC — informational only.
 
@@ -164,10 +164,10 @@ system. This is a low-cost risk reduction.
 
 ### R-003: Note the Vite 8 / @vitejs/plugin-react 6 signal
 
-Rhyzome is already on Vite `8.0.10` and `@vitejs/plugin-react@6.0.1`. This is the leading
+[redacted] is already on Vite `8.0.10` and `@vitejs/plugin-react@6.0.1`. This is the leading
 edge of the ecosystem. LumaWeave and Lattica are both on Vite 7.3.2 with plugin-react 4.7.0.
 Vite 7 is current and supported; there is no urgency to upgrade. But if a future Lattica or
-LumaWeave pass wants to adopt Vite 8, the rhyzome project is a working reference for what
+LumaWeave pass wants to adopt Vite 8, the [redacted] project is a working reference for what
 that looks like (Vite 8 + plugin-react 6 is a coordinated bump — they share a major version).
 
 ### R-004: Lattica should add an engines.node field
@@ -185,10 +185,10 @@ actionable without further input: no pre-install changes needed.
 
 ---
 
-*Files read: `~/Projects/{lumaweave,lattica,bitmosh-website,rhyzome}/package.json`,*
-*`~/Projects/lumaweave/package-lock.json`, `~/Projects/rhyzome/package-lock.json`,*
+*Files read: `~/Projects/{lumaweave,lattica,bitmosh-website,[redacted]}/package.json`,*
+*`~/Projects/lumaweave/package-lock.json`, `~/Projects/[redacted]/package-lock.json`,*
 *`~/Projects/bitmosh-website/pnpm-lock.yaml`, `~/Projects/fossic/fossic-node/package.json`,*
 *`~/Projects/fossic/fossic-node/package-lock.json`, tsconfig.json files for all Node projects,*
 *vite.config files for all Node/Vite projects, `~/Projects/bitmosh-website/postcss.config.mjs`.*
-*Python-primary projects (cerebra, policy-scout, discord-bot, ai-lab, ai-stack) confirmed*
+*Python-primary projects (cerebra, policy-scout, discord-bot, [redacted], ai-stack) confirmed*
 *no `package.json` present.*

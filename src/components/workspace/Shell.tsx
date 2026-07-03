@@ -127,7 +127,7 @@ function PlatformDrawer({ buffers, now }: PlatformDrawerProps) {
       pulsing: rates.policy > 0, degraded: false,
     },
     {
-      key: 'aistack', label: 'ai-stack / bo', color: '#FF5BC7',
+      key: 'aistack', label: 'ai-stack', color: '#FF5BC7',
       subInfo: `${rates.aistack.toFixed(1)}/s · inference`,
       badge: rates.aistack > 0 ? 'live' : 'connected',
       badgeColor: rates.aistack > 0 ? '#A6F35A' : '#6B7A8A',

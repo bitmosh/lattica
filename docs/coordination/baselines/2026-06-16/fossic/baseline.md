@@ -1,6 +1,6 @@
 # Baseline — fossic (2026-06-16)
 
-> **Historical snapshot — 2026-06-16.** References to rhyzome, bons.ai, and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
+> **Historical snapshot — 2026-06-16.** References to [redacted], [redacted], and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
 
 ---
 
@@ -924,9 +924,9 @@ This is the clearest, most actionable snapshot use case across all projects. The
 
 LumaWeave's reconciliation (C.7) names the same cold-start problem for the Lattica tile subscribing to `lumaweave/graph/events`: when the tile first subscribes, it sees zero events if LumaWeave is already in a loaded state and the user doesn't trigger a new source load. A snapshot seeded at the last `SourceLoaded` event gives the tile immediate initial state. Policy Scout flags an equivalent concern for the approval queue — a snapshot at `DecisionIssued` time would seed the tile's pending-approval list on first subscribe. All three cold-start cases are solvable with the existing snapshot API. Adoption is per-project, not a fossic roadmap item.
 
-### TD-004: SimilaritySearchProvider (bons.ai)
+### TD-004: SimilaritySearchProvider ([redacted])
 
-No update. Trigger condition unchanged: fires when bons.ai requests vector search. Until that request is made, no action.
+No update. Trigger condition unchanged: fires when [redacted] requests vector search. Until that request is made, no action.
 
 ### `indexed_tags_filter` adoption gap (Cerebra)
 
@@ -1331,7 +1331,7 @@ The read connection pool means concurrent read operations (multiple tile queries
 |---|---|---|
 | TD-001 | MEDIUM | Python DynReducer bridge cost (~47μs/event over PyO3). Trigger: Cerebra witness layer + measurable user-facing latency. Mitigation: aggressive snapshot cadence (every 10 events). |
 | TD-003 | LOW | `time = "=0.3.37"` exact pin in fossic-tauri. Trigger: Tauri bumps cookie version. |
-| TD-004 | MEDIUM | `SimilaritySearchProvider` trait stub absent from code (feature flag is a placeholder). Trigger: bons.ai requests vector search. |
+| TD-004 | MEDIUM | `SimilaritySearchProvider` trait stub absent from code (feature flag is a placeholder). Trigger: [redacted] requests vector search. |
 | TD-007 | LOW | `take_snapshot` dual-acquisition TOCTOU (read conn released before write conn acquired). Snapshots are idempotent so not a data-loss risk. Trigger: snapshot staleness observed under high concurrent write load. |
 
 ### Open Polish Debt
@@ -1397,9 +1397,9 @@ The shapes from the feasibility analysis hold. Minor refinements:
 
 **Cerebra** — high snapshot cadence (every 10 events) is correct given TD-001. The relay filter list should be explicit: only `SessionOpened`, `MemoryWriteFromCycle`, `ClutchDecisionMade`, `CycleCompleted` relay to hub. All internal step-level events stay local. This keeps the hub clean.
 
-**rhyzome** — still the most straightforward. Rust-native, no bridge overhead, fast `read_state` for bandit arm selection. Small pool size (2) is appropriate since reads are fast. Relay: `strategy_selected` events only.
+**[redacted]** — still the most straightforward. Rust-native, no bridge overhead, fast `read_state` for bandit arm selection. Small pool size (2) is appropriate since reads are fast. Relay: `strategy_selected` events only.
 
-**bons.ai** — one addition: `indexed_tags` should carry `{idea_id, query_id, session_id}` on every event. The hub's `indexed_tags_filter` then makes bons.ai queries filterable from Lattica without round-trips into bons.ai's local store.
+**[redacted]** — one addition: `indexed_tags` should carry `{idea_id, query_id, session_id}` on every event. The hub's `indexed_tags_filter` then makes [redacted] queries filterable from Lattica without round-trips into [redacted]'s local store.
 
 **LumaWeave** — still the most interesting use of `branch`. Layout experiments (`layouts/experiment-*`) should live on a non-main branch; only promoted layouts relay to hub as `main` events. `append_if` is useful here: "append this node mutation only if the node still exists" is a natural state-machine guard for the graph.
 
@@ -1409,9 +1409,9 @@ The shapes from the feasibility analysis hold. Minor refinements:
 
 2. **Cerebra second** — fossic-py is already integrated. `compute_event_id` is live. The relay agent is a Python script (~100 lines). Benefit: hub gets the richest event stream; cross-project causal chains become real.
 
-3. **rhyzome third** — simpler event shape, faster to wire. Rust-native, straightforward relay.
+3. **[redacted] third** — simpler event shape, faster to wire. Rust-native, straightforward relay.
 
-4. **bons.ai last** — depends on TD-004 (SimilaritySearchProvider) for its most interesting local capabilities. Can embed fossic now, but the full local store shape isn't final until vector search is unblocked.
+4. **[redacted] last** — depends on TD-004 (SimilaritySearchProvider) for its most interesting local capabilities. Can embed fossic now, but the full local store shape isn't final until vector search is unblocked.
 
 ### Risks other projects may not see
 
@@ -1421,9 +1421,9 @@ The shapes from the feasibility analysis hold. Minor refinements:
 
 **Causation chains span stores.** A hub event's `causation_id` points to an event in the local store, not in the hub store. `read_one(causation_id)` on the hub will return `EventNotFound`. This is expected but consumers need to know: causal traversal across the hub/local boundary requires going back to the originating store. `walk_causation` on the hub only walks hub-internal chains.
 
-**Event ordering across projects is wall-clock only.** The hub has no global logical clock. Events from Cerebra and rhyzome are ordered by `timestamp_us` (wall clock at relay time), which may not reflect actual causation order if the relay agents have different latencies. If strict ordering matters for a cross-project workflow, the relay agent should set `causation_id` explicitly to the hub event that triggered it (not just the local source event).
+**Event ordering across projects is wall-clock only.** The hub has no global logical clock. Events from Cerebra and [redacted] are ordered by `timestamp_us` (wall clock at relay time), which may not reflect actual causation order if the relay agents have different latencies. If strict ordering matters for a cross-project workflow, the relay agent should set `causation_id` explicitly to the hub event that triggered it (not just the local source event).
 
-**`read_pool_timeout_ms` should be tuned per project.** The default 30s is conservative. Projects with tight latency requirements (LumaWeave UI rendering, rhyzome bandit selection) should set a shorter timeout with a fast fallback rather than waiting 30s for pool exhaustion.
+**`read_pool_timeout_ms` should be tuned per project.** The default 30s is conservative. Projects with tight latency requirements (LumaWeave UI rendering, [redacted] bandit selection) should set a shorter timeout with a fast fallback rather than waiting 30s for pool exhaustion.
 
 ### The `relay_append` helper — before or after first relay?
 

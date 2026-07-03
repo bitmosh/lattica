@@ -1,6 +1,6 @@
 # Baseline — ai-stack (2026-06-16)
 
-> **Historical snapshot — 2026-06-16.** References to rhyzome, bons.ai, and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
+> **Historical snapshot — 2026-06-16.** References to [redacted], [redacted], and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
 
 ---
 

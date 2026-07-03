@@ -1,6 +1,6 @@
 # Platform Baseline — 2026-06-16
 
-> **Historical snapshot — 2026-06-16.** References to rhyzome, bons.ai, and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
+> **Historical snapshot — 2026-06-16.** References to [redacted], [redacted], and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
 
 **Filed by:** lattica-claude (compile pass v0.3.5t)
 **Compiled from:** project baselines at
@@ -524,7 +524,7 @@ Currently emits one event type: `SubscriptionDegraded` — fired when a subscrib
 |---|---|---|
 | TD-001 | MEDIUM | Python DynReducer bridge cost (~47μs/event over PyO3). Trigger: Cerebra witness layer + measurable latency. Mitigation: aggressive snapshot cadence (every 10 events). |
 | TD-003 | LOW | `time = "=0.3.37"` exact pin in fossic-tauri. Trigger: Tauri bumps cookie version. |
-| TD-004 | MEDIUM | `SimilaritySearchProvider` trait stub absent from code (feature flag placeholder). Trigger: bons.ai requests vector search. |
+| TD-004 | MEDIUM | `SimilaritySearchProvider` trait stub absent from code (feature flag placeholder). Trigger: [redacted] requests vector search. |
 | TD-007 | LOW | `take_snapshot` dual-acquisition TOCTOU. Trigger: snapshot staleness under high concurrent write load. |
 
 **Open polish debt:** None. All PD items resolved.
@@ -567,8 +567,8 @@ Key properties: idempotent (`external_id` check prevents double-relay on restart
 **Recommended order of project migrations (per baseline §6):**
 1. LumaWeave first — already on fossic-tauri; relay just adds a second store handle + filter. Benefit: Lattica immediately gets an architectural event stream to visualize.
 2. Cerebra second — fossic-py already integrated; `compute_event_id` live; relay agent is a Python script (~100 lines). Benefit: hub gets richest event stream; cross-project causal chains become real.
-3. rhyzome third — simpler event shape, faster to wire, Rust-native.
-4. bons.ai last — depends on TD-004 (SimilaritySearchProvider) for most interesting local capabilities.
+3. [redacted] third — simpler event shape, faster to wire, Rust-native.
+4. [redacted] last — depends on TD-004 (SimilaritySearchProvider) for most interesting local capabilities.
 
 **`relay_append` helper: after first relay.** Let LumaWeave's relay agent prove the protocol, then extract as convenience helper when writing the second (Cerebra).
 
@@ -685,7 +685,7 @@ The non-fossic data falls into three categories: (a) static configuration that d
 | Snapshots | Cerebra (already using), LumaWeave (graph state), ai-stack (VRAM state seeding) | Cerebra already using; LumaWeave and ai-stack identified need |
 | `compute_event_id` | Fossic (shipped), Cerebra (needed for relay verification) | Available in fossic-py; Cerebra relay agent can use now |
 | Aggregates with `event_type_filter` | Cerebra (post-aggregate Python filter today) | Landed as `indexed_tags_filter`; covers the pattern for indexed fields |
-| Similarity search / vector | Fossic (TD-004 stub) | bons.ai dependency; not available |
+| Similarity search / vector | Fossic (TD-004 stub) | [redacted] dependency; not available |
 | Transforms/projections | Cerebra (graph.json as projection), LumaWeave (exploratory) | Not yet built |
 
 **Common concerns or unknowns:**

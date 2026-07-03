@@ -1,7 +1,7 @@
 ---
 document: FEDERATION_DESIGN_2026-06-16
 version: compile-1
-note: "Historical snapshot 2026-06-16. Rhyzome, bons.ai, and discord-bot references are from this date; those modules are now deprecated."
+note: "Historical snapshot 2026-06-16. [redacted], [redacted], and discord-bot references are from this date; those modules are now deprecated."
 pass: v0.3.5r
 date: 2026-06-16
 compiled-by: lattica-claude

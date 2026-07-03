@@ -2,7 +2,7 @@
 
 All cross-pollination passes, chronological.
 
-> **Note:** Rhyzome, bons.ai, and discord-bot are deprecated and removed from the platform. References to those modules in passes below are historical records of communications sent at the time; they no longer represent active consumers.
+> **Note:** [redacted], [redacted], and discord-bot are deprecated and removed from the platform. References to those modules in passes below are historical records of communications sent at the time; they no longer represent active consumers.
 
 ---
 
@@ -75,8 +75,8 @@ confirmed no breaking change.
 
 ## lumaweave, ai-stack
 
-No impact. lumaweave uses Node binding (unchanged). ai-stack is indirect. (rhyzome and
-bons.ai were benched at time of writing; now deprecated.)
+No impact. lumaweave uses Node binding (unchanged). ai-stack is indirect. ([redacted] and
+[redacted] were benched at time of writing; now deprecated.)
 
 ---
 
@@ -137,11 +137,11 @@ No action required. Awareness only.
 
 ---
 
-## Rhyzome / bons.ai *(deprecated — historical record only)*
+## [redacted] / [redacted] *(deprecated — historical record only)*
 
 **Severity: FYI**
 
-AGENT_TRACE_VOCABULARY.md section numbers shifted — rhyzome vocabulary was §5 (was §4); bons.ai vocabulary was §6 (was §5). These modules are now deprecated; no action needed.
+AGENT_TRACE_VOCABULARY.md section numbers shifted — [redacted] vocabulary was §5 (was §4); [redacted] vocabulary was §6 (was §5). These modules are now deprecated; no action needed.
 
 ---
 
@@ -210,15 +210,15 @@ summary: Add event_type_filter to ReadQuery across all four layers
 
 ---
 
-## Rhyzome *(deprecated — historical record only)*
+## [redacted] *(deprecated — historical record only)*
 
 **Severity: FYI**
 
-- Rhyzome used `read_range` for stream introspection. Module is now deprecated.
+- [redacted] used `read_range` for stream introspection. Module is now deprecated.
 
 ---
 
-## bons.ai *(deprecated — historical record only)*
+## [redacted] *(deprecated — historical record only)*
 
 **Severity: FYI**
 
@@ -285,11 +285,11 @@ snapshots, latency grows linearly with event count.
 
 ---
 
-## bons.ai *(deprecated — historical record only)*
+## [redacted] *(deprecated — historical record only)*
 
 **Severity:** FYI
 
-**What changed:** Same DynReducer protocol update as cerebra. bons.ai was benched at
+**What changed:** Same DynReducer protocol update as cerebra. [redacted] was benched at
 time of writing; module is now deprecated.
 
 ---
@@ -297,7 +297,7 @@ time of writing; module is now deprecated.
 ## policy-scout, bo, lumaweave, ai-stack
 
 No impact. policy-scout and bo don't use reducers. lumaweave uses the Node binding
-(no Python reducer path). ai-stack is indirect. (rhyzome was benched at time of writing; now deprecated.)
+(no Python reducer path). ai-stack is indirect. ([redacted] was benched at time of writing; now deprecated.)
 
 ---
 
@@ -363,7 +363,7 @@ summary: Spec clarification — purge semantics, branch conventions, BranchInfo 
 
 ---
 
-## Rhyzome *(deprecated — historical record only)*
+## [redacted] *(deprecated — historical record only)*
 
 **Severity: FYI**
 
@@ -411,7 +411,7 @@ changes — this is additive.
 
 ## cerebra, policy-scout, bo, ai-stack
 
-No impact. Python binding unchanged. This pass touched only `fossic-node/index.js`. (rhyzome and bons.ai were listed here at time of writing; now deprecated.)
+No impact. Python binding unchanged. This pass touched only `fossic-node/index.js`. ([redacted] and [redacted] were listed here at time of writing; now deprecated.)
 
 ---
 

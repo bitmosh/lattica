@@ -1,6 +1,6 @@
 # Baseline — cerebra (2026-06-16)
 
-> **Historical snapshot — 2026-06-16.** References to rhyzome, bons.ai, and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
+> **Historical snapshot — 2026-06-16.** References to [redacted], [redacted], and discord-bot reflect their status at that date; those modules are now deprecated and removed from the platform.
 
 ---
 
@@ -776,7 +776,7 @@ This is identical to the path `FossicStore.at_platform_path()` resolves to in `c
 - **Current version:** 0.4.4 (pyproject.toml); `cerebra --version` reports 0.4.0 due to stale editable install — actual shipped version is 0.4.4.
 - **Most recent tag:** `v0.1` (pushed 2026-06-16, commit 4efb2bb)
 - **Most recent milestone:** Phase 14 — Integration Testing and Polish. Full spine E2E test (ingest → run-cycle → retrieve → export graph → inspect events) passing against real Ollama. All 14 v0.1 done-when criteria from CEREBRA_MVP_SPEC.md confirmed met.
-- **Identity:** Cerebra is a local-first cognitive cycle runtime that maintains durable memory, evaluates LLM outputs across six epistemological signals, enforces capability and leeway bounds, and emits graph-native events — the execution engine that Bons.ai will eventually express as configuration.
+- **Identity:** Cerebra is a local-first cognitive cycle runtime that maintains durable memory, evaluates LLM outputs across six epistemological signals, enforces capability and leeway bounds, and emits graph-native events — the execution engine that [redacted] will eventually express as configuration.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Lattica Now — Live State
-status: Phase 0 — v0.3.5k — platform live with 5 active tiles
-last_updated: 2026-06-29
+status: Phase 0 — v0.3.7 — platform live with 5 active tiles
+last_updated: 2026-07-03
 ---
 
 # Lattica Now
@@ -12,19 +12,20 @@ file wins.
 
 ## Version
 
-`v0.3.5k` — Shell activity lanes live: fossic `**` subscription, 6 project
-SVG tick lanes, real-time rate counter. Five tiles active. fossic subscription
-pattern established platform-wide.
+`v0.3.7` — `useFossicSubscription` hook extracted platform-wide; `LATTICA_FOSSIC_STORE`
+env var added as platform store contract; Vitest + Playwright + Rust unit test suite
+established; `--project-accent-bo` dead token removed.
 
-`package.json` version: `0.3.5` (sub-version letter tracked in pass names only).
-`src-tauri/Cargo.toml` version: `0.2.0` (needs bump — tracked in H3/known bugs).
+`package.json` version: `0.3.7`.
+`src-tauri/Cargo.toml` version: `0.3.7`.
+`src-tauri/tauri.conf.json` version: `0.3.7`.
 
 ## Current phase
 
 **Phase 0 — Platform Bootstrap.** The bootstrap architecture is locked (ADR-009
 through ADR-014). All six advocate coordination rounds complete. The phase is
 significantly further than documented as of 2026-06-14 — five tiles are live,
-the fossic subscription pattern is in use by four components, and Shell has
+the Fossic subscription hook (`useFossicSubscription`) is in use by four components, and Shell has
 live event-stream monitoring.
 
 Phase 0 exit criteria (from `docs/PHASES.md`) are not yet fully met:
@@ -37,10 +38,10 @@ test suite (Rust unit, Vitest TS unit, Playwright E2E) is now in place.
 
 - **`src/components/workspace/Shell.tsx`** — topbar with brand, 6-lane event
   activity scope (lattica / cerebra / lumaweave / policy / fossic / aistack),
-  real-time rate counter, platform drawer (stub). Subscribes `fossic **` on
-  mount; routes events to per-lane SVG tick buffers via `routeToScope()`. 1 Hz
-  clock drives tick position. 15 s prune interval keeps WINDOW_MS = 90 s
-  rolling window. Known bug: brand label shows `v0.3.4` (M10).
+  real-time rate counter, platform drawer (module health rows + Fossic pillar
+  SVG animation). Subscribes `fossic **` on mount; routes events to per-lane
+  SVG tick buffers via `routeToScope()`. 1 Hz clock drives tick position. 15 s
+  prune interval keeps WINDOW_MS = 90 s rolling window.
 
 - **`src/components/workspace/PaneWorkspace.tsx`** — three-pane layout
   (left / topRight / bottomRight). Tile picker per pane. Freeze state tracked
@@ -48,22 +49,21 @@ test suite (Rust unit, Vitest TS unit, Playwright E2E) is now in place.
   fossic.
 
 - **`src/components/workspace/Pane.tsx`** — renders tile component by key via
-  if/else chain, freeze button, FreezeOverlay when frozen. Known bug:
-  `queuedCount={0}` hardcoded (H4 — freeze wiring incomplete).
+  if/else chain, freeze button, FreezeOverlay when frozen.
 
 - **`src/components/workspace/FreezeOverlay.tsx`** — displays "N events queued"
   badge + thaw button. Reads `queuedCount` prop (currently always 0).
 
 ### Tiles (all live unless noted)
 
-- **`src/tiles/cerebra-signal/CerebraSignalTile.tsx`** — fossic subscription to
+- **`src/tiles/cerebra-signal/CerebraSignalTile.tsx`** — Fossic subscription to
   `cerebra/agent-trace/*`. Maintains rolling history of `SignalEvaluated` events.
   Renders signal name, prediction, outcome, confidence per event. Backfills
   history on mount via `fossic_query` IPC call.
 
 - **`src/tiles/policy-scout/PolicyScoutTile.tsx`** — two tracks:
   - Track A: 30 s CLI poll for current posture state
-  - Track B: fossic subscription to `policy-scout/**` streams; posture fast-path
+  - Track B: Fossic subscription to `policy-scout/**` streams; posture fast-path
     (immediate UI update on posture-change events), decisions feed (rendered
     decision events with outcome badges)
   `trackBState` transitions `'idle' → 'connecting' → 'live'` on first event.
@@ -91,81 +91,68 @@ test suite (Rust unit, Vitest TS unit, Playwright E2E) is now in place.
 
 ### Rust backend (`src-tauri/src/lib.rs`)
 
-- fossic store at `~/.lattica/fossic/store.db` — created on first launch
+- Fossic store at `~/.lattica/fossic/store.db` — created on first launch
 - `fossic_subscribe` / `fossic_unsubscribe` — subscription management
 - `fossic_query` — used by CerebraSignalTile for backfill on mount
 - Startup canary event: fires to `lattica/system/canary` on app start.
-  Known bug: version payload hardcoded `"0.2.0"` (H3 — one-line fix queued).
-- `fossic_query_remote_store` — registered but has zero frontend callers.
-  Intended for future LumaWeaveTile federation view (Phase 2+). Removal
-  queued (H5).
-- 10 read commands via Tauri IPC (ADR-012)
+- Tauri IPC commands: `fossic_subscribe`, `fossic_unsubscribe`, `fossic_query`,
+  `lattica_store_status`, `ps_watch_status`, `ps_approvals_list`, `ps_approve_once`,
+  `ps_deny`, `poll_ai_stack`, `ollama_load_model`, `ollama_unload_model`,
+  `activate_lockdown`, `deactivate_lockdown`, `restart_watch`
 - `fossic_append` is NOT a Tauri command — write-only from Rust
 
 ### Documentation
 
-- `docs/DESIGN.md` — platform architecture, module interaction model
-- `docs/PHASES.md` — all 12 phases with exit criteria
 - `docs/EVENT_FABRIC.md` — ES toolkit event contracts
-- `docs/ADR/` — ADR-001 through ADR-014+ locked
+- `docs/adr/` — ADR-001 through ADR-017 locked
 - `docs/aseptic/repo_fix_2026-06-29.md` — active fix tracker
 
 ## What does NOT exist yet
 
 - Mode B child webview (Linux positioning issue still open)
 - LumaWeaveTile live data source (Phase 2+ — Reflective Twin Architecture)
-- Platform drawer content (M9 — permanent stub)
 
 ## Known bugs (tracking in repo_fix_2026-06-29.md)
 
 | ID | Severity | File | Description |
 |----|----------|------|-------------|
 | C2 | Critical | FossicTile.tsx | LANES relay status hardcoded; cerebra + policy lanes show `pre-relay/healthy:false` despite live subscriptions |
-| H3 | High | lib.rs:319 | Canary event version payload frozen at `"0.2.0"` |
-| H4 | High | Pane.tsx:115 | `queuedCount={0}` hardcoded; freeze button doesn't pause tile animation or count events |
-| H5 | High | lib.rs:345 | `fossic_query_remote_store` registered with zero frontend callers |
-| M10 | Medium | Shell.tsx:146 | Brand label shows `v0.3.4` |
 
 ## To run locally
 
 ```bash
-cd ~/Projects/lattica
-npm run tauri dev   # starts Vite on :1421 + Tauri dev window
+npm run tauri:dev   # starts Vite on :1421 + Tauri dev window
 ```
 
 First build: ~2–5 min (compiles fossic + fossic-tauri). Incremental: ~0.12 s.
 
 ## Fossic subscription pattern (established)
 
+Use the `useFossicSubscription` hook in React components:
+
 ```ts
-// invoke
-const subId = await invoke<string>('fossic_subscribe', {
-  streamPattern: 'cerebra/**',
-  branch: null,
-  includeSystem: false,
-  queueSize: null,
-});
+import { useFossicSubscription } from '../hooks/useFossicSubscription';
 
-// listen
-const unlisten = await listen<FossicEventPayload>('fossic:event', e => {
-  if (e.payload.subscription_id !== subId) return;
-  // handle e.payload.event
-});
-
-// teardown
-unlisten();
-invoke('fossic_unsubscribe', { subscriptionId: subId }).catch(() => {});
+function MyTile() {
+  useFossicSubscription('cerebra/**', (event) => {
+    // handle event (SerializedEvent)
+  });
+}
 ```
 
-Always use a cancel guard (`let cancelled = false`) between invoke and listen
-to handle component teardown during async setup.
+The hook manages cancel guard, subscription ID, and cleanup automatically.
+For custom error handling, pass an options object:
+
+```ts
+useFossicSubscription('policy-scout/**', handleEvent, {
+  onError: () => setStatus('source-unreachable'),
+});
+```
+
+Source: `src/hooks/useFossicSubscription.ts`.
 
 ## Next moves (from repo_fix_2026-06-29.md)
 
 1. **C2** — FossicTile: derive `healthy`/`relayStatus` from live buffer activity
-2. **H3** — lib.rs: `"0.2.0"` → `env!("CARGO_PKG_VERSION")`
-3. **H5** — Remove `fossic_query_remote_store` until LumaWeaveTile needs it
-4. **H4** — Wire freeze button: animation pauses, subscription continues,
-   queuedCount accumulates, thaw resumes live state (no replay)
-5. **v0.3.6 bump** — letters running low; next meaningful batch of changes
-   should bump the minor version
+   (cerebra and policy lanes currently show `pre-relay/healthy:false` despite
+   active Fossic subscriptions)

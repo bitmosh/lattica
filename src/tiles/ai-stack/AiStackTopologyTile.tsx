@@ -262,11 +262,11 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
 
   // list-view rows — stable shape avoids anonymous object in render
   const listRows: Array<{ key: string; name: string; status: NodeStatus; detail: string }> = [
-    { key: "ollama", name: "OLLAMA", status: displaySnap?.ollama ?? "unknown", detail: `:11434 · ${displaySnap?.runningModels.length ?? 0} model${(displaySnap?.runningModels.length ?? 0) !== 1 ? "s" : ""} running` },
-    { key: "litellm", name: "LITELLM", status: displaySnap?.litellm ?? "unknown", detail: `:4000 · ${allAliases.length} alias${allAliases.length !== 1 ? "es" : ""}` },
-    { key: "openwebui", name: "OPEN-WEBUI", status: displaySnap?.openwebui ?? "unknown", detail: ":3000" },
+    { key: "ollama", name: "INFERENCE", status: displaySnap?.ollama ?? "unknown", detail: `:11434 · ${displaySnap?.runningModels.length ?? 0} model${(displaySnap?.runningModels.length ?? 0) !== 1 ? "s" : ""} running` },
+    { key: "litellm", name: "ROUTER", status: displaySnap?.litellm ?? "unknown", detail: `:4000 · ${allAliases.length} alias${allAliases.length !== 1 ? "es" : ""}` },
+    { key: "openwebui", name: "CHAT UI", status: displaySnap?.openwebui ?? "unknown", detail: ":3000" },
     { key: "tts", name: "TTS", status: "unknown", detail: "no host port exposed" },
-    { key: "bo", name: "BO", status: displaySnap?.cerebra ?? "unknown", detail: ":7432 · cerebra daemon" },
+    { key: "bo", name: "CEREBRA DAEMON", status: displaySnap?.cerebra ?? "unknown", detail: ":7432" },
   ];
 
   const lastPolledTime = displaySnap
@@ -279,7 +279,7 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
       <header className="aistack-tile__header">
         <div className="aistack-tile__header-left">
           <StatusDot status={stackStatus} />
-          <span className="aistack-tile__title">AI STACK</span>
+          <span className="aistack-tile__title">INFERENCE STACK</span>
           {hasRunning && (
             <span className="aistack-badge aistack-mono">
               {displaySnap!.runningModels.length} LOADED
@@ -375,7 +375,7 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
           {/* Bo → LiteLLM → Ollama main flow */}
           <div className="aistack-topo__flow">
             <NodeCard
-              name="BO"
+              name="CEREBRA DAEMON"
               port=":7432"
               status={displaySnap?.cerebra ?? "unknown"}
               color={NODE_COLORS.bo}
@@ -404,7 +404,7 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
             </div>
 
             <NodeCard
-              name="LITELLM"
+              name="ROUTER"
               port=":4000"
               status={displaySnap?.litellm ?? "unknown"}
               color={NODE_COLORS.litellm}
@@ -424,7 +424,7 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
             </div>
 
             <NodeCard
-              name="OLLAMA"
+              name="INFERENCE"
               port=":11434"
               status={displaySnap?.ollama ?? "unknown"}
               color={NODE_COLORS.ollama}
@@ -451,7 +451,7 @@ export function AiStackTopologyTile({ frozen = false }: Props) {
           {/* Secondary nodes */}
           <div className="aistack-topo__secondary">
             <NodeCard
-              name="OPEN-WEBUI"
+              name="CHAT UI"
               port=":3000"
               status={displaySnap?.openwebui ?? "unknown"}
               color={NODE_COLORS.openwebui}

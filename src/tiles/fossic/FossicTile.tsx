@@ -82,7 +82,7 @@ const LANES: LaneConfig[] = [
   },
   {
     id: "aistack",
-    label: "ai-stack/gpu · models",
+    label: "inference/gpu · models",
     detail: "pre-relay",
     color: "#FF5BC7",
     prefix: "ai-stack/",

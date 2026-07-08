@@ -15,7 +15,7 @@ export const TILE_OPTIONS: TileOption[] = [
   { key: 'policy',    color: '#B46CFF', title: 'Policy Scout',         sub: 'audit · approval · posture' },
   { key: 'fossic',    color: '#4CC9FF', title: 'Fossic substrate',     sub: 'horizontal flow lanes · 15 streams' },
   { key: 'lumaweave', color: '#A6F35A', title: 'LumaWeave graph',      sub: 'graph/events · 1 stream' },
-  { key: 'aistack',   color: '#FF5BC7', title: 'ai-stack topology',    sub: 'Bo · LiteLLM · Ollama' },
+  { key: 'aistack',   color: '#FF5BC7', title: 'Inference topology',     sub: 'Model · Router · Chat UI' },
   { key: null,        color: '#6B7A8A', title: 'Empty pane',           sub: 'unmount tile · pulse for new' },
 ];
 
@@ -24,7 +24,7 @@ export const TILE_INFO: Record<string, { color: string; name: string; sub: strin
   policy:    { color: '#B46CFF', name: 'policy scout', sub: 'audit · approval · posture' },
   fossic:    { color: '#4CC9FF', name: 'fossic',       sub: 'substrate · 15 streams' },
   lumaweave: { color: '#A6F35A', name: 'lumaweave',    sub: 'graph/events · 1 stream' },
-  aistack:   { color: '#FF5BC7', name: 'ai-stack',     sub: 'Bo · LiteLLM · Ollama' },
+  aistack:   { color: '#FF5BC7', name: 'inference',     sub: 'Model · Router · Chat UI' },
 };
 
 const PANE_LABEL: Record<PaneId, string> = {

@@ -8,10 +8,7 @@ substrate and surfaces their live state as tiles in a split-pane desktop shell.
 Fossic event hub are in place. LumaWeave graph relay is the remaining Phase 0
 milestone.
 
-<!-- OPERATOR: capture a screenshot of the running Lattica shell with all tiles
-     active and the platform drawer open. Save to docs/assets/lattica-shell.png
-     at 1600×900 PNG. See .review/pass-2-asset-spec.md for full staging notes. -->
-![Lattica shell — five live tiles, platform drawer open](docs/assets/lattica-shell.png)
+![Lattica demo](https://raw.githubusercontent.com/bitmosh/lattica/main/docs/assets/demo.gif)
 
 ---
 

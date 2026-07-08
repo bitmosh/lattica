@@ -1,4 +1,4 @@
-use fossic::{Append, FirstOpenPolicy, OpenOptions, Store};
+use fossic::{Append, OpenOptions, Store};
 use std::process::Command;
 use tauri::Manager;
 

@@ -883,7 +883,9 @@ dependencies = [
 
 [[package]]
 name = "fossic"
-version = "1.8.2"
+version = "1.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f5c829bba65e9e21386cb1201d29ac8ca807bb29c47a75addaca4f0da7e7bd2"
 dependencies = [
  "blake3",
  "crossbeam-channel",
@@ -899,7 +901,9 @@ dependencies = [
 
 [[package]]
 name = "fossic-tauri"
-version = "1.8.2"
+version = "1.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7206c3c260d0451cdbc79f0f2a1e1dd920782b292242fe3151009549b009db5c"
 dependencies = [
  "base64 0.22.1",
  "fossic",

@@ -1,0 +1,76 @@
+# Reference Docker Compose file for the inference-setup full-stack path.
+#
+# Runs Ollama + LiteLLM + Open WebUI, exposing the ports Lattica's Inference
+# tile polls by default.
+#
+# This is a reference for local development. For production or shared
+# deployments, review authentication, secrets management, and volume
+# permissions.
+#
+# Prerequisites:
+#   - Docker + Docker Compose
+#   - For GPU support: NVIDIA drivers + NVIDIA Container Toolkit
+#     (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/)
+#   - A litellm-config.yaml in the same directory (see quickstart.md)
+#
+# Usage:
+#   docker compose up -d
+#
+# Stop:
+#   docker compose down
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      # Persist pulled models across container restarts.
+      - ./ollama-data:/root/.ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            # Remove this block to run on CPU (much slower).
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
+    ports:
+      - "4000:4000"
+    volumes:
+      # LiteLLM reads this config on startup. Create your own
+      # litellm-config.yaml — see quickstart.md.
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    command: --config /app/config.yaml --port 4000
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    # If you want LiteLLM to persist request logs, add a Postgres or Redis
+    # service and configure DATABASE_URL / REDIS_URL here. Otherwise
+    # LiteLLM runs stateless.
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      # Persist chat history and user settings across container restarts.
+      - ./openwebui-data:/app/backend/data
+    environment:
+      # Point Open WebUI at LiteLLM for model requests. It will discover
+      # available models via the OpenAI-compatible /v1/models endpoint.
+      - OPENAI_API_BASE_URL=http://litellm:4000/v1
+      - OPENAI_API_KEY=sk-not-a-real-key
+      # Disable Ollama direct integration to force routing through LiteLLM.
+      # Remove this line to let Open WebUI talk directly to Ollama too.
+      - ENABLE_OLLAMA_API=false
+    depends_on:
+      - litellm
+    restart: unless-stopped

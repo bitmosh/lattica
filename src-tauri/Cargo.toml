@@ -16,7 +16,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-fossic       = { path = "../fossic" }
-fossic-tauri = { path = "../fossic/crates/fossic-tauri" }
+fossic       = "1.8.3"
+fossic-tauri = "1.8.3"
 reqwest      = { version = "0.12", default-features = false, features = ["json"] }
 tokio        = { version = "1", features = ["macros"] }

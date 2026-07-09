@@ -8,7 +8,13 @@ substrate and surfaces their live state as tiles in a split-pane desktop shell.
 Fossic event hub are in place. LumaWeave graph relay is the remaining Phase 0
 milestone.
 
+---
+
+## Demo
+
 ![Lattica demo](https://raw.githubusercontent.com/bitmosh/lattica/main/docs/assets/demo.gif)
+
+Mock Data Demo available @ https://www.bitmosh.dev/labs/lattica-prototype/index.html
 
 ---
 

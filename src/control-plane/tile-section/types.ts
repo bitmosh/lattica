@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * v86c Tile System Type Definitions
  * Extended in post-v97 pass 1 with anchor system types.

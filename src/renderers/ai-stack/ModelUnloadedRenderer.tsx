@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * ModelUnloaded payload renderer — ai-stack guest author (P-013).
  *

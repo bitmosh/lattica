@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { useEffect, useState, type ReactNode, type JSX } from 'react';
 import { routeToScope, WINDOW_MS, RATE_WINDOW_MS } from '../../lib/routing';
 import { useFossicSubscription } from '../../hooks/useFossicSubscription';

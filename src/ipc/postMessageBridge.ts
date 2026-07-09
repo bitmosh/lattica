@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * postMessage IPC bridge — ADR-010, Class 1 (ephemeral UI commands).
  *

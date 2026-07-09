@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { registerPayloadRenderer } from "./control-plane/payload-renderer/payloadRendererRegistry";
 import { tileSectionRegistry } from "./control-plane/tile-section/tileSectionRegistry";
 import { StepStartedRenderer } from "./renderers/cerebra/StepStartedRenderer";

@@ -1,6 +1,7 @@
 {
   "name": "lattica",
   "private": true,
+  "license": "Apache-2.0",
   "version": "0.3.8",
   "author": "Ryan Johnson (https://github.com/bitmosh)",
   "packageManager": "npm@10.9.8",

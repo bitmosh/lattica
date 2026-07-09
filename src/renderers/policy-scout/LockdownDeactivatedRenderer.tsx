@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { PayloadRendererProps } from '../../control-plane/payload-renderer/payloadRendererRegistry';
 import './LockdownDeactivatedRenderer.css';
 

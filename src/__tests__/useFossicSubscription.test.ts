@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';

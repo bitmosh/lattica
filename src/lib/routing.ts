@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export const LANE_PREFIX: Record<string, string> = {
   lattica:   'lattica/',
   cerebra:   'cerebra/',

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * SignalEvaluated payload renderer — authored by Cerebra Claude (guest author).
  * Committed by Lattica Claude Code per UP-001 guest-author-in-host-repo pattern.

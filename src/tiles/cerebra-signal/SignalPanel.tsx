@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import "./SignalPanel.css";
 
 const SIGNAL_ORDER: Array<[string, string]> = [

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 /**
  * CheckpointSaved payload renderer — authored by Cerebra Claude (guest author).
  * Committed by Lattica Claude Code per P-013 guest-author-in-host-repo pattern.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 const DEFAULT_DAEMON_URL = "http://127.0.0.1:7432";
 
 export function daemonUrl(): string {

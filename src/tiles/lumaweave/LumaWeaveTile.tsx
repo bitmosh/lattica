@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // TODO: fossic_query_remote_store — Tauri command removed pending this tile's live implementation.
 // Re-register in src-tauri/src/lib.rs when wiring the cross-project event graph (Reflective Twin Architecture, Phase 2+).
 import { LiveValueChip } from '../../components/livevalue/LiveValueChip';

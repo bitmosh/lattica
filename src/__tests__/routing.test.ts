@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { describe, it, expect } from 'vitest';
 import { routeToScope, SCOPE_KEYS, LANE_PREFIX } from '../lib/routing';
 import { SCOPE_PROJECTS } from '../lib/scopes';

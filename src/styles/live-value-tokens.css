@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: Apache-2.0 */
 :root {
   /* LiveValue<T> error-state treatment colors (§B.2)                         */
   /* Component applies 0.6 opacity + shimmer animation on --lv-no-data-yet   */

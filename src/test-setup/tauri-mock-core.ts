@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // Mock @tauri-apps/api/core for browser-based Playwright tests.
 // invoke returns the canned offline/down response for each known command
 // so the app renders in its "services unavailable" state rather than crashing.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { DaemonHealth, DaemonStatus } from "./daemon";
 
 export type AgentState = "RUNNING" | "IDLE" | "ERROR" | "OFFLINE" | "UNKNOWN";

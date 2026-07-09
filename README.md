@@ -103,4 +103,4 @@ Lattica is the unified shell.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Apache-2.0 — see [LICENSE](LICENSE) for the full text.

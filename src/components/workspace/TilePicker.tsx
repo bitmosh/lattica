@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import './TilePicker.css';
 
 export type TileKey = 'cerebra' | 'policy' | 'fossic' | 'lumaweave' | 'aistack' | null;

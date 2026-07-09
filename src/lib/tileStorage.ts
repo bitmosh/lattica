@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { TileKey, PaneId } from '../components/workspace/TilePicker';
 
 export type { PaneId };

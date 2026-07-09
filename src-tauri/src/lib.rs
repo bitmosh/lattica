@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 use fossic::{Append, OpenOptions, Store};
 use std::process::Command;
 use tauri::Manager;

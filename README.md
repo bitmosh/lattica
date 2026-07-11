@@ -1,4 +1,8 @@
 # Lattica
+[![Release](https://img.shields.io/github/v/release/bitmosh/lattica?include_prereleases&label=version)](https://github.com/bitmosh/lattica/releases)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Tauri](https://img.shields.io/badge/Tauri-2.x-orange.svg)](https://tauri.app/)
+[![Last commit](https://img.shields.io/github/last-commit/bitmosh/lattica)](https://github.com/bitmosh/lattica/commits/main)
 
 A local Tauri workspace that connects five ecosystem services — Cerebra,
 Policy Scout, AI Stack, LumaWeave, Fossic — through a shared event-sourcing
